@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DAK Tracker — Bihar Jeevika (Statewide)</title>
+<style>
+:root{
+  --ground:#FFFFFF; --panel:#FFFFFF; --panel-alt:#FAF9F4; --ink:#33413A; --ink-soft:#7C8B81;
+  --primary:#2F9C74; --primary-soft:#E7F5EF; --gold:#CE9C3C; --gold-soft:#FBF1DA;
+  --line:#EAE4D5; --line-strong:#DCD2BB; --low:#C55F49; --low-soft:#FBE8E1;
+  --grey:#B7BEB7; --grey-soft:#EFF1EE;
+}
+*{ box-sizing:border-box; }
+html{ -webkit-text-size-adjust:100%; text-size-adjust:100%; }
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:"Noto Sans Devanagari","Nirmala UI",-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:15px; line-height:1.5; padding:18px 16px 50px;
+}
+.page{ max-width:1040px; margin:0 auto; }
+.serif{ font-family:"Iowan Old Style","Palatino Linotype",Georgia,"Noto Sans Devanagari",serif; }
+.top-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+.badge{ display:inline-flex; align-items:center; gap:6px; font-size:11px; letter-spacing:.08em; text-transform:uppercase; font-weight:700; color:var(--primary); background:var(--primary-soft); border:1px solid var(--line-strong); border-radius:999px; padding:5px 12px; }
+.badge::before{ content:"\25CF"; font-size:8px; }
+.icon-btn{ appearance:none; cursor:pointer; font-family:inherit; font-size:12.5px; font-weight:600; color:var(--ink-soft); background:var(--panel-alt); border:1px solid var(--line-strong); border-radius:999px; padding:7px 14px; display:inline-flex; align-items:center; gap:6px; }
+.icon-btn:hover{ color:var(--ink); border-color:var(--ink-soft); }
+header.masthead{ border-bottom:1px solid var(--line); padding-bottom:14px; margin-bottom:16px; }
+h1{ font-weight:600; font-size:clamp(24px,5vw,32px); margin:2px 0 4px 0; text-wrap:balance; letter-spacing:-0.01em; }
+.crumbs{ color:var(--ink-soft); font-size:13.5px; }
+.crumbs b{ color:var(--ink); font-weight:600; }
+.back-link{ appearance:none; border:none; background:none; cursor:pointer; font-family:inherit; font-size:13px; font-weight:600; color:var(--primary); padding:0; margin-bottom:8px; display:inline-flex; align-items:center; gap:4px; }
+.back-link:hover{ text-decoration:underline; }
+.tabbar{ display:flex; gap:4px; margin-bottom:6px; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+.tabbtn{ appearance:none; border:none; background:none; cursor:pointer; font-family:inherit; font-size:14.5px; font-weight:600; color:var(--ink-soft); padding:11px 4px; margin-right:20px; border-bottom:2px solid transparent; min-height:42px; }
+@media (max-width:640px){
+  .tabbar{ flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .subtabbar{ flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:4px; }
+  .tabbtn, .subtabbtn{ white-space:nowrap; flex:none; }
+}
+.tabbtn:hover{ color:var(--ink); }
+.tabbtn.active{ color:var(--primary); border-bottom-color:var(--primary); }
+.subtabbar{ display:flex; gap:6px; margin:12px 0 18px; flex-wrap:wrap; }
+.subtabbtn{ appearance:none; cursor:pointer; font-family:inherit; font-size:13px; font-weight:600; color:var(--ink-soft); background:var(--panel-alt); border:1px solid var(--line-strong); border-radius:999px; padding:7px 14px; min-height:36px; }
+.subtabbtn.active{ background:var(--primary); border-color:var(--primary); color:#fff; }
+.tabpanel{ display:none; } .tabpanel.active{ display:block; }
+section{ margin-bottom:18px; }
+.section-head{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:10px; flex-wrap:wrap; }
+.section-head h2{ font-size:18px; font-weight:600; margin:0; }
+.section-head .hint{ font-size:12.5px; color:var(--ink-soft); }
+.panel{ background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:16px 18px; }
+.panel-highlight{ background:var(--primary-soft); border:1.5px solid var(--primary); }
+.cat-block{ padding-top:16px; margin-top:16px; border-top:1px solid var(--line); }
+.cat-block:first-child{ padding-top:0; margin-top:0; border-top:none; }
+.cat-block-head{ font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); margin-bottom:10px; }
+.panel + .panel{ margin-top:12px; }
+.tiles{ display:grid; grid-template-columns:repeat(auto-fill,minmax(148px,1fr)); gap:12px; }
+.tile{ border:1px solid var(--line); border-radius:8px; padding:12px 14px; }
+.tile.wide{ grid-column:1/-1; }
+.tile .label{ font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:6px; }
+.tile .label.tip{ cursor:help; text-decoration:underline dotted var(--line-strong); text-underline-offset:3px; }
+.tile .value{ font-size:21px; font-weight:600; font-variant-numeric:tabular-nums; color:var(--primary); word-break:break-word; }
+.tile.big-value .value{ font-size:34px; line-height:1; }
+.tile.neutral .value{ color:var(--ink); font-size:16px; font-weight:600; } .tile.info .value{ color:#5B8AA6; }
+.tile.neg .value{ color:var(--low); } .tile.warn .value{ color:var(--gold); }
+.tile .sub{ font-size:12px; color:var(--ink-soft); margin-top:4px; }
+.table-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+table{ width:100%; border-collapse:collapse; }
+thead th{ text-align:left; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); font-weight:600; padding:0 10px 9px; border-bottom:1px solid var(--line-strong); white-space:nowrap; }
+thead th.num, tbody td.num{ text-align:right; }
+tbody tr{ border-bottom:1px solid var(--line); } tbody tr:last-child{ border-bottom:none; }
+tbody tr:hover{ background:var(--panel-alt); cursor:default; }
+tbody tr.clickable:hover{ cursor:pointer; }
+tbody td{ padding:9px 10px; vertical-align:middle; font-variant-numeric:tabular-nums; }
+th.sortable{ cursor:pointer; user-select:none; }
+th.sortable:hover{ color:var(--ink); }
+.sort-arrow{ font-size:9px; margin-left:4px; color:var(--line-strong); display:inline-block; }
+.sort-arrow.active{ color:var(--primary); }
+.score-cell{ display:flex; align-items:center; gap:10px; justify-content:flex-end; }
+.score-bar{ width:56px; height:6px; border-radius:999px; background:var(--line); position:relative; flex:none; }
+.score-bar .fill{ position:absolute; left:0; top:0; bottom:0; border-radius:999px; background:var(--primary); }
+.score-num{ width:38px; text-align:right; font-weight:600; }
+.status-tag{ font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:999px; white-space:nowrap; display:inline-block; }
+.status-tag.good{ color:var(--primary); background:var(--primary-soft); }
+.status-tag.flag{ color:var(--low); background:var(--low-soft); }
+.status-tag.warn{ color:#8a6a1f; background:var(--gold-soft); }
+.status-tag.na{ color:var(--ink-soft); background:var(--grey-soft); }
+.standing-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin-bottom:0; }
+.standing-card{ border:1px solid var(--line); border-radius:8px; padding:14px 16px; }
+.standing-card .label{ font-size:11px; letter-spacing:.07em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:6px; }
+.standing-card .big{ font-size:30px; font-weight:600; line-height:1; font-variant-numeric:tabular-nums; color:var(--primary); }
+.standing-card .big sup{ font-size:13px; vertical-align:super; }
+.standing-card .big .outof{ font-size:12.5px; font-weight:400; color:var(--ink-soft); margin-left:7px; vertical-align:middle; }
+.standing-card .sub{ font-size:12.5px; color:var(--ink-soft); margin-top:3px; }
+.track{ position:relative; height:7px; border-radius:999px; background:linear-gradient(to right,var(--primary-soft),var(--line)); margin-top:11px; }
+.track .fill{ position:absolute; left:0; top:0; bottom:0; border-radius:999px; background:var(--primary); opacity:.35; }
+.track .marker{ position:absolute; top:50%; width:12px; height:12px; background:var(--primary); border-radius:50%; border:2px solid var(--panel); transform:translate(-50%,-50%); box-shadow:0 0 0 1px var(--line-strong); }
+.standing-card.gold .big{ color:var(--gold); }
+.standing-card.gold .track{ background:linear-gradient(to right,var(--gold-soft),var(--line)); }
+.standing-card.gold .track .fill{ background:var(--gold); } .standing-card.gold .track .marker{ background:var(--gold); }
+.bar-list{ display:flex; flex-direction:column; gap:9px; }
+.bar-row{ display:grid; grid-template-columns:190px 1fr 84px; gap:12px; align-items:center; }
+@media (max-width:560px){ .bar-row{ grid-template-columns:1fr; gap:3px; } .bar-row .bval{ text-align:left; } }
+.bar-row .blabel{ font-size:13px; color:var(--ink); }
+.bar-track{ position:relative; height:8px; border-radius:999px; background:var(--grey-soft); }
+.bar-track .fill{ position:absolute; left:0; top:0; bottom:0; border-radius:999px; }
+.bar-row .bval{ font-size:12.5px; font-weight:700; text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.donut-row{ display:flex; gap:20px; flex-wrap:wrap; justify-content:center; align-items:center; }
+.donut-wrap{ position:relative; margin:0 auto; }
+.donut-slice{ cursor:pointer; }
+.donut-legend{ display:flex; flex-direction:column; gap:7px; }
+.legend-row{ display:flex; align-items:center; gap:8px; font-size:12.5px; }
+.legend-swatch{ width:10px; height:10px; border-radius:3px; flex:none; }
+.legend-row .amt{ margin-left:auto; font-variant-numeric:tabular-nums; color:var(--ink-soft); padding-left:14px; }
+.legend-row-wrap{ display:flex; flex-wrap:wrap; gap:8px 20px; margin-top:12px; }
+.legend-row-wrap .legend-row .amt{ padding-left:6px; }
+.foot-note{ margin-top:20px; font-size:12.5px; color:var(--ink-soft); border-top:1px solid var(--line); padding-top:12px; }
+.note-inline{ font-size:12.5px; color:var(--ink-soft); background:var(--primary-soft); border-radius:8px; padding:8px 12px; margin-top:12px; }
+.callout-attn{ text-align:center; font-size:13.5px; font-weight:700; margin:0 0 8px; padding:11px 16px; background:var(--primary-soft); color:#1f6b4d; border-radius:8px; }
+.callout-attn:last-of-type{ margin-bottom:14px; }
+.callout-attn.low{ background:var(--low-soft); color:#8a3226; }
+.disclaimer{ font-size:13px; color:var(--gold); background:var(--gold-soft); border-radius:8px; padding:9px 13px; }
+.modal-backdrop{ display:none; position:fixed; inset:0; background:rgba(30,35,32,0.45); z-index:100; align-items:center; justify-content:center; padding:20px; }
+.modal-backdrop.open{ display:flex; }
+.modal{ background:var(--panel); border-radius:14px; max-width:580px; width:100%; max-height:88vh; overflow-y:auto; padding:24px 26px; box-shadow:0 20px 60px rgba(0,0,0,0.25); }
+.modal-head{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom:14px; }
+.modal-head h3{ font-size:17px; font-weight:600; margin:0; }
+.modal-close{ appearance:none; border:none; background:none; cursor:pointer; font-size:22px; line-height:1; color:var(--ink-soft); padding:2px 6px; }
+.modal-close:hover{ color:var(--ink); }
+.detail-row{ display:grid; grid-template-columns:150px 1fr; gap:10px; padding:7px 0; border-bottom:1px solid var(--line); font-size:13.5px; }
+.detail-row:last-child{ border-bottom:none; }
+.detail-row .dlabel{ color:var(--ink-soft); font-weight:600; font-size:11.5px; text-transform:uppercase; letter-spacing:.04em; }
+.detail-narrative{ margin-top:14px; padding:12px 14px; background:var(--panel-alt); border-radius:8px; font-size:13.5px; line-height:1.5; }
+.detail-narrative b{ display:block; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); margin-bottom:4px; }
+.mini-tiles{ display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:10px; margin-bottom:14px; }
+.mini-tile{ border:1px solid var(--line); border-radius:7px; padding:9px 11px; }
+.mini-tile .label{ font-size:10.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:4px; }
+.mini-tile .value{ font-size:16px; font-weight:600; color:var(--ink); }
+.rank3-table{ width:100%; border-collapse:collapse; margin-top:6px; font-size:12.5px; }
+.rank3-table th{ text-align:left; color:var(--ink-soft); font-weight:600; padding:4px 6px; font-size:10.5px; text-transform:uppercase; letter-spacing:.04em; border-bottom:1px solid var(--line-strong); }
+.rank3-table td{ padding:6px; border-bottom:1px solid var(--line); }
+.rank3-table td.num{ text-align:right; font-variant-numeric:tabular-nums; }
+.modal-subhead{ font-size:12.5px; font-weight:700; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.05em; margin:16px 0 8px; }
+.modal-subhead:first-child{ margin-top:0; }
+.tooltip-box{ position:fixed; z-index:999; max-width:250px; background:var(--ink); color:#fff; font-size:12.5px;
+  line-height:1.45; padding:8px 11px; border-radius:6px; pointer-events:none; opacity:0; transition:opacity .12s ease;
+  transform:translate(-50%,calc(-100% - 10px)); }
+.tooltip-box.visible{ opacity:1; }
+[data-tip]{ cursor:help; }
+.tip{ text-decoration:underline dotted var(--line-strong); text-underline-offset:3px; }
+/* finder / landing view */
+.finder-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin-bottom:16px; }
+.finder-field label{ display:block; font-size:11.5px; font-weight:600; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:6px; }
+.finder-field select{ width:100%; min-height:42px; font-family:inherit; font-size:14px; color:var(--ink); background:var(--panel); border:1px solid var(--line-strong); border-radius:8px; padding:8px 12px; }
+.finder-field select:disabled{ color:var(--ink-soft); background:var(--panel-alt); }
+.finder-view-btn{ appearance:none; cursor:pointer; font-family:inherit; font-size:14px; font-weight:700; color:#fff; background:var(--primary); border:none; border-radius:8px; padding:11px 22px; min-height:44px; }
+.finder-view-btn:disabled{ background:var(--grey); cursor:not-allowed; }
+.finder-search{ width:100%; min-height:42px; font-family:inherit; font-size:14px; color:var(--ink); background:var(--panel); border:1px solid var(--line-strong); border-radius:8px; padding:8px 12px; margin-bottom:14px; }
+@media print{
+  .tabbar, .subtabbar, .icon-btn, #modal-backdrop{ display:none !important; }
+  .tabpanel{ display:block !important; margin-bottom:34px; page-break-inside:avoid; }
+  body{ padding:0; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="top-row">
+    <span class="badge">DAK Tracker &middot; statewide</span>
+    <button class="icon-btn" id="btn-print" style="display:none;">&#128424;&#65039; Print / Save as PDF</button>
+  </div>
+
+  <div id="view-finder">
+    <header class="masthead">
+      <h1 class="serif">Find a DAK</h1>
+      <div class="crumbs" id="finder-coverage-note">Loading directory&hellip;</div>
+    </header>
+    <section>
+      <div class="panel">
+        <div class="finder-grid">
+          <div class="finder-field"><label for="sel-district">District</label><select id="sel-district"><option value="">Select District&hellip;</option></select></div>
+          <div class="finder-field"><label for="sel-block">Block</label><select id="sel-block" disabled><option value="">Select District first&hellip;</option></select></div>
+          <div class="finder-field"><label for="sel-dak">DAK</label><select id="sel-dak" disabled><option value="">Select Block first&hellip;</option></select></div>
+        </div>
+        <button class="finder-view-btn" id="btn-view-dak" disabled>View Dashboard</button>
+      </div>
+    </section>
+    <section>
+      <div class="section-head"><h2 class="serif">All DAKs</h2><span class="hint">search, sort, or click a row to jump straight in</span></div>
+      <div class="panel">
+        <input type="text" class="finder-search" id="directory-search" placeholder="Search by district, block, or DAK name&hellip;">
+        <div id="directory-table"></div>
+      </div>
+    </section>
+    <div class="foot-note" id="finder-foot-note"></div>
+  </div>
+
+  <div id="view-dashboard" style="display:none;">
+    <button class="back-link" id="btn-back-finder">&larr; All DAKs</button>
+    <header class="masthead" id="masthead-content"></header>
+    <div class="tabbar" id="tabbar"></div>
+    <div class="subtabbar" id="subtabbar" style="display:none;"></div>
+    <div class="tabpanel active" id="panel-overview"></div>
+    <div class="tabpanel" id="panel-cases"></div>
+    <div class="tabpanel" id="panel-scoring"></div>
+    <div class="foot-note">DAK Tracker (statewide). Data as computed by <code>build_dak_statewide_data.py</code> from the BRLPS DAK MIS export. Every Sakshma Didi/DAK with at least one case of a kind is scored, regardless of case volume.</div>
+  </div>
+</div>
+<div id="modal-backdrop" class="modal-backdrop"><div class="modal"><div class="modal-head"><h3 id="modal-title"></h3><button class="modal-close" id="modal-close">&times;</button></div><div id="modal-body"></div></div></div>
+<div class="tooltip-box" id="tooltip-box"></div>
+<script>
+let DATA = null;
+let MANIFEST = null;
+let sdById = {};
+
+// ---------------------------------------------------------------- formatting helpers
+function fmtNum(v){ return v===null||v===undefined ? '—' : Math.round(v).toLocaleString('en-IN'); }
+function fmtF(v,d){ return v===null||v===undefined ? '—' : v.toFixed(d===undefined?1:d); }
+function fmtPct(v,d){ return v===null||v===undefined ? '—' : v.toFixed(d===undefined?1:d)+'%'; }
+function fmtRs(v){ if(v===null||v===undefined) return '—'; return '₹'+Math.round(v).toLocaleString('en-IN'); }
+function ord(n){ if(n===null||n===undefined) return ''; const s=['th','st','nd','rd'], v=Math.round(n)%100; return s[(v-20)%10]||s[v]||s[0]; }
+function grade(pct){ if(pct===null||pct===undefined) return 'var(--grey)'; if(pct>=66) return 'var(--primary)'; if(pct>=33) return 'var(--gold)'; return 'var(--low)'; }
+function toTitleCase(s){
+  if(!s) return s;
+  return String(s).replace(/\w\S*/g, t => t.charAt(0).toUpperCase() + t.slice(1).toLowerCase());
+}
+
+const TIPS = {
+  'Total Cases': 'All entitlement + GBV cases ever logged for this DAK.',
+  'Pending': 'Cases not yet marked Resolved in the case master file.',
+  'Resolved': 'Cases marked Resolved in the case master file.',
+  'Resolution Rate': 'Share of this DAK’s cases that have been resolved.',
+  'Entitlement Cases': 'Cases seeking a government entitlement/scheme (ration card, insurance, pension, etc).',
+  'GBV Cases': 'Gender-based-violence cases handled by this DAK.',
+  'Ongoing': 'Marked Resolved in the case master, but the detail record still says the intervention is ongoing.',
+  'Not Available (followup)': 'Marked Resolved, but continuous followup could not locate the applicant.',
+  'Backlog Aging': 'How long currently-pending cases have been open, bucketed by age.',
+  'Median Days': 'Middle value of days-to-resolution among this DAK’s resolved cases (half resolved faster, half slower).',
+  'Cases': 'Total entitlement + GBV cases attributed to this person.',
+  'Entitlement Score': 'Percentile-based score combining resolution rate, speed, and backlog age on entitlement cases only.',
+  'GBV Score': 'Percentile-based score combining resolution rate, speed, and backlog age on GBV cases only.',
+  'Unified Score': 'A case-volume-weighted average of Entitlement Score, GBV Score, Self-Sourced Rate and Origination Index — a category backed by more cases counts for more, and a category with too little data to rank is excluded entirely rather than scored zero.',
+  'Self-Sourced Rate': 'Share of a Sakshma Didi’s own cases that she personally brought in, rather than being routed to her.',
+  'Origination Index': 'Her share of her DAK’s total self-sourced caseload, divided by an equal per-person share — above 1 means she originates more cases than an equal split would predict.',
+  'Outreach Share': 'Share of this DAK’s total cases that arrived via the Sakshma Didi/Gender CRP channel, rather than some other route.',
+  'Backlog Age': 'Average age (in days) of this population’s currently-open, unresolved cases.',
+  'Standing': 'Where this Sakshma Didi’s Unified Score ranks against her peers at each geographic level — a smaller number is better.',
+};
+
+function tile(label, value, sub, cls, tip){
+  const t = tip || TIPS[label];
+  const v = (value===null||value===undefined) ? '—' : value;
+  const l = t ? `<div class="label tip" data-tip="${t}">${label}</div>` : `<div class="label">${label}</div>`;
+  return `<div class="tile ${cls||''}">${l}<div class="value">${v}</div>${sub?`<div class="sub">${sub}</div>`:''}</div>`;
+}
+function miniTile(label, value, tip){
+  const t = tip || TIPS[label];
+  const l = t ? `<div class="label tip" data-tip="${t}">${label}</div>` : `<div class="label">${label}</div>`;
+  return `<div class="mini-tile">${l}<div class="value">${value===null||value===undefined?'—':value}</div></div>`;
+}
+
+function standingCard(kind, rankPack, labelText, tip){
+  const t = tip || TIPS[labelText];
+  const lbl = t ? `<span class="tip" data-tip="${t}">${labelText}</span>` : labelText;
+  if(!rankPack) return `<div class="standing-card ${kind}"><div class="label">${lbl}</div><div class="big serif">—</div><div class="sub">not enough data to rank</div></div>`;
+  const barPct = rankPack.pctl || 0;
+  return `<div class="standing-card ${kind}"><div class="label">${lbl}</div>
+    <div class="big serif">${fmtNum(rankPack.rank)}<sup>${ord(rankPack.rank)}</sup><span class="outof">out of ${fmtNum(rankPack.n)}</span></div>
+    <div class="sub">${fmtNum(rankPack.pctl)}${ord(Math.round(rankPack.pctl))} percentile</div>
+    <div class="track"><div class="fill" style="width:${barPct}%"></div><div class="marker" style="left:${barPct}%"></div></div></div>`;
+}
+
+function barRow(label, val, max, color, valLabel, tip){
+  const t = tip || TIPS[label];
+  const lbl = t ? `<span class="tip" data-tip="${t}">${label}</span>` : label;
+  const pct = max>0 ? Math.min(val/max*100,100) : 0;
+  return `<div class="bar-row"><div class="blabel">${lbl}</div><div class="bar-track"><div class="fill" style="width:${pct}%;background:${color}"></div></div><div class="bval">${valLabel!==undefined?valLabel:fmtNum(val)}</div></div>`;
+}
+
+function drawDonut(svgId, segments){
+  const svg=document.getElementById(svgId); if(!svg) return;
+  const r=65,cx=95,cy=95,C=2*Math.PI*r,sw=50; let off=0,html='';
+  segments.forEach(seg=>{
+    const frac = Math.max(seg.frac,0), len=frac*C;
+    html+=`<circle class="donut-slice" data-tip="${seg.label}: ${(seg.frac*100).toFixed(1)}%" cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${seg.color}" stroke-width="${sw}" stroke-dasharray="${len.toFixed(1)} ${C.toFixed(1)}" stroke-dashoffset="${(-off).toFixed(1)}" transform="rotate(-90 ${cx} ${cy})"/>`;
+    if(frac>=0.05){
+      const midAngleDeg = ((off+len/2)/C)*360 - 90, rad = midAngleDeg*Math.PI/180;
+      const lx = cx + r*Math.cos(rad), ly = cy + r*Math.sin(rad);
+      html += `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" font-size="13" font-weight="600" fill="#fff" text-anchor="middle" dominant-baseline="middle" style="pointer-events:none;">${Math.round(frac*100)}%</text>`;
+    }
+    off += len;
+  });
+  svg.innerHTML = html;
+}
+
+function stackedBarChart(segments){
+  const entries = segments.filter(s=>s.value>0);
+  const total = entries.reduce((a,s)=>a+s.value,0);
+  if(!total) return '<p class="disclaimer">No cases to show.</p>';
+  const bar = `<div style="display:flex;height:26px;border-radius:7px;overflow:hidden;">
+    ${entries.map(s=>`<div data-tip="${s.label}: ${fmtNum(s.value)} (${(s.value/total*100).toFixed(1)}%)" style="width:${(s.value/total*100).toFixed(2)}%;background:${s.color};"></div>`).join('')}
+  </div>`;
+  const legend = `<div class="legend-row-wrap">${entries.map(s=>`<div class="legend-row" data-tip="${s.label}: ${fmtNum(s.value)} (${(s.value/total*100).toFixed(1)}%)"><span class="legend-swatch" style="background:${s.color}"></span>${s.label}<span class="amt">${fmtNum(s.value)}</span></div>`).join('')}</div>`;
+  return bar + legend;
+}
+
+function median(arr){
+  if(!arr.length) return null;
+  const s = arr.slice().sort((a,b)=>a-b), mid = Math.floor(s.length/2);
+  return s.length%2 ? s[mid] : (s[mid-1]+s[mid])/2;
+}
+function sharedHistogramDomain(...valueArrays){
+  const all = [].concat(...valueArrays);
+  if(!all.length) return null;
+  return { min: Math.min(...all), max: Math.max(...all), nBins: Math.max(1, Math.min(12, new Set(all).size)) };
+}
+function histogram(svgId, values, color, domain){
+  const svg = document.getElementById(svgId); if(!svg) return;
+  if(!values.length){ svg.innerHTML = ''; return; }
+  const W=560, H=180, padL=8, padR=8, padT=26, padB=22;
+  const innerW = W-padL-padR, innerH = H-padT-padB;
+  const min = domain ? domain.min : Math.min(...values);
+  const max = domain ? domain.max : Math.max(...values);
+  const nBins = domain ? domain.nBins : Math.max(1, Math.min(12, new Set(values).size));
+  const binW = (max-min)/nBins || 1;
+  const bins = Array(nBins).fill(0);
+  values.forEach(v=>{
+    let idx = Math.floor((v-min)/binW);
+    if(idx>=nBins) idx = nBins-1; if(idx<0) idx = 0;
+    bins[idx]++;
+  });
+  const maxCount = Math.max(...bins, 1);
+  const gap = 3;
+  const barW = (innerW - gap*(nBins-1)) / nBins;
+  const med = median(values);
+  let bars = '';
+  bins.forEach((c,i)=>{
+    const bh = (c/maxCount) * innerH;
+    const x = padL + i*(barW+gap);
+    const y = padT + (innerH-bh);
+    const lo = Math.round(min+i*binW), hi = Math.round(min+(i+1)*binW);
+    bars += `<rect data-tip="${lo}–${hi} days: ${c} case${c===1?'':'s'}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${Math.max(barW,1).toFixed(1)}" height="${Math.max(bh,0).toFixed(1)}" fill="${color}" rx="2"/>`;
+  });
+  const medFrac = (max>min) ? (med-min)/(max-min) : 0.5;
+  const medX = padL + medFrac*innerW;
+  const labelX = Math.min(Math.max(medX, 42), W-42);
+  const axis = `<text x="${padL}" y="${H-6}" font-size="11" fill="${cssVar('--ink-soft')}">${Math.round(min)}d</text>
+    <text x="${W-padR}" y="${H-6}" font-size="11" fill="${cssVar('--ink-soft')}" text-anchor="end">${Math.round(max)}d</text>`;
+  const medLine = `<line x1="${medX.toFixed(1)}" y1="${padT}" x2="${medX.toFixed(1)}" y2="${H-padB}" stroke="${cssVar('--ink')}" stroke-width="1.5" stroke-dasharray="3,3"/>
+    <text x="${labelX.toFixed(1)}" y="16" font-size="11.5" font-weight="700" fill="${cssVar('--ink')}" text-anchor="middle">Median ${Math.round(med)}d</text>`;
+  svg.innerHTML = bars + axis + medLine;
+}
+function cssVar(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+
+function makeSortableTable(containerId, cols, data, rowBuilder, onRowClick){
+  const state = { col: null, dir: 1 };
+  function draw(){
+    const sorted = state.col === null ? data : data.slice().sort((a,b)=>{
+      let av=a[cols[state.col].key], bv=b[cols[state.col].key];
+      if(typeof av==='string'){ av=av.toUpperCase(); bv=bv.toUpperCase(); }
+      if(av==null) return 1; if(bv==null) return -1;
+      if(av<bv) return -1*state.dir; if(av>bv) return 1*state.dir; return 0;
+    });
+    const theadHtml = `<tr>${cols.map((c,i)=>{
+      const cls=[c.num?'num':'', c.key?'sortable':''].filter(Boolean).join(' ');
+      const arrow = c.key ? ` <span class="sort-arrow${state.col===i?' active':''}">${state.col===i?(state.dir===1?'▲':'▼'):'⇅'}</span>` : '';
+      return `<th${cls?` class="${cls}"`:''}${c.key?` data-colidx="${i}"`:''}>${c.label}${arrow}</th>`;
+    }).join('')}</tr>`;
+    const tbodyHtml = sorted.map((item,idx)=>{
+      const r = rowBuilder(item);
+      const cls = onRowClick && onRowClick.enabled(item) ? ' class="clickable"' : '';
+      return `<tr${cls} data-idx="${idx}">${r.map((v,i)=>`<td${cols[i].num?' class="num"':''}>${v}</td>`).join('')}</tr>`;
+    }).join('');
+    document.getElementById(containerId).innerHTML = `<div class="table-wrap"><table><thead>${theadHtml}</thead><tbody>${tbodyHtml}</tbody></table></div>`;
+    document.querySelectorAll(`#${containerId} th.sortable`).forEach(th=>{
+      th.addEventListener('click', ()=>{
+        const idx = +th.dataset.colidx;
+        if(state.col===idx) state.dir*=-1; else { state.col=idx; state.dir=1; }
+        draw();
+      });
+    });
+    if(onRowClick){
+      document.querySelectorAll(`#${containerId} tbody tr.clickable`).forEach(tr=>{
+        tr.addEventListener('click', ()=> onRowClick.handler(sorted[+tr.dataset.idx]));
+      });
+    }
+  }
+  draw();
+}
+
+function initTooltips(){
+  const box = document.getElementById('tooltip-box');
+  function place(e){ box.style.left = e.clientX+'px'; box.style.top = (e.clientY-8)+'px'; }
+  document.addEventListener('mouseover', e=>{
+    const el = e.target.closest('[data-tip]'); if(!el) return;
+    box.textContent = el.getAttribute('data-tip'); box.classList.add('visible'); place(e);
+  });
+  document.addEventListener('mousemove', e=>{ if(e.target.closest('[data-tip]')) place(e); });
+  document.addEventListener('mouseout', e=>{ if(e.target.closest('[data-tip]')) box.classList.remove('visible'); });
+}
+
+// ---------------------------------------------------------------- masthead
+function renderMasthead(){
+  const o = DATA.identity;
+  document.getElementById('masthead-content').innerHTML = `
+    <div class="crumbs"><b>${toTitleCase(o.district)}</b> &rsaquo; <b>${toTitleCase(o.block)}</b></div>
+    <h1 class="serif">${toTitleCase(o.dak_name)}</h1>
+    <div class="crumbs">Didi Adhikar Kendra</div>`;
+}
+
+// ---------------------------------------------------------------- Overview
+function renderOverview(){
+  const ov = DATA.overview, k = ov.kpi, id = DATA.identity;
+
+  const kpiTiles = [
+    tile('Total Cases', fmtNum(k.total_cases)),
+    tile('Resolution Rate', fmtPct(k.resolution_rate_pct,1)),
+    tile('Ongoing', k.ongoing, null, 'warn'),
+  ];
+  const statusSegments = [
+    {label:'Resolved', value: k.resolved - k.ongoing - k.not_available, color:'var(--primary)'},
+    {label:'Pending', value: k.pending, color:'var(--gold)'},
+    {label:'Ongoing', value: k.ongoing, color:'#5B8AA6'},
+    {label:'Not Available (followup)', value: k.not_available, color:'var(--grey)'},
+  ];
+
+  const mixColors = {'Entitlement':'var(--primary)','GBV':'var(--gold)'};
+  const typeSegs = (ov.case_type_mix||[]).map(m=>({frac:m.pct/100, color:mixColors[m.label]||'var(--grey)', label:m.label}));
+  const typeLegend = (ov.case_type_mix||[]).map(m=>`<div class="legend-row"><span class="legend-swatch" style="background:${mixColors[m.label]||'var(--grey)'}"></span>${m.label}<span class="amt">${fmtNum(m.n)}</span></div>`).join('');
+
+  const vtMax = ov.violence_type_mix.length ? ov.violence_type_mix[0].n : 1;
+  const vtRows = ov.violence_type_mix.slice(0,8).map(m=>barRow(m.label, m.n, vtMax, 'var(--gold)', `${m.n} (${fmtF(m.pct,1)}%)`)).join('');
+
+  const crMax = ov.case_reach_mix.length ? ov.case_reach_mix[0].n : 1;
+  const crRows = ov.case_reach_mix.slice(0,8).map(m=>barRow(m.label, m.n, crMax, 'var(--primary)', `${m.n} (${fmtF(m.pct,1)}%)`)).join('');
+
+  const entDays = DATA.cases.filter(c=>c.kind==='Entitlement' && c.status==='Resolved' && c.days_open!=null).map(c=>c.days_open);
+  const gbvDays = DATA.cases.filter(c=>c.kind==='GBV' && c.status==='Resolved' && c.days_open!=null).map(c=>c.days_open);
+
+  const roster = DATA.roster.map((r,i)=>({...r, _idx:i}));
+  const rosterCols = [
+    {label:'Name', key:'name'},
+    {label:'Role', key:'role'},
+    {label:'DOJ', key:'doj'},
+    {label:'Mobile'},
+    {label:'Own CLF / VO / SHG'},
+  ];
+  const rosterRowBuilder = (r)=>[
+    toTitleCase(r.name), r.role, r.doj||'—', r.mobile||'—',
+    r.own_clf ? `${r.own_clf}${r.own_vo?' / '+r.own_vo:''}${r.own_shg?' / '+r.own_shg:''}` : '—',
+  ];
+
+  document.getElementById('panel-overview').innerHTML = `
+    <section><div class="section-head"><h2 class="serif">DAK Identity</h2></div>
+      <div class="panel"><div class="tiles">
+        ${tile('Formation Date', id.formation_date, null, 'neutral')}
+        ${tile('Nodal CLF', id.nodal_clf, 'banking home, not org lineage', 'neutral')}
+        ${tile('Bank', id.bank, `${id.bank_branch||''}${id.ifsc?' &middot; '+id.ifsc:''}`, 'neutral')}
+        ${tile('Address', toTitleCase(id.address), null, 'neutral')}
+      </div></div>
+    </section>
+
+    <section><div class="section-head"><h2 class="serif">Case Snapshot</h2></div>
+      <div class="panel">
+        <div class="tiles" style="margin-bottom:18px;">${kpiTiles.join('')}</div>
+        ${stackedBarChart(statusSegments)}
+      </div>
+    </section>
+
+    <section><div class="section-head"><h2 class="serif">Case Type Mix</h2></div>
+      <div class="panel"><div class="donut-row">
+        <div class="donut-wrap"><svg id="svg-typemix" width="180" height="180" viewBox="0 0 190 190"></svg></div>
+        <div class="donut-legend">${typeLegend}</div>
+      </div></div>
+    </section>
+
+    <section><div class="section-head"><h2 class="serif">Violence Type Breakdown</h2><span class="hint">within GBV cases, ranked</span></div>
+      <div class="panel"><div class="bar-list">${vtRows || '<div class="hint">No GBV cases recorded.</div>'}</div></div>
+    </section>
+
+    <section><div class="section-head"><h2 class="serif">Case Reach</h2><span class="hint">how the case first reached the DAK</span></div>
+      <div class="panel"><div class="bar-list">${crRows}</div></div>
+    </section>
+
+    <section><div class="section-head"><h2 class="serif">Days to Resolution — Distribution</h2><span class="hint">resolved cases only &middot; dashed line marks the median</span></div>
+      <div class="panel">
+        <div style="margin-bottom:20px;">
+          <div style="font-size:13px;font-weight:600;margin-bottom:8px;">Entitlement <span style="color:var(--ink-soft);font-weight:400;">(${entDays.length} resolved case${entDays.length===1?'':'s'})</span></div>
+          ${entDays.length ? `<svg id="hist-ent" viewBox="0 0 560 180" style="display:block;width:100%;height:auto;"></svg>` : `<p class="disclaimer">No resolved entitlement cases yet.</p>`}
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:600;margin-bottom:8px;">GBV <span style="color:var(--ink-soft);font-weight:400;">(${gbvDays.length} resolved case${gbvDays.length===1?'':'s'})</span></div>
+          ${gbvDays.length ? `<svg id="hist-gbv" viewBox="0 0 560 180" style="display:block;width:100%;height:auto;"></svg>` : `<p class="disclaimer">No resolved GBV cases yet.</p>`}
+        </div>
+      </div>
+    </section>
+
+    <section><div class="section-head"><h2 class="serif">Roster</h2><span class="hint">${DATA.roster.length} people &middot; click a Sakshma Didi for her performance</span></div>
+      <div class="panel" id="roster-table"></div>
+    </section>`;
+  drawDonut('svg-typemix', typeSegs);
+  const daysDomain = sharedHistogramDomain(entDays, gbvDays);
+  if(entDays.length) histogram('hist-ent', entDays, 'var(--primary)', daysDomain);
+  if(gbvDays.length) histogram('hist-gbv', gbvDays, 'var(--gold)', daysDomain);
+  makeSortableTable('roster-table', rosterCols, roster, rosterRowBuilder, {
+    enabled: r => r.sd_id!=null && sdById[r.sd_id],
+    handler: r => openSdModal(sdById[r.sd_id]),
+  });
+}
+
+// ---------------------------------------------------------------- Case Tracker
+function renderCases(){
+  const cases = DATA.cases.map((c,i)=>({...c, _idx:i}));
+  const backlog = DATA.backlog_aging;
+  const backlogMax = Math.max(...backlog.map(b=>b.n), 1);
+  const backlogRows = backlog.map(b=>barRow(b.label, b.n, backlogMax, b.label==='90+ days'?'var(--low)':(b.label==='31-90 days'?'var(--gold)':'var(--primary)'), fmtNum(b.n))).join('');
+
+  document.getElementById('panel-cases').innerHTML = `
+    <section><div class="section-head"><h2 class="serif tip" data-tip="${TIPS['Backlog Aging']}">Backlog Aging</h2><span class="hint">currently pending cases, by age</span></div>
+      <div class="panel"><div class="bar-list">${backlogRows}</div></div>
+    </section>
+    <section><div class="section-head"><h2 class="serif">Case List</h2><span class="hint">${cases.length} cases &middot; click a row for detail</span></div>
+      <div class="panel" id="case-table"></div>
+    </section>`;
+
+  const cols = [
+    {label:'Case ID', key:'case_id', num:true},
+    {label:'Sakshma Didi', key:'sd_name'},
+    {label:'Type', key:'kind'},
+    {label:'Application Date', key:'application_date'},
+    {label:'Status', key:'status'},
+    {label:'Days Open', key:'days_open', num:true},
+  ];
+  const rowBuilder = (c)=>{
+    const typeLabel = c.kind==='GBV' && c.violence_type ? `GBV &middot; ${c.violence_type}` : c.kind;
+    const statusCls = c.status==='Resolved'?'good':(c.status==='Pending'?'warn':'na');
+    return [c.case_id, toTitleCase(c.sd_name), typeLabel, c.application_date||'—', `<span class="status-tag ${statusCls}">${c.status}</span>`, fmtNum(c.days_open)];
+  };
+  makeSortableTable('case-table', cols, cases, rowBuilder, { enabled: ()=>true, handler: (c)=> openCaseModal(c) });
+}
+
+function openCaseModal(c){
+  const d = c.detail;
+  document.getElementById('modal-title').textContent = `Case #${c.case_id}`;
+  let html = `<div class="detail-row"><div class="dlabel">Applicant</div><div>${toTitleCase(d.applicant_name)||'—'}</div></div>
+    <div class="detail-row"><div class="dlabel">Father/Husband Name</div><div>${toTitleCase(d.father_husband_name)||'—'}</div></div>
+    <div class="detail-row"><div class="dlabel">Contact</div><div>${d.contact||'—'}</div></div>
+    <div class="detail-row"><div class="dlabel">Aadhar</div><div>${d.aadhar||'—'}</div></div>
+    <div class="detail-row"><div class="dlabel">Sakshma Didi</div><div>${toTitleCase(c.sd_name)}</div></div>
+    <div class="detail-row"><div class="dlabel">Case Reach</div><div>${d.case_reach||'—'}</div></div>
+    <div class="detail-row"><div class="dlabel">Application Date</div><div>${c.application_date||'—'}</div></div>
+    <div class="detail-row"><div class="dlabel">Status</div><div><span class="status-tag ${c.status==='Resolved'?'good':(c.status==='Pending'?'warn':'na')}">${c.status}</span>${d.resolved_date?` &middot; resolved ${d.resolved_date}`:''}</div></div>`;
+  if(d.description) html += `<div class="detail-narrative"><b>Description</b>${d.description}</div>`;
+  if(d.intervention || d.intervention_type) html += `<div class="detail-narrative"><b>DAK Intervention${d.intervention_type?' — '+d.intervention_type:''}</b>${d.intervention||''}</div>`;
+  if(d.outcome || d.outcome_type) html += `<div class="detail-narrative"><b>Outcome${d.outcome_type?' — '+d.outcome_type:''}</b>${d.outcome||''}</div>`;
+  document.getElementById('modal-body').innerHTML = html;
+  document.getElementById('modal-backdrop').classList.add('open');
+}
+
+function rank3Table(labelText, rankByLevel, tip){
+  const t = tip || TIPS[labelText];
+  const rows = ['block','district','state'].map(lvl=>{
+    const p = rankByLevel[lvl];
+    if(!p) return `<tr><td>${{block:'Block',district:'District',state:'State'}[lvl]}</td><td colspan="2" style="color:var(--ink-soft)">no cases</td></tr>`;
+    return `<tr><td>${{block:'Block',district:'District',state:'State'}[lvl]}</td><td class="num">${fmtNum(p.pctl)}${ord(Math.round(p.pctl))} pctl</td><td class="num">${fmtNum(p.rank)}${ord(p.rank)} of ${fmtNum(p.n)}</td></tr>`;
+  }).join('');
+  return `<div class="modal-subhead${t?' tip':''}"${t?` data-tip="${t}"`:''}>${labelText}</div>
+    <table class="rank3-table"><thead><tr><th>Level</th><th class="num">Percentile</th><th class="num">Rank</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+// "What to work on" - category_score quietly averages three sub-metric
+// percentiles (resolution rate, speed, backlog age) into one number; this
+// names whichever one is actually weak vs strong, in the same constructive
+// framing as the CLF tracker's "needs the most attention on" callouts -
+// this is feedback about a real person, so it always names a strength
+// alongside the weak spot rather than a bare deficiency.
+function focusInsight(block){
+  if(!block) return '';
+  const subs = [
+    {label:'Resolution Rate', pctl: block.pctl_resolution_rate},
+    {label:'Speed (Median Days)', pctl: block.pctl_median_days},
+    {label:'Backlog Age', pctl: block.pctl_backlog_age},
+  ].filter(s=>s.pctl!=null);
+  if(subs.length < 2) return '';
+  const sorted = subs.slice().sort((a,b)=>a.pctl-b.pctl);
+  const weakest = sorted[0], strongest = sorted[sorted.length-1];
+  if(weakest.label===strongest.label) return '';
+  return `<div class="note-inline">Held back mainly by <b>${weakest.label}</b> (${fmtNum(weakest.pctl)}${ord(Math.round(weakest.pctl))} percentile) — <b>${strongest.label}</b> is her strongest area here (${fmtNum(strongest.pctl)}${ord(Math.round(strongest.pctl))} percentile).</div>`;
+}
+function openSdModal(r){
+  if(!r) return;
+  document.getElementById('modal-title').textContent = toTitleCase(r.sd_name);
+  const e = r.entitlement, g = r.gbv;
+  let html = `<div class="mini-tiles">
+      ${miniTile('Unified Score', fmtF(r.unified_score,1))}
+      ${miniTile('Self-Sourced Rate', fmtPct(r.self_sourced_rate,1))}
+      ${miniTile('Origination Index', fmtF(r.origination_index,2))}
+    </div>`;
+  html += `<div class="modal-subhead tip" data-tip="${TIPS['Entitlement Score']}">Entitlement Cases</div>`;
+  html += e ? `<div class="mini-tiles">
+      ${miniTile('Cases', fmtNum(e.n))}${miniTile('Resolved', fmtNum(e.n_resolved))}
+      ${miniTile('Resolution Rate', fmtPct(e.resolution_rate,1))}${miniTile('Median Days', e.median_days==null?'—':fmtF(e.median_days,0))}
+      ${miniTile('Backlog Age', e.backlog_age==null?'—':fmtF(e.backlog_age,0)+'d')}${miniTile('Category Score', e.category_score==null?'—':fmtF(e.category_score,1))}
+    </div>${focusInsight(e)}` : `<p class="disclaimer">No entitlement cases recorded.</p>`;
+  html += `<div class="modal-subhead tip" data-tip="${TIPS['GBV Score']}">GBV Cases</div>`;
+  html += g ? `<div class="mini-tiles">
+      ${miniTile('Cases', fmtNum(g.n))}${miniTile('Resolved', fmtNum(g.n_resolved))}
+      ${miniTile('Resolution Rate', fmtPct(g.resolution_rate,1))}${miniTile('Median Days', g.median_days==null?'—':fmtF(g.median_days,0))}
+      ${miniTile('Backlog Age', g.backlog_age==null?'—':fmtF(g.backlog_age,0)+'d')}${miniTile('Category Score', g.category_score==null?'—':fmtF(g.category_score,1))}
+    </div>${focusInsight(g)}` : `<p class="disclaimer">No GBV cases recorded.</p>`;
+  html += rank3Table('Entitlement Score', r.rank.entitlement_score);
+  html += rank3Table('GBV Score', r.rank.gbv_score);
+  html += rank3Table('Unified Score', r.rank.unified_score);
+  document.getElementById('modal-body').innerHTML = html;
+  document.getElementById('modal-backdrop').classList.add('open');
+}
+document.getElementById('modal-close').addEventListener('click', ()=> document.getElementById('modal-backdrop').classList.remove('open'));
+document.getElementById('modal-backdrop').addEventListener('click', (e)=>{ if(e.target.id==='modal-backdrop') e.currentTarget.classList.remove('open'); });
+
+// ---------------------------------------------------------------- Scoring & Ranking
+function renderScoring(sub){
+  sub = sub || 'sd';
+  document.getElementById('subtabbar').style.display = 'flex';
+  document.getElementById('subtabbar').innerHTML = `
+    <button class="subtabbtn ${sub==='sd'?'active':''}" data-sub="sd">Sakshma Didi Ranking</button>
+    <button class="subtabbtn ${sub==='dak'?'active':''}" data-sub="dak">DAK Ranking</button>`;
+  document.querySelectorAll('#subtabbar .subtabbtn').forEach(b=> b.addEventListener('click', ()=> renderScoring(b.dataset.sub)));
+  if(sub==='sd') renderSdRanking(); else renderDakRanking();
+}
+
+function performanceHighlights(){
+  const scored = DATA.scoring.sd_ranking.filter(r=> r.unified_score!=null);
+  if(scored.length < 2) return '';
+  const best = scored.slice().sort((a,b)=>b.unified_score-a.unified_score)[0];
+  const worst = scored.slice().sort((a,b)=>a.unified_score-b.unified_score)[0];
+  if(best.sd_id===worst.sd_id) return '';
+  return `<p class="callout-attn">Top performer: ${toTitleCase(best.sd_name)} &middot; Unified Score ${fmtF(best.unified_score,1)}</p>
+    <p class="callout-attn low">Needs support: ${toTitleCase(worst.sd_name)} &middot; Unified Score ${fmtF(worst.unified_score,1)}</p>`;
+}
+
+function renderSdRanking(){
+  const rows = DATA.scoring.sd_ranking.map((r,i)=>({...r, _idx:i}));
+  rows.forEach(r=>{
+    r._e = r.entitlement ? r.entitlement.category_score : null;
+    r._g = r.gbv ? r.gbv.category_score : null;
+    r._u = r.unified_score;
+    r._cases = (r.entitlement?r.entitlement.n:0) + (r.gbv?r.gbv.n:0);
+    r._blockRank = r.rank.unified_score.block;
+    r._districtRank = r.rank.unified_score.district;
+    r._stateRank = r.rank.unified_score.state;
+    r._blockRankNum = r._blockRank ? r._blockRank.rank : null;
+    r._districtRankNum = r._districtRank ? r._districtRank.rank : null;
+    r._stateRankNum = r._stateRank ? r._stateRank.rank : null;
+  });
+
+  document.getElementById('panel-scoring').innerHTML = `
+    <section><div class="section-head"><h2 class="serif">Sakshma Didi Ranking</h2><span class="hint">click a row for full metrics</span></div>
+      ${performanceHighlights()}
+      <div class="panel" id="sd-scores-table"></div>
+    </section>
+    <section><div class="section-head"><h2 class="serif tip" data-tip="${TIPS['Standing']}">Standing</h2><span class="hint">Unified Score's rank among peers at each level</span></div>
+      <div class="panel" id="sd-standing-table"></div>
+    </section>`;
+
+  const scoreCell = (score)=>{
+    if(score==null) return `<span style="color:var(--ink-soft)">no cases</span>`;
+    const c = grade(score);
+    return `<div class="score-cell"><div class="score-bar"><div class="fill" style="width:${score||0}%;background:${c}"></div></div><span class="score-num" style="color:${c}">${fmtF(score,1)}</span></div>`;
+  };
+  const scoreCols = [
+    {label:'Sakshma Didi', key:'sd_name'},
+    {label:'Cases', key:'_cases', num:true},
+    {label:'Entitlement Score', key:'_e', num:true},
+    {label:'GBV Score', key:'_g', num:true},
+    {label:'Unified Score', key:'_u', num:true},
+  ];
+  const scoreRowBuilder = (r)=>[
+    toTitleCase(r.sd_name), fmtNum(r._cases), scoreCell(r._e), scoreCell(r._g), scoreCell(r._u),
+  ];
+  makeSortableTable('sd-scores-table', scoreCols, rows, scoreRowBuilder, { enabled: ()=>true, handler: (r)=> openSdModal(r) });
+
+  const rankCell = (pack)=>{
+    if(!pack) return `<span style="color:var(--ink-soft)">no cases</span>`;
+    const c = grade(pack.pctl);
+    return `<b style="color:${c};font-size:15px;">${fmtNum(pack.rank)}${ord(pack.rank)}</b> <span style="color:var(--ink-soft);font-size:12px;">of ${fmtNum(pack.n)}</span>`;
+  };
+  const standingCols = [
+    {label:'Sakshma Didi', key:'sd_name'},
+    {label:'Block Rank', key:'_blockRankNum', num:true},
+    {label:'District Rank', key:'_districtRankNum', num:true},
+    {label:'State Rank', key:'_stateRankNum', num:true},
+  ];
+  const standingRowBuilder = (r)=>[
+    toTitleCase(r.sd_name), rankCell(r._blockRank), rankCell(r._districtRank), rankCell(r._stateRank),
+  ];
+  makeSortableTable('sd-standing-table', standingCols, rows, standingRowBuilder, { enabled: ()=>true, handler: (r)=> openSdModal(r) });
+}
+
+// Unified Score leads, highlighted, since it's the cumulative number for the
+// DAK - the three category scores that feed into it (Entitlement/GBV/
+// Outreach) are supporting detail, not headline numbers, so they now share
+// one combined section below instead of each getting equal-weight top billing.
+function renderDakRanking(){
+  const s = DATA.scoring.dak_ranking;
+  const catBlock = (title, tipKey, hint, metricTiles, rankDistrict, rankState)=>`
+    <div class="cat-block">
+      <div class="cat-block-head${TIPS[tipKey]?' tip':''}"${TIPS[tipKey]?` data-tip="${TIPS[tipKey]}"`:''}>${title}${hint?` <span style="font-weight:400;text-transform:none;letter-spacing:normal;">&middot; ${hint}</span>`:''}</div>
+      <div class="tiles" style="margin-bottom:14px;">${metricTiles.join('')}</div>
+      <div class="standing-grid">
+        ${standingCard('', rankDistrict, 'District Standing')}
+        ${standingCard('gold', rankState, 'State Standing')}
+      </div>
+    </div>`;
+
+  document.getElementById('panel-scoring').innerHTML = `
+    <section><div class="section-head"><h2 class="serif tip" data-tip="${TIPS['Unified Score']}">Unified DAK Score</h2><span class="hint">case-volume-weighted across all categories below</span></div>
+      <div class="panel panel-highlight">
+        <div class="tiles n1" style="margin-bottom:16px;">${tile('Unified Score', fmtF(s.unified_score,1), null, 'big-value')}</div>
+        <div class="standing-grid">
+          ${standingCard('', s.unified_rank_district, 'District Standing')}
+          ${standingCard('gold', s.unified_rank_state, 'State Standing')}
+        </div>
+      </div>
+    </section>
+    <section><div class="section-head"><h2 class="serif">Category Scores</h2><span class="hint">entitlement, GBV, and proactive outreach</span></div>
+      <div class="panel">
+        ${catBlock('Entitlement', 'Entitlement Score', null, [
+          tile('Cases', fmtNum(s.entitlement.n)),
+          tile('Resolution Rate', fmtPct(s.entitlement.resolution_rate,1)),
+          tile('Median Days', s.entitlement.median_days==null?'—':fmtF(s.entitlement.median_days,0)),
+          tile('Backlog Age', s.entitlement.backlog_age==null?'—':fmtF(s.entitlement.backlog_age,0)+' days'),
+          tile('Category Score', s.entitlement.category_score==null?'—':fmtF(s.entitlement.category_score,1)),
+        ], s.entitlement.rank_district, s.entitlement.rank_state)}
+        ${catBlock('GBV', 'GBV Score', null, [
+          tile('Cases', fmtNum(s.gbv.n)),
+          tile('Resolution Rate', fmtPct(s.gbv.resolution_rate,1)),
+          tile('Median Days', s.gbv.median_days==null?'—':fmtF(s.gbv.median_days,0)),
+          tile('Backlog Age', s.gbv.backlog_age==null?'—':fmtF(s.gbv.backlog_age,0)+' days'),
+          tile('Category Score', s.gbv.category_score==null?'—':fmtF(s.gbv.category_score,1)),
+        ], s.gbv.rank_district, s.gbv.rank_state)}
+        ${catBlock('Proactive Outreach Share', 'Outreach Share', '% of cases arriving via the Sakshma Didi/Gender CRP channel', [
+          tile('Outreach Share', fmtPct(s.outreach_share,1)),
+        ], s.outreach_rank_district, s.outreach_rank_state)}
+      </div>
+    </section>`;
+}
+
+// ---------------------------------------------------------------- tabs
+const TABS = [
+  {id:'overview', label:'Overview'},
+  {id:'cases', label:'Case Tracker'},
+  {id:'scoring', label:'Scoring & Ranking'},
+];
+function renderTabbar(active){
+  document.getElementById('tabbar').innerHTML = TABS.map(t=>`<button class="tabbtn ${t.id===active?'active':''}" data-tab="${t.id}">${t.label}</button>`).join('');
+  document.querySelectorAll('.tabbtn').forEach(b=> b.addEventListener('click', ()=> switchTab(b.dataset.tab)));
+}
+function switchTab(id){
+  TABS.forEach(t=> document.getElementById('panel-'+t.id).classList.toggle('active', t.id===id));
+  if(id!=='scoring') document.getElementById('subtabbar').style.display='none';
+  renderTabbar(id);
+  if(id==='overview') renderOverview();
+  else if(id==='cases') renderCases();
+  else if(id==='scoring') renderScoring();
+}
+
+// ---------------------------------------------------------------- finder / directory
+function districtsInManifest(){
+  return [...new Set(MANIFEST.daks.map(d=>d.district))].sort();
+}
+function blocksInDistrict(district){
+  return [...new Set(MANIFEST.daks.filter(d=>d.district===district).map(d=>d.block))].sort();
+}
+function daksInBlock(district, block){
+  return MANIFEST.daks.filter(d=>d.district===district && d.block===block).sort((a,b)=>a.dak_name.localeCompare(b.dak_name));
+}
+
+function populateSelect(sel, options, placeholder){
+  sel.innerHTML = `<option value="">${placeholder}</option>` + options.map(o=>`<option value="${o.value}">${o.label}</option>`).join('');
+  sel.disabled = options.length===0;
+}
+
+function initFinderControls(){
+  const selDistrict = document.getElementById('sel-district');
+  const selBlock = document.getElementById('sel-block');
+  const selDak = document.getElementById('sel-dak');
+  const btnView = document.getElementById('btn-view-dak');
+
+  populateSelect(selDistrict, districtsInManifest().map(d=>({value:d, label:toTitleCase(d)})), 'Select District…');
+
+  selDistrict.addEventListener('change', ()=>{
+    populateSelect(selBlock, selDistrict.value ? blocksInDistrict(selDistrict.value).map(b=>({value:b, label:toTitleCase(b)})) : [], selDistrict.value ? 'Select Block…' : 'Select District first…');
+    populateSelect(selDak, [], 'Select Block first…');
+    btnView.disabled = true;
+  });
+  selBlock.addEventListener('change', ()=>{
+    const opts = (selDistrict.value && selBlock.value) ? daksInBlock(selDistrict.value, selBlock.value).map(d=>({value:d.slug, label:toTitleCase(d.dak_name)})) : [];
+    populateSelect(selDak, opts, selBlock.value ? 'Select DAK…' : 'Select Block first…');
+    btnView.disabled = true;
+  });
+  selDak.addEventListener('change', ()=>{ btnView.disabled = !selDak.value; });
+  btnView.addEventListener('click', ()=>{ if(selDak.value) loadDak(selDak.value); });
+}
+
+function renderDirectory(filterText){
+  filterText = (filterText||'').trim().toLowerCase();
+  const rows = MANIFEST.daks.filter(d=>{
+    if(!filterText) return true;
+    return d.district.toLowerCase().includes(filterText) || d.block.toLowerCase().includes(filterText) || d.dak_name.toLowerCase().includes(filterText);
+  });
+  const cols = [
+    {label:'District', key:'district'},
+    {label:'Block', key:'block'},
+    {label:'DAK', key:'dak_name'},
+    {label:'Cases', key:'n_cases', num:true},
+    {label:'Sakshma Didis', key:'n_sd', num:true},
+    {label:'Unified Score', key:'unified_score', num:true},
+  ];
+  const rowBuilder = (d)=>[toTitleCase(d.district), toTitleCase(d.block), toTitleCase(d.dak_name), fmtNum(d.n_cases), fmtNum(d.n_sd), d.unified_score==null?'—':fmtF(d.unified_score,1)];
+  makeSortableTable('directory-table', cols, rows, rowBuilder, { enabled: ()=>true, handler: (d)=> loadDak(d.slug) });
+}
+
+function showFinder(){
+  document.getElementById('view-finder').style.display = 'block';
+  document.getElementById('view-dashboard').style.display = 'none';
+  document.getElementById('btn-print').style.display = 'none';
+  history.replaceState(null, '', location.pathname + location.search);
+}
+
+function loadDak(slug){
+  fetch(`data/dak/${slug}.json`, {cache:'no-store'})
+    .then(r=>{ if(!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+    .then(d=>{
+      DATA = d;
+      sdById = {};
+      (DATA.scoring.sd_ranking||[]).forEach(r=>{ sdById[r.sd_id] = r; });
+      document.getElementById('view-finder').style.display = 'none';
+      document.getElementById('view-dashboard').style.display = 'block';
+      document.getElementById('btn-print').style.display = 'inline-flex';
+      history.replaceState(null, '', location.pathname + location.search + '#' + slug);
+      renderMasthead();
+      switchTab('overview');
+    })
+    .catch(err=>{
+      alert(`Could not load this DAK's data (${err.message}). It may not be built yet, or the page needs to be served over http:// (see the note at the bottom of the directory).`);
+    });
+}
+
+document.getElementById('btn-back-finder').addEventListener('click', showFinder);
+document.getElementById('directory-search').addEventListener('input', (e)=> renderDirectory(e.target.value));
+document.getElementById('btn-print').addEventListener('click', ()=> window.print());
+
+// ---------------------------------------------------------------- boot
+initTooltips();
+fetch('data/manifest.json', {cache:'no-store'})
+  .then(r=>{ if(!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+  .then(m=>{
+    MANIFEST = m;
+    const nDaks = m.daks.length;
+    document.getElementById('finder-coverage-note').textContent = `Live for ${nDaks} DAK${nDaks===1?'':'s'} (generated ${m.generated_at})`;
+    document.getElementById('finder-foot-note').textContent = `Directory + per-DAK data computed by build_dak_statewide_data.py. Every Sakshma Didi/DAK with at least one case of a kind is scored, regardless of case volume.`;
+    initFinderControls();
+    renderDirectory('');
+    const hashSlug = location.hash ? decodeURIComponent(location.hash.slice(1)) : '';
+    if(hashSlug && m.daks.some(d=>d.slug===hashSlug)) loadDak(hashSlug);
+  })
+  .catch(err=>{
+    document.getElementById('finder-coverage-note').innerHTML = `<span style="color:var(--low);">Could not load the DAK directory (${err.message}).</span>`;
+    document.getElementById('finder-foot-note').innerHTML = `<strong>This page must be served over http://, not opened directly as a file.</strong> Run <code>python -m http.server</code> from this folder and open the printed localhost address, or host this folder on a static web server.`;
+  });
+</script>
+</body>
+</html>
