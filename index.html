@@ -451,6 +451,12 @@ function renderOverview(){
   ];
 
   document.getElementById('panel-overview').innerHTML = `
+    <div class="note-inline" style="margin-top:0;margin-bottom:18px;">
+      <b>How this tracker scores:</b> every Sakshma Didi and DAK gets a <b>Unified Score</b> (0–100) —
+      a case-volume-weighted average of her Entitlement performance, GBV performance, and proactive
+      casefinding, so a category backed by more cases counts for more toward the final number.
+      See the <b>Scoring &amp; Ranking</b> tab for the full breakdown and rankings.
+    </div>
     <section><div class="section-head"><h2 class="serif">DAK Identity</h2></div>
       <div class="panel"><div class="tiles">
         ${tile('Formation Date', id.formation_date, null, 'neutral')}
