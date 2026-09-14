@@ -461,7 +461,6 @@ function renderOverview(){
       <div class="panel"><div class="tiles">
         ${tile('Formation Date', id.formation_date, null, 'neutral')}
         ${tile('Nodal CLF', id.nodal_clf, 'banking home, not org lineage', 'neutral')}
-        ${tile('Bank', id.bank, `${id.bank_branch||''}${id.ifsc?' &middot; '+id.ifsc:''}`, 'neutral')}
         ${tile('Address', toTitleCase(id.address), null, 'neutral')}
       </div></div>
     </section>
