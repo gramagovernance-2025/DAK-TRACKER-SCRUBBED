@@ -54,7 +54,7 @@ section{ margin-bottom:18px; }
 .cat-block:first-child{ padding-top:0; margin-top:0; border-top:none; }
 .cat-block-head{ font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); margin-bottom:10px; }
 .panel + .panel{ margin-top:12px; }
-.tiles{ display:grid; grid-template-columns:repeat(auto-fill,minmax(148px,1fr)); gap:12px; }
+.tiles{ display:grid; grid-template-columns:repeat(auto-fit,minmax(148px,1fr)); gap:12px; }
 .tile{ border:1px solid var(--line); border-radius:8px; padding:12px 14px; }
 .tile.wide{ grid-column:1/-1; }
 .tile .label{ font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:6px; }
@@ -120,6 +120,8 @@ th.sortable:hover{ color:var(--ink); }
 .callout-attn:last-of-type{ margin-bottom:14px; }
 .callout-attn.low{ background:var(--low-soft); color:#8a3226; }
 .disclaimer{ font-size:13px; color:var(--gold); background:var(--gold-soft); border-radius:8px; padding:9px 13px; }
+.status-banner{ display:flex; align-items:flex-start; gap:10px; font-size:13.5px; font-weight:700; padding:12px 16px; background:var(--low-soft); color:#8a3226; border:1px solid var(--low); border-radius:8px; margin-bottom:16px; }
+.status-banner::before{ content:"\26A0\FE0F"; font-size:15px; line-height:1.3; flex:none; }
 .modal-backdrop{ display:none; position:fixed; inset:0; background:rgba(30,35,32,0.45); z-index:100; align-items:center; justify-content:center; padding:20px; }
 .modal-backdrop.open{ display:flex; }
 .modal{ background:var(--panel); border-radius:14px; max-width:580px; width:100%; max-height:88vh; overflow-y:auto; padding:24px 26px; box-shadow:0 20px 60px rgba(0,0,0,0.25); }
@@ -149,47 +151,71 @@ th.sortable:hover{ color:var(--ink); }
 [data-tip]{ cursor:help; }
 .tip{ text-decoration:underline dotted var(--line-strong); text-underline-offset:3px; }
 /* finder / landing view */
-.finder-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin-bottom:16px; }
-.finder-field label{ display:block; font-size:11.5px; font-weight:600; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:6px; }
-.finder-field select{ width:100%; min-height:42px; font-family:inherit; font-size:14px; color:var(--ink); background:var(--panel); border:1px solid var(--line-strong); border-radius:8px; padding:8px 12px; }
-.finder-field select:disabled{ color:var(--ink-soft); background:var(--panel-alt); }
-.finder-view-btn{ appearance:none; cursor:pointer; font-family:inherit; font-size:14px; font-weight:700; color:#fff; background:var(--primary); border:none; border-radius:8px; padding:11px 22px; min-height:44px; }
-.finder-view-btn:disabled{ background:var(--grey); cursor:not-allowed; }
-.finder-search{ width:100%; min-height:42px; font-family:inherit; font-size:14px; color:var(--ink); background:var(--panel); border:1px solid var(--line-strong); border-radius:8px; padding:8px 12px; margin-bottom:14px; }
+.finder-search{ width:100%; min-height:46px; font-family:inherit; font-size:15px; color:var(--ink); background:var(--panel); border:1.5px solid var(--line-strong); border-radius:8px; padding:10px 14px; }
+.finder-icon{ text-align:center; font-size:30px; margin-bottom:6px; }
+.finder-title{ text-align:center; }
+.finder-title .crumbs{ text-align:center; }
+.nav-label{ font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:10px; }
+.nav-select-stack{ display:flex; flex-direction:column; gap:10px; }
+.nav-select-stack select{ width:100%; min-height:46px; font-family:inherit; font-size:15px; color:var(--ink); background:var(--panel); border:1.5px solid var(--line-strong); border-radius:8px; padding:10px 14px; }
+.nav-select-stack select:disabled{ color:var(--ink-soft); background:var(--panel-alt); }
+.nav-divider{ display:flex; align-items:center; gap:12px; margin:18px 0; color:var(--ink-soft); font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; }
+.nav-divider::before, .nav-divider::after{ content:""; flex:1; height:1px; background:var(--line-strong); }
+.nav-full-btn{ display:block; width:100%; text-align:center; appearance:none; cursor:pointer; font-family:inherit; font-size:15px; font-weight:700; color:#fff; background:var(--primary); border:none; border-radius:8px; padding:14px 22px; }
+.nav-full-btn:hover{ opacity:.92; }
+/* heatmap */
+.heatmap-cell{ font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:6px; display:inline-block; min-width:22px; text-align:center; }
+.heatmap-cell.zero{ color:var(--ink-soft); background:var(--grey-soft); font-weight:400; }
+.heatmap-select{ min-width:200px; font-family:inherit; font-size:13px; color:var(--ink); background:var(--panel); border:1px solid var(--line-strong); border-radius:8px; padding:7px 10px; margin-bottom:12px; }
+/* masthead period picker - global, to the right of the title, same picker for DAK/District/State */
+.masthead-row{ display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; }
+.masthead-titleblock{ min-width:0; flex:1 1 auto; }
+.period-picker{ display:flex; gap:8px; flex:none; margin-top:2px; }
+.period-select{ font-family:inherit; font-size:13px; font-weight:600; color:var(--ink); background:var(--panel); border:1.5px solid var(--line-strong); border-radius:8px; padding:8px 10px; min-height:38px; }
+.period-select:disabled{ color:var(--ink-soft); background:var(--panel-alt); }
 @media print{
   .tabbar, .subtabbar, .icon-btn, #modal-backdrop{ display:none !important; }
   .tabpanel{ display:block !important; margin-bottom:34px; page-break-inside:avoid; }
   body{ padding:0; }
 }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.35.0/plotly.min.js"></script>
 </head>
 <body>
 <div class="page">
   <div class="top-row">
     <span class="badge">DAK Tracker &middot; statewide</span>
+    <button class="icon-btn" id="btn-export-excel" style="display:none;">&#128190; Download Excel</button>
     <button class="icon-btn" id="btn-print" style="display:none;">&#128424;&#65039; Print / Save as PDF</button>
   </div>
 
   <div id="view-finder">
-    <header class="masthead">
+    <div class="finder-icon">&#128269;</div>
+    <header class="masthead finder-title">
       <h1 class="serif">Find a DAK</h1>
-      <div class="crumbs" id="finder-coverage-note">Loading directory&hellip;</div>
+      <div class="crumbs">Search by District, Block, and DAK, or search by name.</div>
     </header>
     <section>
       <div class="panel">
-        <div class="finder-grid">
-          <div class="finder-field"><label for="sel-district">District</label><select id="sel-district"><option value="">Select District&hellip;</option></select></div>
-          <div class="finder-field"><label for="sel-block">Block</label><select id="sel-block" disabled><option value="">Select District first&hellip;</option></select></div>
-          <div class="finder-field"><label for="sel-dak">DAK</label><select id="sel-dak" disabled><option value="">Select Block first&hellip;</option></select></div>
+        <div class="nav-label">BROWSE</div>
+        <div class="nav-select-stack">
+          <select id="sel-district"><option value="">Select District&hellip;</option></select>
+          <select id="sel-block" disabled><option value="">Select Block&hellip;</option></select>
+          <select id="sel-dak" disabled><option value="">Select DAK&hellip;</option></select>
         </div>
-        <button class="finder-view-btn" id="btn-view-dak" disabled>View Dashboard</button>
+        <div class="nav-divider">OR SEARCH BY NAME</div>
+        <input type="text" class="finder-search" id="directory-search" placeholder="Search by district, block, or DAK name&hellip;">
+        <div id="directory-table"></div>
+        <div class="crumbs" id="finder-coverage-note" style="text-align:center;margin-top:14px;">Loading directory&hellip;</div>
       </div>
     </section>
     <section>
-      <div class="section-head"><h2 class="serif">All DAKs</h2><span class="hint">search, sort, or click a row to jump straight in</span></div>
       <div class="panel">
-        <input type="text" class="finder-search" id="directory-search" placeholder="Search by district, block, or DAK name&hellip;">
-        <div id="directory-table"></div>
+        <div class="nav-label">OR TRACK DAKS WITHIN A DISTRICT OR STATE</div>
+        <div class="nav-select-stack"><select id="sel-district-only"><option value="">Select District to view its Tracker&hellip;</option></select></div>
+        <div class="nav-divider">OR</div>
+        <button class="nav-full-btn" id="btn-view-state">View Bihar Statewide Dashboard</button>
       </div>
     </section>
     <div class="foot-note" id="finder-foot-note"></div>
@@ -197,13 +223,42 @@ th.sortable:hover{ color:var(--ink); }
 
   <div id="view-dashboard" style="display:none;">
     <button class="back-link" id="btn-back-finder">&larr; All DAKs</button>
+    <div id="banner-status"></div>
     <header class="masthead" id="masthead-content"></header>
     <div class="tabbar" id="tabbar"></div>
     <div class="subtabbar" id="subtabbar" style="display:none;"></div>
     <div class="tabpanel active" id="panel-overview"></div>
     <div class="tabpanel" id="panel-cases"></div>
     <div class="tabpanel" id="panel-scoring"></div>
+    <div class="tabpanel" id="panel-altservices"></div>
+    <div class="tabpanel" id="panel-training"></div>
     <div class="foot-note">DAK Tracker (statewide). Data as computed by <code>build_dak_statewide_data.py</code> from the BRLPS DAK MIS export. Every Sakshma Didi/DAK with at least one case of a kind is scored, regardless of case volume.</div>
+  </div>
+
+  <div id="view-district" style="display:none;">
+    <button class="back-link" id="btn-back-choose-district-2">&larr; Change tracker type</button>
+    <header class="masthead" id="district-masthead-content"></header>
+    <div class="tabbar" id="district-tabbar"></div>
+    <div class="subtabbar" id="district-subtabbar" style="display:none;"></div>
+    <div class="tabpanel active" id="district-panel-overview"></div>
+    <div class="tabpanel" id="district-panel-cases"></div>
+    <div class="tabpanel" id="district-panel-scoring"></div>
+    <div class="tabpanel" id="district-panel-altservices"></div>
+    <div class="tabpanel" id="district-panel-training"></div>
+    <div class="foot-note">District Tracker. Aggregated by <code>build_dak_statewide_data.py</code> from every DAK in this district.</div>
+  </div>
+
+  <div id="view-state" style="display:none;">
+    <button class="back-link" id="btn-back-choose-state">&larr; Change tracker type</button>
+    <header class="masthead" id="state-masthead-content"></header>
+    <div class="tabbar" id="state-tabbar"></div>
+    <div class="subtabbar" id="state-subtabbar" style="display:none;"></div>
+    <div class="tabpanel active" id="state-panel-overview"></div>
+    <div class="tabpanel" id="state-panel-cases"></div>
+    <div class="tabpanel" id="state-panel-scoring"></div>
+    <div class="tabpanel" id="state-panel-altservices"></div>
+    <div class="tabpanel" id="state-panel-training"></div>
+    <div class="foot-note">Statewide Tracker. Aggregated by <code>build_dak_statewide_data.py</code> from every DAK in Bihar.</div>
   </div>
 </div>
 <div id="modal-backdrop" class="modal-backdrop"><div class="modal"><div class="modal-head"><h3 id="modal-title"></h3><button class="modal-close" id="modal-close">&times;</button></div><div id="modal-body"></div></div></div>
@@ -212,9 +267,86 @@ th.sortable:hover{ color:var(--ink); }
 let DATA = null;
 let MANIFEST = null;
 let sdById = {};
+let CURRENT_SCOPE = null; // 'dak' | 'district' | 'state' - which export/print the top-row buttons act on
+
+// ---------------------------------------------------------------- period picker (Cumulative / Year / Year-Month)
+// Global, not per-view: picking a period sticks as you navigate between a
+// DAK, its district, and the state view, rather than resetting every time.
+// Every payload (DAK/District/State) has the identical `periods` list
+// (computed once, statewide, in the build script) and a `by_period` dict
+// keyed "cumulative" | "YYYY" | "YYYY-MM" holding the same
+// overview/backlog_aging/scoring shape that used to live at the payload's
+// top level - currentPeriod() is the one seam every render function reads
+// through instead of hitting payload.overview/.scoring directly.
+let SELECTED_PERIOD = 'cumulative';
+const MONTH_NAMES = {'01':'Jan','02':'Feb','03':'Mar','04':'Apr','05':'May','06':'Jun','07':'Jul','08':'Aug','09':'Sep','10':'Oct','11':'Nov','12':'Dec'};
+
+function currentPeriod(payload){
+  return payload.by_period[SELECTED_PERIOD] || payload.by_period['cumulative'];
+}
+
+function periodPickerHtml(prefix){
+  return `<div class="period-picker">
+    <select id="${prefix}-period-year" class="period-select"></select>
+    <select id="${prefix}-period-month" class="period-select" disabled></select>
+  </div>`;
+}
+
+// Populates a scope's picker from that payload's `periods`, restores the
+// current global selection if still valid, and wires both selects to update
+// SELECTED_PERIOD then call `onChange()` (a scope-specific "re-render
+// whatever tab is currently showing" callback) rather than re-fetching.
+function populatePeriodPicker(prefix, payload, onChange){
+  const yearSel = document.getElementById(`${prefix}-period-year`);
+  const monthSel = document.getElementById(`${prefix}-period-month`);
+  const years = (payload.periods && payload.periods.years) || [];
+  const monthsByYear = (payload.periods && payload.periods.months_by_year) || {};
+  yearSel.innerHTML = `<option value="cumulative">Cumulative</option>` + years.slice().reverse().map(y=>`<option value="${y}">${y}</option>`).join('');
+
+  function rebuildMonths(selectedYear){
+    if(selectedYear === 'cumulative'){
+      monthSel.innerHTML = '';
+      monthSel.disabled = true;
+      return;
+    }
+    const months = monthsByYear[selectedYear] || [];
+    monthSel.innerHTML = `<option value="${selectedYear}">Full Year</option>` + months.map(m=>`<option value="${selectedYear}-${m}">${MONTH_NAMES[m]}</option>`).join('');
+    monthSel.disabled = false;
+  }
+
+  const allMonthKeys = years.flatMap(y=>(monthsByYear[y]||[]).map(m=>`${y}-${m}`));
+  const restore = (SELECTED_PERIOD==='cumulative' || years.includes(SELECTED_PERIOD) || allMonthKeys.includes(SELECTED_PERIOD)) ? SELECTED_PERIOD : 'cumulative';
+  const restoreYear = restore==='cumulative' ? 'cumulative' : restore.split('-')[0];
+  yearSel.value = restoreYear;
+  rebuildMonths(restoreYear);
+  if(restoreYear !== 'cumulative') monthSel.value = restore;
+  SELECTED_PERIOD = restore;
+
+  yearSel.addEventListener('change', ()=>{
+    rebuildMonths(yearSel.value);
+    SELECTED_PERIOD = yearSel.value === 'cumulative' ? 'cumulative' : monthSel.value;
+    onChange();
+  });
+  monthSel.addEventListener('change', ()=>{
+    SELECTED_PERIOD = monthSel.value;
+    onChange();
+  });
+}
 
 // ---------------------------------------------------------------- formatting helpers
 function fmtNum(v){ return v===null||v===undefined ? '—' : Math.round(v).toLocaleString('en-IN'); }
+// Ranking tables default-sort by this before their first render, so the
+// leading Rank column (idx+1, recalculated live by makeSortableTable on
+// every re-sort) shows a meaningful 1/2/3... on load rather than server/
+// roster order. Nulls sort last regardless of direction.
+function sortDescByKey(arr, key){
+  return arr.slice().sort((a,b)=>{
+    const av=a[key], bv=b[key];
+    if(av==null && bv==null) return 0;
+    if(av==null) return 1; if(bv==null) return -1;
+    return bv-av;
+  });
+}
 function fmtF(v,d){ return v===null||v===undefined ? '—' : v.toFixed(d===undefined?1:d); }
 function fmtPct(v,d){ return v===null||v===undefined ? '—' : v.toFixed(d===undefined?1:d)+'%'; }
 function fmtRs(v){ if(v===null||v===undefined) return '—'; return '₹'+Math.round(v).toLocaleString('en-IN'); }
@@ -226,20 +358,18 @@ function toTitleCase(s){
 }
 
 const TIPS = {
-  'Total Cases': 'All entitlement + GBV cases ever logged for this DAK.',
+  'Total Cases': 'All entitlement + Gender cases ever logged for this DAK.',
   'Pending': 'Cases not yet marked Resolved in the case master file.',
   'Resolved': 'Cases marked Resolved in the case master file.',
   'Resolution Rate': 'Share of this DAK’s cases that have been resolved.',
   'Entitlement Cases': 'Cases seeking a government entitlement/scheme (ration card, insurance, pension, etc).',
-  'GBV Cases': 'Gender-based-violence cases handled by this DAK.',
-  'Ongoing': 'Marked Resolved in the case master, but the detail record still says the intervention is ongoing.',
-  'Not Available (followup)': 'Marked Resolved, but continuous followup could not locate the applicant.',
+  'Gender Cases': 'Gender-based-violence cases handled by this DAK.',
   'Backlog Aging': 'How long currently-pending cases have been open, bucketed by age.',
   'Median Days': 'Middle value of days-to-resolution among this DAK’s resolved cases (half resolved faster, half slower).',
-  'Cases': 'Total entitlement + GBV cases attributed to this person.',
+  'Cases': 'Total entitlement + Gender cases attributed to this person.',
   'Entitlement Score': 'Percentile-based score combining resolution rate, speed, and backlog age on entitlement cases only.',
-  'GBV Score': 'Percentile-based score combining resolution rate, speed, and backlog age on GBV cases only.',
-  'Unified Score': 'A case-volume-weighted average of Entitlement Score, GBV Score, Self-Sourced Rate and Origination Index — a category backed by more cases counts for more, and a category with too little data to rank is excluded entirely rather than scored zero.',
+  'Gender Score': 'Percentile-based score combining resolution rate, speed, and backlog age on Gender cases only.',
+  'Unified Score': 'A case-volume-weighted average of Entitlement Score, Gender Score, Self-Sourced Rate and Origination Index — a category backed by more cases counts for more, and a category with too little data to rank is excluded entirely rather than scored zero.',
   'Self-Sourced Rate': 'Share of a Sakshma Didi’s own cases that she personally brought in, rather than being routed to her.',
   'Origination Index': 'Her share of her DAK’s total self-sourced caseload, divided by an equal per-person share — above 1 means she originates more cases than an equal split would predict.',
   'Outreach Share': 'Share of this DAK’s total cases that arrived via the Sakshma Didi/Gender CRP channel, rather than some other route.',
@@ -367,7 +497,7 @@ function makeSortableTable(containerId, cols, data, rowBuilder, onRowClick){
       return `<th${cls?` class="${cls}"`:''}${c.key?` data-colidx="${i}"`:''}>${c.label}${arrow}</th>`;
     }).join('')}</tr>`;
     const tbodyHtml = sorted.map((item,idx)=>{
-      const r = rowBuilder(item);
+      const r = rowBuilder(item, idx);
       const cls = onRowClick && onRowClick.enabled(item) ? ' class="clickable"' : '';
       return `<tr${cls} data-idx="${idx}">${r.map((v,i)=>`<td${cols[i].num?' class="num"':''}>${v}</td>`).join('')}</tr>`;
     }).join('');
@@ -400,113 +530,88 @@ function initTooltips(){
 }
 
 // ---------------------------------------------------------------- masthead
+function statusBannerHtml(text){
+  return `<div class="status-banner">${text}</div>`;
+}
+// Type 2 ("no_activity") gets a page-level banner shown above every tab, since
+// it affects everything on the page equally (no roster, no cases, nothing to
+// score). Type 3 ("roster_incomplete") only affects the roster section
+// specifically -- see renderOverview() -- so it does NOT show here.
 function renderMasthead(){
   const o = DATA.identity;
+  document.getElementById('banner-status').innerHTML = DATA.status === 'no_activity'
+    ? statusBannerHtml('This DAK has not registered any Sakshma Didis, and has not received any cases.')
+    : '';
   document.getElementById('masthead-content').innerHTML = `
-    <div class="crumbs"><b>${toTitleCase(o.district)}</b> &rsaquo; <b>${toTitleCase(o.block)}</b></div>
-    <h1 class="serif">${toTitleCase(o.dak_name)}</h1>
-    <div class="crumbs">Didi Adhikar Kendra</div>`;
+    <div class="masthead-row">
+      <div class="masthead-titleblock">
+        <div class="crumbs"><b>${toTitleCase(o.district)}</b> &rsaquo; <b>${toTitleCase(o.block)}</b></div>
+        <h1 class="serif">${toTitleCase(o.dak_name)}</h1>
+        <div class="crumbs">Didi Adhikar Kendra</div>
+      </div>
+      ${periodPickerHtml('dak')}
+    </div>`;
+  populatePeriodPicker('dak', DATA, refreshDakView);
+}
+function refreshDakView(){
+  sdById = {};
+  (currentPeriod(DATA).scoring.sd_ranking||[]).forEach(r=>{ sdById[r.sd_id] = r; });
+  switchTab(CURRENT_TAB);
 }
 
 // ---------------------------------------------------------------- Overview
 function renderOverview(){
-  const ov = DATA.overview, k = ov.kpi, id = DATA.identity;
+  const ov = currentPeriod(DATA).overview, k = ov.kpi, id = DATA.identity;
 
   const kpiTiles = [
     tile('Total Cases', fmtNum(k.total_cases)),
     tile('Resolution Rate', fmtPct(k.resolution_rate_pct,1)),
-    tile('Ongoing', k.ongoing, null, 'warn'),
+    tile('Pending', fmtNum(k.pending), null, 'warn'),
   ];
   const statusSegments = [
-    {label:'Resolved', value: k.resolved - k.ongoing - k.not_available, color:'var(--primary)'},
+    {label:'Resolved', value: k.resolved, color:'var(--primary)'},
     {label:'Pending', value: k.pending, color:'var(--gold)'},
-    {label:'Ongoing', value: k.ongoing, color:'#5B8AA6'},
-    {label:'Not Available (followup)', value: k.not_available, color:'var(--grey)'},
   ];
 
-  const mixColors = {'Entitlement':'var(--primary)','GBV':'var(--gold)'};
-  const typeSegs = (ov.case_type_mix||[]).map(m=>({frac:m.pct/100, color:mixColors[m.label]||'var(--grey)', label:m.label}));
-  const typeLegend = (ov.case_type_mix||[]).map(m=>`<div class="legend-row"><span class="legend-swatch" style="background:${mixColors[m.label]||'var(--grey)'}"></span>${m.label}<span class="amt">${fmtNum(m.n)}</span></div>`).join('');
-
-  const vtMax = ov.violence_type_mix.length ? ov.violence_type_mix[0].n : 1;
-  const vtRows = ov.violence_type_mix.slice(0,8).map(m=>barRow(m.label, m.n, vtMax, 'var(--gold)', `${m.n} (${fmtF(m.pct,1)}%)`)).join('');
-
-  const crMax = ov.case_reach_mix.length ? ov.case_reach_mix[0].n : 1;
-  const crRows = ov.case_reach_mix.slice(0,8).map(m=>barRow(m.label, m.n, crMax, 'var(--primary)', `${m.n} (${fmtF(m.pct,1)}%)`)).join('');
-
-  const entDays = DATA.cases.filter(c=>c.kind==='Entitlement' && c.status==='Resolved' && c.days_open!=null).map(c=>c.days_open);
-  const gbvDays = DATA.cases.filter(c=>c.kind==='GBV' && c.status==='Resolved' && c.days_open!=null).map(c=>c.days_open);
-
+  const built = caseMetricSectionsHtml(DATA, 'dak');
   const roster = DATA.roster.map((r,i)=>({...r, _idx:i}));
   const rosterCols = [
     {label:'Name', key:'name'},
-    {label:'Role', key:'role'},
     {label:'DOJ', key:'doj'},
     {label:'Mobile'},
     {label:'Own CLF / VO / SHG'},
+    {label:'Amount Received', key:'incentive_amount', num:true},
   ];
   const rosterRowBuilder = (r)=>[
-    toTitleCase(r.name), r.role, r.doj||'—', r.mobile||'—',
+    toTitleCase(r.name), r.doj||'—', r.mobile||'—',
     r.own_clf ? `${r.own_clf}${r.own_vo?' / '+r.own_vo:''}${r.own_shg?' / '+r.own_shg:''}` : '—',
+    r.incentive_amount!=null ? fmtNum(r.incentive_amount) : '—',
   ];
 
   document.getElementById('panel-overview').innerHTML = `
-    <div class="note-inline" style="margin-top:0;margin-bottom:18px;">
-      <b>How this tracker scores:</b> every Sakshma Didi and DAK gets a <b>Unified Score</b> (0–100) —
-      a case-volume-weighted average of her Entitlement performance, GBV performance, and proactive
-      casefinding, so a category backed by more cases counts for more toward the final number.
-      See the <b>Scoring &amp; Ranking</b> tab for the full breakdown and rankings.
-    </div>
     <section><div class="section-head"><h2 class="serif">DAK Identity</h2></div>
       <div class="panel"><div class="tiles">
         ${tile('Formation Date', id.formation_date, null, 'neutral')}
         ${tile('Nodal CLF', id.nodal_clf, 'banking home, not org lineage', 'neutral')}
         ${tile('Address', toTitleCase(id.address), null, 'neutral')}
+        ${tile('DAK Coordinator', id.coordinator_name ? toTitleCase(id.coordinator_name) : '—', id.coordinator_mobile || null, 'neutral')}
       </div></div>
     </section>
 
     <section><div class="section-head"><h2 class="serif">Case Snapshot</h2></div>
       <div class="panel">
-        <div class="tiles" style="margin-bottom:18px;">${kpiTiles.join('')}</div>
+        <div class="tiles" style="margin-bottom:18px;">${kpiTiles.join('')}${tile('Amount Received', fmtNum(DATA.total_amount_received), 'all-time, not period-specific', 'neutral')}</div>
         ${stackedBarChart(statusSegments)}
       </div>
     </section>
 
-    <section><div class="section-head"><h2 class="serif">Case Type Mix</h2></div>
-      <div class="panel"><div class="donut-row">
-        <div class="donut-wrap"><svg id="svg-typemix" width="180" height="180" viewBox="0 0 190 190"></svg></div>
-        <div class="donut-legend">${typeLegend}</div>
-      </div></div>
-    </section>
+    ${built.html}
 
-    <section><div class="section-head"><h2 class="serif">Violence Type Breakdown</h2><span class="hint">within GBV cases, ranked</span></div>
-      <div class="panel"><div class="bar-list">${vtRows || '<div class="hint">No GBV cases recorded.</div>'}</div></div>
-    </section>
-
-    <section><div class="section-head"><h2 class="serif">Case Reach</h2><span class="hint">how the case first reached the DAK</span></div>
-      <div class="panel"><div class="bar-list">${crRows}</div></div>
-    </section>
-
-    <section><div class="section-head"><h2 class="serif">Days to Resolution — Distribution</h2><span class="hint">resolved cases only &middot; dashed line marks the median</span></div>
-      <div class="panel">
-        <div style="margin-bottom:20px;">
-          <div style="font-size:13px;font-weight:600;margin-bottom:8px;">Entitlement <span style="color:var(--ink-soft);font-weight:400;">(${entDays.length} resolved case${entDays.length===1?'':'s'})</span></div>
-          ${entDays.length ? `<svg id="hist-ent" viewBox="0 0 560 180" style="display:block;width:100%;height:auto;"></svg>` : `<p class="disclaimer">No resolved entitlement cases yet.</p>`}
-        </div>
-        <div>
-          <div style="font-size:13px;font-weight:600;margin-bottom:8px;">GBV <span style="color:var(--ink-soft);font-weight:400;">(${gbvDays.length} resolved case${gbvDays.length===1?'':'s'})</span></div>
-          ${gbvDays.length ? `<svg id="hist-gbv" viewBox="0 0 560 180" style="display:block;width:100%;height:auto;"></svg>` : `<p class="disclaimer">No resolved GBV cases yet.</p>`}
-        </div>
-      </div>
-    </section>
-
-    <section><div class="section-head"><h2 class="serif">Roster</h2><span class="hint">${DATA.roster.length} people &middot; click a Sakshma Didi for her performance</span></div>
+    <section><div class="section-head"><h2 class="serif">Sakshma Didi Roster</h2><span class="hint">${DATA.roster.length} Sakshma Didis &middot; click one for her performance</span></div>
+      ${DATA.roster_source === 'cases_only' ? statusBannerHtml("This DAK's roster of Sakshma Didis were tracked from the cases they registered, and not the staff roster.") : ''}
       <div class="panel" id="roster-table"></div>
     </section>`;
-  drawDonut('svg-typemix', typeSegs);
-  const daysDomain = sharedHistogramDomain(entDays, gbvDays);
-  if(entDays.length) histogram('hist-ent', entDays, 'var(--primary)', daysDomain);
-  if(gbvDays.length) histogram('hist-gbv', gbvDays, 'var(--gold)', daysDomain);
+  drawCaseMetricCharts(built, 'dak');
   makeSortableTable('roster-table', rosterCols, roster, rosterRowBuilder, {
     enabled: r => r.sd_id!=null && sdById[r.sd_id],
     handler: r => openSdModal(sdById[r.sd_id]),
@@ -516,15 +621,15 @@ function renderOverview(){
 // ---------------------------------------------------------------- Case Tracker
 function renderCases(){
   const cases = DATA.cases.map((c,i)=>({...c, _idx:i}));
-  const backlog = DATA.backlog_aging;
+  const backlog = currentPeriod(DATA).backlog_aging;
   const backlogMax = Math.max(...backlog.map(b=>b.n), 1);
   const backlogRows = backlog.map(b=>barRow(b.label, b.n, backlogMax, b.label==='90+ days'?'var(--low)':(b.label==='31-90 days'?'var(--gold)':'var(--primary)'), fmtNum(b.n))).join('');
 
   document.getElementById('panel-cases').innerHTML = `
-    <section><div class="section-head"><h2 class="serif tip" data-tip="${TIPS['Backlog Aging']}">Backlog Aging</h2><span class="hint">currently pending cases, by age</span></div>
+    <section><div class="section-head"><h2 class="serif tip" data-tip="${TIPS['Backlog Aging']}">Backlog Aging</h2><span class="hint">of cases filed in the selected period, still pending as of today</span></div>
       <div class="panel"><div class="bar-list">${backlogRows}</div></div>
     </section>
-    <section><div class="section-head"><h2 class="serif">Case List</h2><span class="hint">${cases.length} cases &middot; click a row for detail</span></div>
+    <section><div class="section-head"><h2 class="serif">Case List</h2><span class="hint">${cases.length} cases, all-time &middot; click a row for detail</span></div>
       <div class="panel" id="case-table"></div>
     </section>`;
 
@@ -532,14 +637,14 @@ function renderCases(){
     {label:'Case ID', key:'case_id', num:true},
     {label:'Sakshma Didi', key:'sd_name'},
     {label:'Type', key:'kind'},
+    {label:'Gender Type', key:'violence_type'},
     {label:'Application Date', key:'application_date'},
     {label:'Status', key:'status'},
     {label:'Days Open', key:'days_open', num:true},
   ];
   const rowBuilder = (c)=>{
-    const typeLabel = c.kind==='GBV' && c.violence_type ? `GBV &middot; ${c.violence_type}` : c.kind;
     const statusCls = c.status==='Resolved'?'good':(c.status==='Pending'?'warn':'na');
-    return [c.case_id, toTitleCase(c.sd_name), typeLabel, c.application_date||'—', `<span class="status-tag ${statusCls}">${c.status}</span>`, fmtNum(c.days_open)];
+    return [c.case_id, toTitleCase(c.sd_name), c.kind, c.violence_type || '–', c.application_date||'—', `<span class="status-tag ${statusCls}">${c.status}</span>`, fmtNum(c.days_open)];
   };
   makeSortableTable('case-table', cols, cases, rowBuilder, { enabled: ()=>true, handler: (c)=> openCaseModal(c) });
 }
@@ -594,7 +699,7 @@ function focusInsight(block){
 function openSdModal(r){
   if(!r) return;
   document.getElementById('modal-title').textContent = toTitleCase(r.sd_name);
-  const e = r.entitlement, g = r.gbv;
+  const e = r.entitlement, g = r.gender;
   let html = `<div class="mini-tiles">
       ${miniTile('Unified Score', fmtF(r.unified_score,1))}
       ${miniTile('Self-Sourced Rate', fmtPct(r.self_sourced_rate,1))}
@@ -606,14 +711,14 @@ function openSdModal(r){
       ${miniTile('Resolution Rate', fmtPct(e.resolution_rate,1))}${miniTile('Median Days', e.median_days==null?'—':fmtF(e.median_days,0))}
       ${miniTile('Backlog Age', e.backlog_age==null?'—':fmtF(e.backlog_age,0)+'d')}${miniTile('Category Score', e.category_score==null?'—':fmtF(e.category_score,1))}
     </div>${focusInsight(e)}` : `<p class="disclaimer">No entitlement cases recorded.</p>`;
-  html += `<div class="modal-subhead tip" data-tip="${TIPS['GBV Score']}">GBV Cases</div>`;
+  html += `<div class="modal-subhead tip" data-tip="${TIPS['Gender Score']}">Gender Cases</div>`;
   html += g ? `<div class="mini-tiles">
       ${miniTile('Cases', fmtNum(g.n))}${miniTile('Resolved', fmtNum(g.n_resolved))}
       ${miniTile('Resolution Rate', fmtPct(g.resolution_rate,1))}${miniTile('Median Days', g.median_days==null?'—':fmtF(g.median_days,0))}
       ${miniTile('Backlog Age', g.backlog_age==null?'—':fmtF(g.backlog_age,0)+'d')}${miniTile('Category Score', g.category_score==null?'—':fmtF(g.category_score,1))}
-    </div>${focusInsight(g)}` : `<p class="disclaimer">No GBV cases recorded.</p>`;
+    </div>${focusInsight(g)}` : `<p class="disclaimer">No Gender cases recorded.</p>`;
   html += rank3Table('Entitlement Score', r.rank.entitlement_score);
-  html += rank3Table('GBV Score', r.rank.gbv_score);
+  html += rank3Table('Gender Score', r.rank.gender_score);
   html += rank3Table('Unified Score', r.rank.unified_score);
   document.getElementById('modal-body').innerHTML = html;
   document.getElementById('modal-backdrop').classList.add('open');
@@ -623,7 +728,8 @@ document.getElementById('modal-backdrop').addEventListener('click', (e)=>{ if(e.
 
 // ---------------------------------------------------------------- Scoring & Ranking
 function renderScoring(sub){
-  sub = sub || 'sd';
+  sub = sub || CURRENT_SUBTAB || 'sd';
+  CURRENT_SUBTAB = sub;
   document.getElementById('subtabbar').style.display = 'flex';
   document.getElementById('subtabbar').innerHTML = `
     <button class="subtabbtn ${sub==='sd'?'active':''}" data-sub="sd">Sakshma Didi Ranking</button>
@@ -632,8 +738,8 @@ function renderScoring(sub){
   if(sub==='sd') renderSdRanking(); else renderDakRanking();
 }
 
-function performanceHighlights(){
-  const scored = DATA.scoring.sd_ranking.filter(r=> r.unified_score!=null);
+function performanceHighlights(rows){
+  const scored = rows.filter(r=> r.unified_score!=null);
   if(scored.length < 2) return '';
   const best = scored.slice().sort((a,b)=>b.unified_score-a.unified_score)[0];
   const worst = scored.slice().sort((a,b)=>a.unified_score-b.unified_score)[0];
@@ -643,12 +749,13 @@ function performanceHighlights(){
 }
 
 function renderSdRanking(){
-  const rows = DATA.scoring.sd_ranking.map((r,i)=>({...r, _idx:i}));
+  const scoring = currentPeriod(DATA).scoring;
+  const rows = sortDescByKey(scoring.sd_ranking, 'unified_score').map((r,i)=>({...r, _idx:i}));
   rows.forEach(r=>{
     r._e = r.entitlement ? r.entitlement.category_score : null;
-    r._g = r.gbv ? r.gbv.category_score : null;
+    r._g = r.gender ? r.gender.category_score : null;
     r._u = r.unified_score;
-    r._cases = (r.entitlement?r.entitlement.n:0) + (r.gbv?r.gbv.n:0);
+    r._cases = (r.entitlement?r.entitlement.n:0) + (r.gender?r.gender.n:0);
     r._blockRank = r.rank.unified_score.block;
     r._districtRank = r.rank.unified_score.district;
     r._stateRank = r.rank.unified_score.state;
@@ -659,7 +766,7 @@ function renderSdRanking(){
 
   document.getElementById('panel-scoring').innerHTML = `
     <section><div class="section-head"><h2 class="serif">Sakshma Didi Ranking</h2><span class="hint">click a row for full metrics</span></div>
-      ${performanceHighlights()}
+      ${performanceHighlights(scoring.sd_ranking)}
       <div class="panel" id="sd-scores-table"></div>
     </section>
     <section><div class="section-head"><h2 class="serif tip" data-tip="${TIPS['Standing']}">Standing</h2><span class="hint">Unified Score's rank among peers at each level</span></div>
@@ -672,14 +779,15 @@ function renderSdRanking(){
     return `<div class="score-cell"><div class="score-bar"><div class="fill" style="width:${score||0}%;background:${c}"></div></div><span class="score-num" style="color:${c}">${fmtF(score,1)}</span></div>`;
   };
   const scoreCols = [
+    {label:'Rank', num:true},
     {label:'Sakshma Didi', key:'sd_name'},
     {label:'Cases', key:'_cases', num:true},
     {label:'Entitlement Score', key:'_e', num:true},
-    {label:'GBV Score', key:'_g', num:true},
+    {label:'Gender Score', key:'_g', num:true},
     {label:'Unified Score', key:'_u', num:true},
   ];
-  const scoreRowBuilder = (r)=>[
-    toTitleCase(r.sd_name), fmtNum(r._cases), scoreCell(r._e), scoreCell(r._g), scoreCell(r._u),
+  const scoreRowBuilder = (r, idx)=>[
+    idx+1, toTitleCase(r.sd_name), fmtNum(r._cases), scoreCell(r._e), scoreCell(r._g), scoreCell(r._u),
   ];
   makeSortableTable('sd-scores-table', scoreCols, rows, scoreRowBuilder, { enabled: ()=>true, handler: (r)=> openSdModal(r) });
 
@@ -701,11 +809,11 @@ function renderSdRanking(){
 }
 
 // Unified Score leads, highlighted, since it's the cumulative number for the
-// DAK - the three category scores that feed into it (Entitlement/GBV/
+// DAK - the three category scores that feed into it (Entitlement/Gender/
 // Outreach) are supporting detail, not headline numbers, so they now share
 // one combined section below instead of each getting equal-weight top billing.
 function renderDakRanking(){
-  const s = DATA.scoring.dak_ranking;
+  const s = currentPeriod(DATA).scoring.dak_ranking;
   const catBlock = (title, tipKey, hint, metricTiles, rankDistrict, rankState)=>`
     <div class="cat-block">
       <div class="cat-block-head${TIPS[tipKey]?' tip':''}"${TIPS[tipKey]?` data-tip="${TIPS[tipKey]}"`:''}>${title}${hint?` <span style="font-weight:400;text-transform:none;letter-spacing:normal;">&middot; ${hint}</span>`:''}</div>
@@ -726,7 +834,7 @@ function renderDakRanking(){
         </div>
       </div>
     </section>
-    <section><div class="section-head"><h2 class="serif">Category Scores</h2><span class="hint">entitlement, GBV, and proactive outreach</span></div>
+    <section><div class="section-head"><h2 class="serif">Category Scores</h2><span class="hint">entitlement, Gender, and proactive outreach</span></div>
       <div class="panel">
         ${catBlock('Entitlement', 'Entitlement Score', null, [
           tile('Cases', fmtNum(s.entitlement.n)),
@@ -735,13 +843,13 @@ function renderDakRanking(){
           tile('Backlog Age', s.entitlement.backlog_age==null?'—':fmtF(s.entitlement.backlog_age,0)+' days'),
           tile('Category Score', s.entitlement.category_score==null?'—':fmtF(s.entitlement.category_score,1)),
         ], s.entitlement.rank_district, s.entitlement.rank_state)}
-        ${catBlock('GBV', 'GBV Score', null, [
-          tile('Cases', fmtNum(s.gbv.n)),
-          tile('Resolution Rate', fmtPct(s.gbv.resolution_rate,1)),
-          tile('Median Days', s.gbv.median_days==null?'—':fmtF(s.gbv.median_days,0)),
-          tile('Backlog Age', s.gbv.backlog_age==null?'—':fmtF(s.gbv.backlog_age,0)+' days'),
-          tile('Category Score', s.gbv.category_score==null?'—':fmtF(s.gbv.category_score,1)),
-        ], s.gbv.rank_district, s.gbv.rank_state)}
+        ${catBlock('Gender', 'Gender Score', null, [
+          tile('Cases', fmtNum(s.gender.n)),
+          tile('Resolution Rate', fmtPct(s.gender.resolution_rate,1)),
+          tile('Median Days', s.gender.median_days==null?'—':fmtF(s.gender.median_days,0)),
+          tile('Backlog Age', s.gender.backlog_age==null?'—':fmtF(s.gender.backlog_age,0)+' days'),
+          tile('Category Score', s.gender.category_score==null?'—':fmtF(s.gender.category_score,1)),
+        ], s.gender.rank_district, s.gender.rank_state)}
         ${catBlock('Proactive Outreach Share', 'Outreach Share', '% of cases arriving via the Sakshma Didi/Gender CRP channel', [
           tile('Outreach Share', fmtPct(s.outreach_share,1)),
         ], s.outreach_rank_district, s.outreach_rank_state)}
@@ -749,23 +857,903 @@ function renderDakRanking(){
     </section>`;
 }
 
+// ---------------------------------------------------------------- Alternate Services (DAK Specta/CSC)
+// Deliberately separate from scoring - see build script comments. Coverage
+// is sparse (~19% of DAKs have ever recorded anything), so a DAK with none
+// gets a plain neutral note, not the tab's full empty-chart machinery.
+function renderAltServices(){
+  const alt = currentPeriod(DATA).alt_services;
+  const everActive = Object.values(DATA.by_period).some(p=>p.alt_services.kpi.total_txn>0);
+  const kpiTiles = [
+    tile('Total Transactions', fmtNum(alt.kpi.total_txn)),
+    tile('Total Amount', fmtRs(alt.kpi.total_amount)),
+    tile('Service Types Used', fmtNum(alt.kpi.n_service_types), null, 'neutral'),
+  ];
+  const mixMax = alt.service_mix.length ? alt.service_mix[0].n : 1;
+  const mixRows = alt.service_mix.slice(0,10).map(m=>barRow(m.label, m.n, mixMax, 'var(--primary)')).join('');
+  if(!everActive){
+    document.getElementById('panel-altservices').innerHTML = `
+      <section><div class="section-head"><h2 class="serif">Alternate Services</h2><span class="hint">CSC/VLE services beyond core casework</span></div>
+        <div class="panel"><p class="disclaimer">No alternate-service (CSC) activity on record for this DAK.</p></div>
+      </section>`;
+    return;
+  }
+  document.getElementById('panel-altservices').innerHTML = `
+    <section><div class="section-head"><h2 class="serif">Alternate Services Snapshot</h2><span class="hint">CSC/VLE services beyond core casework</span></div>
+      <div class="panel"><div class="tiles">${kpiTiles.join('')}</div></div>
+    </section>
+    <section><div class="section-head"><h2 class="serif">Transactions Over Time</h2><span class="hint">not affected by the period picker above</span></div>
+      <div class="panel" id="dak-alt-trend"></div>
+    </section>
+    <section><div class="section-head"><h2 class="serif">Service Type Breakdown</h2><span class="hint">ranked by transaction count</span></div>
+      <div class="panel"><div class="bar-list">${mixRows || '<div class="hint">No activity in the selected period.</div>'}</div></div>
+    </section>`;
+  renderAltServicesTrendChart('dak-alt-trend', DATA);
+}
+
+// ---------------------------------------------------------------- Training Capacity (MPR - Block, Monthly Progress Report)
+// A capacity/input measure (BMMU staffing, BRP training/deployment for the
+// Gender program) attributed to this DAK via its block (the MPR reporting
+// unit IS the DAK's block - see build script comments). Kept OUT of scoring
+// for the same reason as Alternate Services. Unlike Alternate Services,
+// always rendered in full (not collapsed to a "no activity" note) - the
+// compliance indicator is itself the point of this tab, so a DAK that has
+// never submitted should visibly show "0 of N months submitted" rather than
+// have the whole tab hidden.
+function renderTraining(){
+  const k = currentPeriod(DATA).training_kpi;
+  const compliance = DATA.training_capacity.compliance;
+  const kpiTiles = [
+    tile('BMMU Staff Trained', fmtNum(k.bmmu_staff_trained)),
+    tile('BRPs Trained', fmtNum(k.brps_trained)),
+    tile('BRPs Deployed', fmtNum(k.brps_deployed)),
+  ];
+  document.getElementById('panel-training').innerHTML = `
+    <section><div class="section-head"><h2 class="serif">Training Capacity Snapshot</h2><span class="hint">BMMU/BRP Gender-training counts, from the Monthly Progress Report (MPR)</span></div>
+      <div class="panel"><div class="tiles">${kpiTiles.join('')}</div></div>
+    </section>
+    <section><div class="section-head"><h2 class="serif">Reporting Compliance</h2><span class="hint">all-time, not affected by the period picker above</span></div>
+      <div class="panel">${trainingComplianceHtml(compliance)}</div>
+    </section>
+    <section><div class="section-head"><h2 class="serif">Training Counts Over Time</h2><span class="hint">not affected by the period picker above &middot; gaps mark months with no submitted report</span></div>
+      <div class="panel" id="dak-training-trend"></div>
+    </section>`;
+  renderTrainingTrendChart('dak-training-trend', DATA);
+}
+
 // ---------------------------------------------------------------- tabs
 const TABS = [
   {id:'overview', label:'Overview'},
   {id:'cases', label:'Case Tracker'},
+  {id:'altservices', label:'Alternate Services'},
+  {id:'training', label:'Training Capacity'},
   {id:'scoring', label:'Scoring & Ranking'},
 ];
+let CURRENT_TAB = 'overview', CURRENT_SUBTAB = 'sd';
 function renderTabbar(active){
   document.getElementById('tabbar').innerHTML = TABS.map(t=>`<button class="tabbtn ${t.id===active?'active':''}" data-tab="${t.id}">${t.label}</button>`).join('');
-  document.querySelectorAll('.tabbtn').forEach(b=> b.addEventListener('click', ()=> switchTab(b.dataset.tab)));
+  // Scoped to #tabbar specifically -- District/State scope have their own
+  // tabbar elements that also use the .tabbtn class for shared styling, and
+  // an unscoped selector here would wire this view's switchTab() onto their
+  // buttons too (they're all present in the DOM at once, just hidden).
+  document.querySelectorAll('#tabbar .tabbtn').forEach(b=> b.addEventListener('click', ()=> switchTab(b.dataset.tab)));
 }
 function switchTab(id){
+  CURRENT_TAB = id;
   TABS.forEach(t=> document.getElementById('panel-'+t.id).classList.toggle('active', t.id===id));
   if(id!=='scoring') document.getElementById('subtabbar').style.display='none';
   renderTabbar(id);
   if(id==='overview') renderOverview();
   else if(id==='cases') renderCases();
-  else if(id==='scoring') renderScoring();
+  else if(id==='scoring') renderScoring(CURRENT_SUBTAB);
+  else if(id==='altservices') renderAltServices();
+  else if(id==='training') renderTraining();
+}
+
+// ---------------------------------------------------------------- shared District/State components
+// Heatmap #1: case counts. Server precomputes one row per block/district with
+// a count for Total/Entitlement/Gender/each of the 19 violence sub-types
+// (build_dak_statewide_data.py's case_count_table()) - the category list here
+// is read straight off the first row's own keys rather than hardcoded, so it
+// stays correct if the underlying violence-type list ever changes.
+// ---------------------------------------------------------------- real choropleths (Plotly, built from actual Bihar block/district shapefiles)
+let GEO_BLOCKS = null, GEO_DISTRICTS = null;
+function loadGeoBlocks(){
+  if(GEO_BLOCKS) return Promise.resolve(GEO_BLOCKS);
+  return fetch('data/geo/blocks_534.geojson', {cache:'force-cache'}).then(r=>r.json()).then(g=>{ GEO_BLOCKS = g; return g; });
+}
+function loadGeoDistricts(){
+  if(GEO_DISTRICTS) return Promise.resolve(GEO_DISTRICTS);
+  return fetch('data/geo/districts_38.geojson', {cache:'force-cache'}).then(r=>r.json()).then(g=>{ GEO_DISTRICTS = g; return g; });
+}
+function plotlyGeoLayout(){
+  return {
+    geo: { visible:false, showland:false, showcountries:false, showframe:false, fitbounds:'locations', bgcolor:'rgba(0,0,0,0)' },
+    margin: {t:10,b:10,l:10,r:10}, height:480, paper_bgcolor:'rgba(0,0,0,0)',
+    legend: {orientation:'h', y:-0.03, font:{size:12}},
+  };
+}
+
+// ---------------------------------------------------------------- trend-over-time charts
+// The one component that deliberately ignores the period picker - its whole
+// point is showing every month at once, not the currently-selected one. Both
+// read straight from payload.by_period, which already carries every month
+// (built for the picker itself), so no new server data is needed just to
+// support this - only Alternate Services' own numbers needed adding server-
+// side, for reasons unrelated to the trend chart itself.
+function monthlyPeriodKeys(payload){
+  return Object.keys(payload.by_period).filter(k=>/^\d{4}-\d{2}$/.test(k)).sort();
+}
+function monthLabel(m){
+  const [y,mm] = m.split('-');
+  return `${MONTH_NAMES[mm]} '${y.slice(2)}`;
+}
+function plotlyBarLayout(yTitle){
+  return {
+    autosize:true, margin:{t:10,b:50,l:55,r:20}, height:280, paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)',
+    xaxis:{tickangle:-45, automargin:true}, yaxis:{title:{text:yTitle}, automargin:true},
+    legend:{orientation:'h', y:-0.35},
+  };
+}
+
+// Case Volume Over Time - stacked Resolved/Pending, full bar height = total
+// cases filed that month (Application_Date-based, same as every other
+// case-volume metric in this tracker).
+function renderCaseTrendChart(containerId, payload){
+  const host = document.getElementById(containerId);
+  const months = monthlyPeriodKeys(payload);
+  const labels = months.map(monthLabel);
+  const chartId = containerId+'-chart', selId = containerId+'-toggle';
+  host.innerHTML = `<select class="heatmap-select" id="${selId}">
+    <option value="all">All Cases</option>
+    <option value="entitlement">Entitlement</option>
+    <option value="gender">Gender</option>
+  </select><div id="${chartId}"></div>`;
+  function draw(kind){
+    const resolved = months.map(m=>{
+      const kpi = payload.by_period[m].overview.kpi;
+      return kind==='all' ? kpi.resolved : kpi.by_kind[kind].resolved;
+    });
+    const pending = months.map(m=>{
+      const kpi = payload.by_period[m].overview.kpi;
+      return kind==='all' ? kpi.pending : kpi.by_kind[kind].pending;
+    });
+    const traces = [
+      {x:labels, y:resolved, name:'Resolved', type:'bar', marker:{color:'#2F9C74'}},
+      {x:labels, y:pending, name:'Pending', type:'bar', marker:{color:'#CE9C3C'}},
+    ];
+    Plotly.newPlot(chartId, traces, {...plotlyBarLayout('Cases'), barmode:'stack'}, {displayModeBar:false, responsive:true});
+  }
+  draw('all');
+  document.getElementById(selId).addEventListener('change', e=> draw(e.target.value));
+}
+
+// Alternate Services' own trend, with the same Count/Amount toggle as its
+// choropleth, for a consistent mental model between the two.
+function renderAltServicesTrendChart(containerId, payload){
+  const host = document.getElementById(containerId);
+  const months = monthlyPeriodKeys(payload);
+  const labels = months.map(monthLabel);
+  const chartId = containerId+'-chart', selId = containerId+'-toggle';
+  host.innerHTML = `<select class="heatmap-select" id="${selId}">
+    <option value="total_txn">Count of Services</option>
+    <option value="total_amount">Total Amount</option>
+  </select><div id="${chartId}"></div>`;
+  function draw(metric){
+    const values = months.map(m=>payload.by_period[m].alt_services.kpi[metric]);
+    Plotly.newPlot(chartId, [{x:labels, y:values, type:'bar', marker:{color:'#2A5C8C'}}],
+      plotlyBarLayout(metric==='total_txn' ? 'Transactions' : 'Amount (₹)'), {displayModeBar:false, responsive:true});
+  }
+  draw('total_txn');
+  document.getElementById(selId).addEventListener('change', e=> draw(e.target.value));
+}
+
+// Training Capacity's own trend - unlike the two charts above, this does NOT
+// read densely off payload.by_period (which zero-fills every month). MPR
+// submission is genuinely sparse (a block can simply not have filed a given
+// month's report), and a zero-filled bar would misrepresent "not submitted"
+// as "submitted zero" - the exact distinction this tracker deliberately
+// preserves server-side (training_trend_series() only emits a point for
+// months actually submitted). Reads the fixed axis from payload.mpr_window_
+// months (the full Dec-2025-Sep-2026 window) and looks up each month in the
+// sparse series, leaving a genuine gap (null) for months with no submission.
+function renderTrainingTrendChart(containerId, payload){
+  const host = document.getElementById(containerId);
+  const months = payload.mpr_window_months || [];
+  const labels = months.map(monthLabel);
+  const byMonth = {};
+  (payload.training_capacity.series || []).forEach(s=> byMonth[s.period] = s);
+  const chartId = containerId+'-chart', selId = containerId+'-toggle';
+  host.innerHTML = `<select class="heatmap-select" id="${selId}">
+    <option value="bmmu_staff_trained">BMMU Staff Trained</option>
+    <option value="brps_trained">BRPs Trained</option>
+    <option value="brps_deployed">BRPs Deployed</option>
+  </select><div id="${chartId}"></div>`;
+  function draw(metric){
+    const values = months.map(m=> byMonth[m] ? byMonth[m][metric] : null);
+    Plotly.newPlot(chartId, [{x:labels, y:values, type:'bar', marker:{color:'#2A5C8C'}, connectgaps:false}],
+      plotlyBarLayout('Count'), {displayModeBar:false, responsive:true});
+  }
+  draw('bmmu_staff_trained');
+  document.getElementById(selId).addEventListener('change', e=> draw(e.target.value));
+}
+
+// Training Capacity's compliance indicator - plain text, deliberately not
+// color-coded (agreed with Mohan: this is a reporting-compliance fact, not a
+// performance grade). Always "N of M months submitted" against the FULL
+// tracked window, plus the most recent submission if any.
+function trainingComplianceHtml(compliance){
+  return `<div class="tiles">
+      ${tile('Months Submitted', `${compliance.n_submitted} of ${compliance.n_window}`, null, 'neutral')}
+      ${tile('Last Submitted', compliance.last_submitted || 'Never', null, 'neutral')}
+    </div>`;
+}
+
+// Heatmap #1: case counts, a real choropleth colored on a blue intensity
+// spectrum (deliberately not red/yellow/green, to avoid visual confusion
+// with the DAK-setup status map below) - block-level for District scope,
+// district-level for State scope. Category dropdown swaps which count
+// column drives the color, derived from the row keys themselves (Total /
+// Entitlement / Gender / each of the 19 violence sub-types) rather than
+// hardcoded, so it stays correct if that list ever changes server-side.
+function renderCaseHeatmapSection(containerId, rowLabel, heatmapRows, geoLoader, idKey){
+  const host = document.getElementById(containerId);
+  if(!heatmapRows || !heatmapRows.length){ host.innerHTML = '<p class="disclaimer">No case data to show.</p>'; return; }
+  const cats = Object.keys(heatmapRows[0]).filter(k=>k!==idKey && k!=='label');
+  const mapId = containerId+'-map', selId = containerId+'-cat-select';
+  host.innerHTML = `<select class="heatmap-select" id="${selId}">${cats.map(c=>`<option value="${c}">${c}</option>`).join('')}</select><div id="${mapId}" style="width:100%;"></div>`;
+  geoLoader().then(geojson=>{
+    function draw(cat){
+      const values = heatmapRows.map(r=>r[cat]||0);
+      const trace = {
+        type: 'choropleth', geojson, locations: heatmapRows.map(r=>r[idKey]), z: values,
+        // Explicit zmin/zmax rather than Plotly's auto-range: if every value
+        // for the selected category happens to be 0 (a violence sub-type
+        // with no cases anywhere in view), auto-ranging collapses to a
+        // single-point [0,0] domain, which some Plotly versions render blank
+        // instead of "all lightest color."
+        zmin: 0, zmax: Math.max(...values, 1),
+        featureidkey: `properties.${idKey}`, colorscale: [[0,'#D7E2ED'],[1,'#2A5C8C']],
+        marker: {line:{color:'#fff', width:0.6}}, showscale:true, colorbar:{thickness:14, title:{text:cat, side:'right'}},
+        text: heatmapRows.map(r=>`${toTitleCase(r.label)}: ${fmtNum(r[cat]||0)}`), hoverinfo:'text',
+      };
+      Plotly.newPlot(mapId, [trace], plotlyGeoLayout(), {displayModeBar:false, responsive:true});
+    }
+    draw(cats[0]);
+    document.getElementById(selId).addEventListener('change', (e)=> draw(e.target.value));
+  }).catch(err=>{ host.innerHTML = `<p class="disclaimer">Map failed to load (${err.message}).</p>`; });
+}
+
+// Heatmap #2: "% DAK set up" - fixed 3-category choropleth (red = not
+// disbursed, yellow = disbursed but no DAK, green = DAK set up), block-level
+// for District scope and statewide-all-534-blocks for State scope (per
+// Mohan's explicit instruction - not dissolved to district level like the
+// case-count map). One flat-color trace per status (Plotly's standard
+// pattern for a discrete/categorical choropleth, since a single continuous
+// colorscale would blend red/yellow/green into confusing intermediate hues).
+const DAK_SETUP_LABELS = {not_disbursed:'Funds Not Disbursed', disbursed_no_dak:'Disbursed, No DAK', dak_set_up:'DAK Set Up'};
+const DAK_SETUP_CLASS = {not_disbursed:'na', disbursed_no_dak:'flag', dak_set_up:'good'};
+const DAK_SETUP_COLOR = {not_disbursed:'#C55F49', disbursed_no_dak:'#CE9C3C', dak_set_up:'#2F9C74'};
+function renderDakSetupChoropleth(containerId, rows, geoLoader, idKey){
+  const host = document.getElementById(containerId);
+  if(!rows || !rows.length){ host.innerHTML = '<p class="disclaimer">No block-universe data available.</p>'; return; }
+  geoLoader().then(geojson=>{
+    const traces = Object.keys(DAK_SETUP_COLOR).map(status=>{
+      const subset = rows.filter(r=>r.status===status);
+      if(!subset.length) return null;
+      return {
+        type:'choropleth', geojson, locations: subset.map(r=>r[idKey]), z: subset.map(()=>1),
+        // Every z is 1 here (this trace is one flat color, not a gradient) -
+        // explicit zmin/zmax avoids Plotly auto-ranging to a degenerate
+        // [1,1] domain, which some versions render as blank instead of solid.
+        zmin: 0, zmax: 1,
+        featureidkey: `properties.${idKey}`, colorscale: [[0,DAK_SETUP_COLOR[status]],[1,DAK_SETUP_COLOR[status]]],
+        showscale:false, name: DAK_SETUP_LABELS[status], showlegend:true,
+        marker: {line:{color:'#fff', width:0.6}},
+        text: subset.map(r=>`${toTitleCase(r.label)}: ${DAK_SETUP_LABELS[status]}`), hoverinfo:'text',
+      };
+    }).filter(Boolean);
+    Plotly.newPlot(containerId, traces, plotlyGeoLayout(), {displayModeBar:false, responsive:true});
+  }).catch(err=>{ host.innerHTML = `<p class="disclaimer">Map failed to load (${err.message}).</p>`; });
+}
+
+// District scope's table view beneath its block map: the same block/status
+// rows, plain list form.
+function renderDakSetupBlockTable(containerId, rows){
+  const cols = [{label:'Block', key:'label'}, {label:'Status', key:'status'}];
+  const rowBuilder = (r)=>[toTitleCase(r.label), `<span class="status-tag ${DAK_SETUP_CLASS[r.status]}">${DAK_SETUP_LABELS[r.status]}</span>`];
+  makeSortableTable(containerId, cols, rows, rowBuilder, null);
+}
+
+// State scope's table view beneath its statewide block map: the 3-column
+// per-district summary Mohan asked for (not a 534-row block list).
+function renderDakSetupDistrictTable(containerId, rows){
+  const cols = [
+    {label:'District', key:'label'}, {label:'Total Blocks', key:'n_blocks_total', num:true},
+    {label:'Blocks Disbursed', key:'n_blocks_disbursed', num:true}, {label:'Blocks DAK Set Up', key:'n_blocks_dak_set_up', num:true},
+  ];
+  const rowBuilder = (r)=>[toTitleCase(r.label), fmtNum(r.n_blocks_total), fmtNum(r.n_blocks_disbursed), fmtNum(r.n_blocks_dak_set_up)];
+  makeSortableTable(containerId, cols, rows, rowBuilder, null);
+}
+
+function dakStatusBadge(status){
+  if(status==='no_activity') return '<span class="status-tag flag">No SDs/Cases</span>';
+  if(status==='roster_incomplete') return '<span class="status-tag warn">Roster Incomplete</span>';
+  return '<span class="status-tag good">OK</span>';
+}
+// Shared by District scope (own DAKs only) and State scope (all 198, with an
+// extra District column) - clicking a row opens that DAK's own dashboard via
+// the existing loadDak(), same click-through idiom as the landing directory.
+function renderDakRankingTable(containerId, rows, showDistrictCol){
+  const items = sortDescByKey(rows, 'unified_score').map((r,i)=>({...r, _idx:i}));
+  const cols = [
+    {label:'Rank', num:true},
+    {label:'DAK', key:'dak_name'},
+    ...(showDistrictCol ? [{label:'District', key:'district'}] : []),
+    {label:'Block', key:'block'},
+    {label:'Cases', key:'n_cases', num:true},
+    {label:'Unified Score', key:'unified_score', num:true},
+    {label:'Status', key:'status'},
+  ];
+  const rowBuilder = (r, idx)=>[
+    idx+1, toTitleCase(r.dak_name),
+    ...(showDistrictCol ? [toTitleCase(r.district)] : []),
+    toTitleCase(r.block), fmtNum(r.n_cases),
+    r.unified_score==null?'—':fmtF(r.unified_score,1),
+    dakStatusBadge(r.status),
+  ];
+  makeSortableTable(containerId, cols, items, rowBuilder, { enabled: r=>!!r.slug, handler: r=> loadDak(r.slug) });
+}
+
+// SD Ranking rows share the exact shape build_payload() already builds for a
+// single DAK's own roster (sd_scoring_row() in the build script) - so the
+// existing openSdModal() (defined above, only reads fields off its `r` param)
+// works unmodified for a District's cross-DAK SD list too.
+function renderSdRankingTable(containerId, rows){
+  const items = sortDescByKey(rows, 'unified_score').map((r,i)=>({...r, _idx:i}));
+  items.forEach(r=>{
+    r._e = r.entitlement ? r.entitlement.category_score : null;
+    r._g = r.gender ? r.gender.category_score : null;
+    r._u = r.unified_score;
+    r._cases = (r.entitlement?r.entitlement.n:0) + (r.gender?r.gender.n:0);
+  });
+  const scoreCell = (score)=>{
+    if(score==null) return `<span style="color:var(--ink-soft)">no cases</span>`;
+    const c = grade(score);
+    return `<div class="score-cell"><div class="score-bar"><div class="fill" style="width:${score||0}%;background:${c}"></div></div><span class="score-num" style="color:${c}">${fmtF(score,1)}</span></div>`;
+  };
+  const cols = [
+    {label:'Rank', num:true},
+    {label:'Sakshma Didi', key:'sd_name'}, {label:'Cases', key:'_cases', num:true},
+    {label:'Entitlement Score', key:'_e', num:true}, {label:'Gender Score', key:'_g', num:true}, {label:'Unified Score', key:'_u', num:true},
+  ];
+  const rowBuilder = (r, idx)=>[idx+1, toTitleCase(r.sd_name), fmtNum(r._cases), scoreCell(r._e), scoreCell(r._g), scoreCell(r._u)];
+  makeSortableTable(containerId, cols, items, rowBuilder, { enabled: ()=>true, handler: (r)=> openSdModal(r) });
+}
+
+function renderDistrictRankingTable(containerId, rows){
+  // Already sorted by unified_score descending server-side (state.json's
+  // district_ranking), so no client-side re-sort needed before the initial
+  // render - only the DAK/SD ranking lists arrive in roster/key order and
+  // need sortDescByKey() first.
+  const items = rows.map((r,i)=>({...r, _idx:i}));
+  const cols = [
+    {label:'Rank', num:true},
+    {label:'District', key:'district'}, {label:'DAKs', key:'n_daks', num:true},
+    {label:'Sakshma Didis', key:'n_sds', num:true}, {label:'Cases', key:'n_cases', num:true},
+    {label:'Unified Score', key:'unified_score', num:true},
+  ];
+  const rowBuilder = (r, idx)=>[
+    idx+1, toTitleCase(r.district), fmtNum(r.n_daks), fmtNum(r.n_sds), fmtNum(r.n_cases),
+    r.unified_score==null?'—':fmtF(r.unified_score,1),
+  ];
+  makeSortableTable(containerId, cols, items, rowBuilder, { enabled: r=>!!r.slug, handler: r=> loadDistrict(r.slug) });
+}
+
+// Alternate Services ranking tables - same "Rank" + "show every row, 0s for
+// the inactive majority" convention as every other ranking table, sorted by
+// transaction count rather than a score since there's no scoring dimension
+// here at all (deliberately kept out of Unified Score, see build script).
+function renderAltDakRankingTable(containerId, rows, showDistrictCol){
+  const items = sortDescByKey(rows, 'total_txn').map((r,i)=>({...r, _idx:i}));
+  const cols = [
+    {label:'Rank', num:true},
+    {label:'DAK', key:'dak_name'},
+    ...(showDistrictCol ? [{label:'District', key:'district'}] : []),
+    {label:'Block', key:'block'},
+    {label:'Transactions', key:'total_txn', num:true},
+    {label:'Amount', key:'total_amount', num:true},
+    {label:'Service Types', key:'n_service_types', num:true},
+  ];
+  const rowBuilder = (r, idx)=>[
+    idx+1, toTitleCase(r.dak_name),
+    ...(showDistrictCol ? [toTitleCase(r.district)] : []),
+    toTitleCase(r.block), fmtNum(r.total_txn), fmtRs(r.total_amount), fmtNum(r.n_service_types),
+  ];
+  makeSortableTable(containerId, cols, items, rowBuilder, { enabled: r=>!!r.slug, handler: r=> loadDak(r.slug) });
+}
+function renderAltDistrictRankingTable(containerId, rows){
+  const items = sortDescByKey(rows, 'total_txn').map((r,i)=>({...r, _idx:i}));
+  const cols = [
+    {label:'Rank', num:true}, {label:'District', key:'district'},
+    {label:'Transactions', key:'total_txn', num:true}, {label:'Amount', key:'total_amount', num:true},
+    {label:'Service Types', key:'n_service_types', num:true},
+  ];
+  const rowBuilder = (r, idx)=>[idx+1, toTitleCase(r.district), fmtNum(r.total_txn), fmtRs(r.total_amount), fmtNum(r.n_service_types)];
+  makeSortableTable(containerId, cols, items, rowBuilder, { enabled: r=>!!r.slug, handler: r=> loadDistrict(r.slug) });
+}
+function renderTrainDakRankingTable(containerId, rows, showDistrictCol){
+  const items = sortDescByKey(rows, 'bmmu_staff_trained').map((r,i)=>({...r, _idx:i}));
+  const cols = [
+    {label:'Rank', num:true},
+    {label:'DAK', key:'dak_name'},
+    ...(showDistrictCol ? [{label:'District', key:'district'}] : []),
+    {label:'Block', key:'block'},
+    {label:'BMMU Staff Trained', key:'bmmu_staff_trained', num:true},
+    {label:'BRPs Trained', key:'brps_trained', num:true},
+    {label:'BRPs Deployed', key:'brps_deployed', num:true},
+    {label:'Submitted', key:'n_submitted', num:true},
+  ];
+  const rowBuilder = (r, idx)=>[
+    idx+1, toTitleCase(r.dak_name),
+    ...(showDistrictCol ? [toTitleCase(r.district)] : []),
+    toTitleCase(r.block), fmtNum(r.bmmu_staff_trained), fmtNum(r.brps_trained), fmtNum(r.brps_deployed),
+    `${r.n_submitted} of ${r.n_window}`,
+  ];
+  makeSortableTable(containerId, cols, items, rowBuilder, { enabled: r=>!!r.slug, handler: r=> loadDak(r.slug) });
+}
+function renderTrainDistrictRankingTable(containerId, rows){
+  const items = sortDescByKey(rows, 'bmmu_staff_trained').map((r,i)=>({...r, _idx:i}));
+  const cols = [
+    {label:'Rank', num:true}, {label:'District', key:'district'},
+    {label:'BMMU Staff Trained', key:'bmmu_staff_trained', num:true},
+    {label:'BRPs Trained', key:'brps_trained', num:true},
+    {label:'BRPs Deployed', key:'brps_deployed', num:true},
+  ];
+  const rowBuilder = (r, idx)=>[idx+1, toTitleCase(r.district), fmtNum(r.bmmu_staff_trained), fmtNum(r.brps_trained), fmtNum(r.brps_deployed)];
+  makeSortableTable(containerId, cols, items, rowBuilder, { enabled: r=>!!r.slug, handler: r=> loadDistrict(r.slug) });
+}
+
+// ---------------------------------------------------------------- District scope
+let DISTRICT_DATA = null;
+const DISTRICT_TABS = [
+  {id:'overview', label:'Overview'}, {id:'cases', label:'Case Tracker'}, {id:'altservices', label:'Alternate Services'},
+  {id:'training', label:'Training Capacity'}, {id:'scoring', label:'Scoring & Ranking'},
+];
+function renderDistrictTabbar(active){
+  document.getElementById('district-tabbar').innerHTML = DISTRICT_TABS.map(t=>`<button class="tabbtn ${t.id===active?'active':''}" data-tab="${t.id}">${t.label}</button>`).join('');
+  document.querySelectorAll('#district-tabbar .tabbtn').forEach(b=> b.addEventListener('click', ()=> switchDistrictTab(b.dataset.tab)));
+}
+let CURRENT_DISTRICT_TAB = 'overview', CURRENT_DISTRICT_SUBTAB = 'sd';
+function switchDistrictTab(id){
+  CURRENT_DISTRICT_TAB = id;
+  DISTRICT_TABS.forEach(t=> document.getElementById('district-panel-'+t.id).classList.toggle('active', t.id===id));
+  if(id!=='scoring') document.getElementById('district-subtabbar').style.display='none';
+  renderDistrictTabbar(id);
+  if(id==='overview') renderDistrictOverview();
+  else if(id==='cases') renderDistrictCases();
+  else if(id==='scoring') renderDistrictScoring(CURRENT_DISTRICT_SUBTAB);
+  else if(id==='altservices') renderDistrictAltServices();
+  else if(id==='training') renderDistrictTraining();
+}
+function refreshDistrictView(){
+  switchDistrictTab(CURRENT_DISTRICT_TAB);
+}
+// Case Type Mix / Gender Type Breakdown / Case Reach / Days-to-Resolution -
+// identical sections to the DAK-scope Overview tab, shared here since
+// District/State Overview now carry the same case_type_mix/violence_type_mix/
+// case_reach_mix/days_to_resolution fields server-side (case_metric_overview()
+// in the build script). idPrefix keeps SVG element ids unique across the
+// DAK/District/State view containers, which all exist in the DOM at once.
+function caseMetricSectionsHtml(payload, idPrefix){
+  const ov = currentPeriod(payload).overview;
+  const mixColors = {'Entitlement':'var(--primary)','Gender':'var(--gold)'};
+  const typeSegs = (ov.case_type_mix||[]).map(m=>({frac:m.pct/100, color:mixColors[m.label]||'var(--grey)', label:m.label}));
+  const typeLegend = (ov.case_type_mix||[]).map(m=>`<div class="legend-row"><span class="legend-swatch" style="background:${mixColors[m.label]||'var(--grey)'}"></span>${m.label}<span class="amt">${fmtNum(m.n)}</span></div>`).join('');
+  const vtMax = (ov.violence_type_mix||[]).length ? ov.violence_type_mix[0].n : 1;
+  const vtRows = (ov.violence_type_mix||[]).slice(0,8).map(m=>barRow(m.label, m.n, vtMax, 'var(--gold)', `${m.n} (${fmtF(m.pct,1)}%)`)).join('');
+  const crMax = (ov.case_reach_mix||[]).length ? ov.case_reach_mix[0].n : 1;
+  const crRows = (ov.case_reach_mix||[]).slice(0,8).map(m=>barRow(m.label, m.n, crMax, 'var(--primary)', `${m.n} (${fmtF(m.pct,1)}%)`)).join('');
+  const entDays = (ov.days_to_resolution && ov.days_to_resolution.entitlement) || [];
+  const genderDays = (ov.days_to_resolution && ov.days_to_resolution.gender) || [];
+  const html = `
+    <section><div class="section-head"><h2 class="serif">Case Type Mix</h2></div>
+      <div class="panel"><div class="donut-row">
+        <div class="donut-wrap"><svg id="${idPrefix}-svg-typemix" width="180" height="180" viewBox="0 0 190 190"></svg></div>
+        <div class="donut-legend">${typeLegend}</div>
+      </div></div>
+    </section>
+    <section><div class="section-head"><h2 class="serif">Gender Type Breakdown</h2><span class="hint">within Gender cases, ranked</span></div>
+      <div class="panel"><div class="bar-list">${vtRows || '<div class="hint">No Gender cases recorded.</div>'}</div></div>
+    </section>
+    <section><div class="section-head"><h2 class="serif">Case Reach</h2><span class="hint">how the case first reached the DAK</span></div>
+      <div class="panel"><div class="bar-list">${crRows}</div></div>
+    </section>
+    <section><div class="section-head"><h2 class="serif">Days to Resolution — Distribution</h2><span class="hint">resolved cases only &middot; dashed line marks the median</span></div>
+      <div class="panel">
+        <div style="margin-bottom:20px;">
+          <div style="font-size:13px;font-weight:600;margin-bottom:8px;">Entitlement <span style="color:var(--ink-soft);font-weight:400;">(${entDays.length} resolved case${entDays.length===1?'':'s'})</span></div>
+          ${entDays.length ? `<svg id="${idPrefix}-hist-ent" viewBox="0 0 560 180" style="display:block;width:100%;height:auto;"></svg>` : `<p class="disclaimer">No resolved entitlement cases yet.</p>`}
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:600;margin-bottom:8px;">Gender <span style="color:var(--ink-soft);font-weight:400;">(${genderDays.length} resolved case${genderDays.length===1?'':'s'})</span></div>
+          ${genderDays.length ? `<svg id="${idPrefix}-hist-gender" viewBox="0 0 560 180" style="display:block;width:100%;height:auto;"></svg>` : `<p class="disclaimer">No resolved Gender cases yet.</p>`}
+        </div>
+      </div>
+    </section>
+    <section><div class="section-head"><h2 class="serif">Case Volume Over Time</h2><span class="hint">resolved vs. pending, by month filed &middot; not affected by the period picker above</span></div>
+      <div class="panel" id="${idPrefix}-case-trend"></div>
+    </section>`;
+  return {html, typeSegs, entDays, genderDays, payload};
+}
+function drawCaseMetricCharts(built, idPrefix){
+  drawDonut(`${idPrefix}-svg-typemix`, built.typeSegs);
+  const daysDomain = sharedHistogramDomain(built.entDays, built.genderDays);
+  if(built.entDays.length) histogram(`${idPrefix}-hist-ent`, built.entDays, 'var(--primary)', daysDomain);
+  if(built.genderDays.length) histogram(`${idPrefix}-hist-gender`, built.genderDays, 'var(--gold)', daysDomain);
+  renderCaseTrendChart(`${idPrefix}-case-trend`, built.payload);
+}
+
+function renderDistrictMasthead(){
+  const id = DISTRICT_DATA.identity;
+  document.getElementById('district-masthead-content').innerHTML = `
+    <div class="masthead-row">
+      <div class="masthead-titleblock">
+        <div class="crumbs">District</div>
+        <h1 class="serif">${toTitleCase(id.district)}</h1>
+        <div class="crumbs">${fmtNum(id.n_daks)} DAKs &middot; ${fmtNum(id.n_sds)} Sakshma Didis &middot; ${fmtNum(id.n_blocks)} blocks in the fund-disbursement universe</div>
+      </div>
+      ${periodPickerHtml('district')}
+    </div>`;
+  populatePeriodPicker('district', DISTRICT_DATA, refreshDistrictView);
+}
+function renderDistrictOverview(){
+  const ov = currentPeriod(DISTRICT_DATA).overview, k = ov.kpi;
+  const kpiTiles = [
+    tile('Total Cases', fmtNum(k.total_cases)), tile('Resolution Rate', fmtPct(k.resolution_rate_pct,1)),
+    tile('Pending', fmtNum(k.pending), null, 'warn'),
+    tile('% DAK Set Up', DISTRICT_DATA.pct_dak_set_up==null?'—':fmtPct(DISTRICT_DATA.pct_dak_set_up,1)),
+    tile('Amount Received', fmtNum(DISTRICT_DATA.total_amount_received), 'all-time, not period-specific', 'neutral'),
+  ];
+  const built = caseMetricSectionsHtml(DISTRICT_DATA, 'district');
+  document.getElementById('district-panel-overview').innerHTML = `
+    <section><div class="section-head"><h2 class="serif">District Snapshot</h2></div>
+      <div class="panel"><div class="tiles">${kpiTiles.join('')}</div></div>
+    </section>
+    ${built.html}
+    <section><div class="section-head"><h2 class="serif">% DAK Set Up — by Block</h2><span class="hint">funds-disbursement status vs. whether a DAK actually exists there (all-time) &middot; red = not disbursed, yellow = disbursed but no DAK, green = DAK set up</span></div>
+      <div class="panel"><div id="district-dak-setup-map"></div></div>
+      <div class="panel" style="margin-top:12px;" id="district-dak-setup-table"></div>
+    </section>`;
+  drawCaseMetricCharts(built, 'district');
+  renderDakSetupChoropleth('district-dak-setup-map', DISTRICT_DATA.dak_setup_blocks, loadGeoBlocks, 'block_id');
+  renderDakSetupBlockTable('district-dak-setup-table', DISTRICT_DATA.dak_setup_blocks);
+}
+function renderDistrictCases(){
+  const backlog = currentPeriod(DISTRICT_DATA).backlog_aging;
+  const backlogMax = Math.max(...backlog.map(b=>b.n), 1);
+  const backlogRows = backlog.map(b=>barRow(b.label, b.n, backlogMax, b.label==='90+ days'?'var(--low)':(b.label==='31-90 days'?'var(--gold)':'var(--primary)'), fmtNum(b.n))).join('');
+  document.getElementById('district-panel-cases').innerHTML = `
+    <section><div class="section-head"><h2 class="serif tip" data-tip="${TIPS['Backlog Aging']}">Backlog Aging</h2><span class="hint">currently pending cases, by age</span></div>
+      <div class="panel"><div class="bar-list">${backlogRows}</div></div>
+    </section>
+    <section><div class="section-head"><h2 class="serif">Case Count — by Block</h2><span class="hint">choose a category to color-rank blocks</span></div>
+      <div class="panel" id="district-case-heatmap"></div>
+    </section>`;
+  renderCaseHeatmapSection('district-case-heatmap', 'Block', currentPeriod(DISTRICT_DATA).case_heatmap, loadGeoBlocks, 'block_id');
+}
+// The highlighted "own aggregate" panel above a DAK Ranking table - mirrors
+// the DAK-scope renderDakRanking()'s "Unified DAK Score" panel exactly, one
+// level up, using district_own/state_own scoring blocks (entitlement/gender/
+// outreach_share/unified_score, each with only a state-level rank pack since
+// there's no sub-geography below a district - or below the state itself -
+// to also rank within).
+function ownAggregatePanelHtml(titleText, hintText, s){
+  if(!s) return '';
+  const catBlock = (title, tipKey, metricTiles, rankState)=>`
+    <div class="cat-block">
+      <div class="cat-block-head${TIPS[tipKey]?' tip':''}"${TIPS[tipKey]?` data-tip="${TIPS[tipKey]}"`:''}>${title}</div>
+      <div class="tiles" style="margin-bottom:14px;">${metricTiles.join('')}</div>
+      <div class="standing-grid">${standingCard('gold', rankState, 'State Standing')}</div>
+    </div>`;
+  return `
+    <section><div class="section-head"><h2 class="serif tip" data-tip="${TIPS['Unified Score']}">${titleText} — Unified Score</h2><span class="hint">${hintText}</span></div>
+      <div class="panel panel-highlight">
+        <div class="tiles n1" style="margin-bottom:16px;">${tile('Unified Score', fmtF(s.unified_score,1), null, 'big-value')}</div>
+        <div class="standing-grid">${standingCard('gold', s.unified_rank_state, 'State Standing')}</div>
+      </div>
+    </section>
+    <section><div class="section-head"><h2 class="serif">Category Scores</h2><span class="hint">entitlement, Gender, and proactive outreach</span></div>
+      <div class="panel">
+        ${catBlock('Entitlement', 'Entitlement Score', [
+          tile('Cases', fmtNum(s.entitlement.n)),
+          tile('Resolution Rate', fmtPct(s.entitlement.resolution_rate,1)),
+          tile('Median Days', s.entitlement.median_days==null?'—':fmtF(s.entitlement.median_days,0)),
+          tile('Backlog Age', s.entitlement.backlog_age==null?'—':fmtF(s.entitlement.backlog_age,0)+' days'),
+          tile('Category Score', s.entitlement.category_score==null?'—':fmtF(s.entitlement.category_score,1)),
+        ], s.entitlement.rank_state)}
+        ${catBlock('Gender', 'Gender Score', [
+          tile('Cases', fmtNum(s.gender.n)),
+          tile('Resolution Rate', fmtPct(s.gender.resolution_rate,1)),
+          tile('Median Days', s.gender.median_days==null?'—':fmtF(s.gender.median_days,0)),
+          tile('Backlog Age', s.gender.backlog_age==null?'—':fmtF(s.gender.backlog_age,0)+' days'),
+          tile('Category Score', s.gender.category_score==null?'—':fmtF(s.gender.category_score,1)),
+        ], s.gender.rank_state)}
+        ${catBlock('Proactive Outreach Share', 'Outreach Share', [
+          tile('Outreach Share', fmtPct(s.outreach_share,1)),
+        ], s.outreach_rank_state)}
+      </div>
+    </section>`;
+}
+
+function renderDistrictScoring(sub){
+  sub = sub || CURRENT_DISTRICT_SUBTAB || 'sd';
+  CURRENT_DISTRICT_SUBTAB = sub;
+  const scoring = currentPeriod(DISTRICT_DATA).scoring;
+  document.getElementById('district-subtabbar').style.display = 'flex';
+  document.getElementById('district-subtabbar').innerHTML = `
+    <button class="subtabbtn ${sub==='sd'?'active':''}" data-sub="sd">Sakshma Didi Ranking</button>
+    <button class="subtabbtn ${sub==='dak'?'active':''}" data-sub="dak">DAK Ranking</button>`;
+  document.querySelectorAll('#district-subtabbar .subtabbtn').forEach(b=> b.addEventListener('click', ()=> renderDistrictScoring(b.dataset.sub)));
+  if(sub==='sd'){
+    document.getElementById('district-panel-scoring').innerHTML = `
+      <section><div class="section-head"><h2 class="serif">Sakshma Didi Ranking</h2><span class="hint">${scoring.sd_ranking.length} Sakshma Didis in this district &middot; click a row for full metrics</span></div>
+        ${performanceHighlights(scoring.sd_ranking)}
+        <div class="panel" id="district-sd-table"></div>
+      </section>`;
+    renderSdRankingTable('district-sd-table', scoring.sd_ranking);
+  } else {
+    document.getElementById('district-panel-scoring').innerHTML = `
+      ${ownAggregatePanelHtml(toTitleCase(DISTRICT_DATA.identity.district), 'this district as a whole, case-volume-weighted across every DAK inside it', scoring.district_own)}
+      <section><div class="section-head"><h2 class="serif">DAK Ranking</h2><span class="hint">all ${scoring.dak_ranking.length} DAKs in this district &middot; click a row to open it</span></div>
+        <div class="panel" id="district-dak-table"></div>
+      </section>`;
+    renderDakRankingTable('district-dak-table', scoring.dak_ranking, false);
+  }
+}
+
+function renderDistrictAltServices(){
+  const alt = currentPeriod(DISTRICT_DATA).alt_services;
+  const nActive = alt.dak_ranking.filter(r=>r.total_txn>0).length;
+  const kpiTiles = [
+    tile('Total Transactions', fmtNum(alt.kpi.total_txn)),
+    tile('Total Amount', fmtRs(alt.kpi.total_amount)),
+    tile('Service Types Used', fmtNum(alt.kpi.n_service_types), null, 'neutral'),
+    tile('DAKs With Activity', `${nActive} of ${alt.dak_ranking.length}`, null, 'neutral'),
+  ];
+  const mixMax = alt.service_mix.length ? alt.service_mix[0].n : 1;
+  const mixRows = alt.service_mix.slice(0,10).map(m=>barRow(m.label, m.n, mixMax, 'var(--primary)')).join('');
+  document.getElementById('district-panel-altservices').innerHTML = `
+    <section><div class="section-head"><h2 class="serif">Alternate Services Snapshot</h2><span class="hint">CSC/VLE services beyond core casework</span></div>
+      <div class="panel"><div class="tiles">${kpiTiles.join('')}</div></div>
+    </section>
+    <section><div class="section-head"><h2 class="serif">Transactions Over Time</h2><span class="hint">not affected by the period picker above</span></div>
+      <div class="panel" id="district-alt-trend"></div>
+    </section>
+    <section><div class="section-head"><h2 class="serif">By Block</h2><span class="hint">choose Count or Amount</span></div>
+      <div class="panel"><div id="district-alt-map"></div></div>
+    </section>
+    <section><div class="section-head"><h2 class="serif">Service Type Breakdown</h2><span class="hint">ranked by transaction count</span></div>
+      <div class="panel"><div class="bar-list">${mixRows || '<div class="hint">No activity in the selected period.</div>'}</div></div>
+    </section>
+    <section><div class="section-head"><h2 class="serif">By DAK</h2><span class="hint">all ${alt.dak_ranking.length} DAKs in this district &middot; click a row to open it</span></div>
+      <div class="panel" id="district-alt-dak-table"></div>
+    </section>`;
+  renderAltServicesTrendChart('district-alt-trend', DISTRICT_DATA);
+  renderCaseHeatmapSection('district-alt-map', 'Block', alt.block_totals, loadGeoBlocks, 'block_id');
+  renderAltDakRankingTable('district-alt-dak-table', alt.dak_ranking, false);
+}
+
+function renderDistrictTraining(){
+  const training = currentPeriod(DISTRICT_DATA).training;
+  const compliance = DISTRICT_DATA.training_capacity.compliance;
+  const nActive = training.dak_ranking.filter(r=>r.bmmu_staff_trained>0 || r.brps_trained>0 || r.brps_deployed>0).length;
+  const kpiTiles = [
+    tile('BMMU Staff Trained', fmtNum(training.kpi.bmmu_staff_trained)),
+    tile('BRPs Trained', fmtNum(training.kpi.brps_trained)),
+    tile('BRPs Deployed', fmtNum(training.kpi.brps_deployed)),
+    tile('DAKs With Submissions', `${nActive} of ${training.dak_ranking.length}`, null, 'neutral'),
+  ];
+  document.getElementById('district-panel-training').innerHTML = `
+    <section><div class="section-head"><h2 class="serif">Training Capacity Snapshot</h2><span class="hint">BMMU/BRP Gender-training counts, from the Monthly Progress Report (MPR)</span></div>
+      <div class="panel"><div class="tiles">${kpiTiles.join('')}</div></div>
+    </section>
+    <section><div class="section-head"><h2 class="serif">Reporting Compliance</h2><span class="hint">all-time, not affected by the period picker above</span></div>
+      <div class="panel">${trainingComplianceHtml(compliance)}</div>
+    </section>
+    <section><div class="section-head"><h2 class="serif">Training Counts Over Time</h2><span class="hint">not affected by the period picker above &middot; gaps mark months with no submitted report</span></div>
+      <div class="panel" id="district-training-trend"></div>
+    </section>
+    <section><div class="section-head"><h2 class="serif">By Block</h2><span class="hint">choose a category to color-rank blocks</span></div>
+      <div class="panel"><div id="district-training-map"></div></div>
+    </section>
+    <section><div class="section-head"><h2 class="serif">By DAK</h2><span class="hint">all ${training.dak_ranking.length} DAKs in this district &middot; click a row to open it</span></div>
+      <div class="panel" id="district-training-dak-table"></div>
+    </section>`;
+  renderTrainingTrendChart('district-training-trend', DISTRICT_DATA);
+  renderCaseHeatmapSection('district-training-map', 'Block', training.block_totals, loadGeoBlocks, 'block_id');
+  renderTrainDakRankingTable('district-training-dak-table', training.dak_ranking, false);
+}
+
+// ---------------------------------------------------------------- State scope
+let STATE_DATA = null;
+const STATE_TABS = [
+  {id:'overview', label:'Overview'}, {id:'cases', label:'Case Tracker'}, {id:'altservices', label:'Alternate Services'},
+  {id:'training', label:'Training Capacity'}, {id:'scoring', label:'Scoring & Ranking'},
+];
+function renderStateTabbar(active){
+  document.getElementById('state-tabbar').innerHTML = STATE_TABS.map(t=>`<button class="tabbtn ${t.id===active?'active':''}" data-tab="${t.id}">${t.label}</button>`).join('');
+  document.querySelectorAll('#state-tabbar .tabbtn').forEach(b=> b.addEventListener('click', ()=> switchStateTab(b.dataset.tab)));
+}
+let CURRENT_STATE_TAB = 'overview', CURRENT_STATE_SUBTAB = 'dak', CURRENT_STATE_ALT_SUBTAB = 'dak', CURRENT_STATE_TRAINING_SUBTAB = 'dak';
+function switchStateTab(id){
+  CURRENT_STATE_TAB = id;
+  STATE_TABS.forEach(t=> document.getElementById('state-panel-'+t.id).classList.toggle('active', t.id===id));
+  if(id!=='scoring' && id!=='altservices' && id!=='training') document.getElementById('state-subtabbar').style.display='none';
+  renderStateTabbar(id);
+  if(id==='overview') renderStateOverview();
+  else if(id==='cases') renderStateCases();
+  else if(id==='scoring') renderStateScoring(CURRENT_STATE_SUBTAB);
+  else if(id==='altservices') renderStateAltServices(CURRENT_STATE_ALT_SUBTAB);
+  else if(id==='training') renderStateTraining(CURRENT_STATE_TRAINING_SUBTAB);
+}
+function refreshStateView(){
+  switchStateTab(CURRENT_STATE_TAB);
+}
+function renderStateMasthead(){
+  document.getElementById('state-masthead-content').innerHTML = `
+    <div class="masthead-row">
+      <div class="masthead-titleblock">
+        <h1 class="serif">Bihar Statewide</h1>
+        <div class="crumbs">All 38 districts &middot; all 198 DAKs</div>
+      </div>
+      ${periodPickerHtml('state')}
+    </div>`;
+  populatePeriodPicker('state', STATE_DATA, refreshStateView);
+}
+function renderStateOverview(){
+  const ov = currentPeriod(STATE_DATA).overview, k = ov.kpi, id = STATE_DATA.identity;
+  // Trimmed to exactly what Mohan asked for at state scope: Total Cases,
+  // Resolution Rate, % DAK Set Up, # DAKs, # Sakshma Didis - no Pending or
+  // # Districts tile here (both shown at DAK/District scope, deliberately
+  // dropped at this scope per his instruction).
+  const kpiTiles = [
+    tile('Total Cases', fmtNum(k.total_cases)), tile('Resolution Rate', fmtPct(k.resolution_rate_pct,1)),
+    tile('% DAK Set Up', STATE_DATA.pct_dak_set_up==null?'—':fmtPct(STATE_DATA.pct_dak_set_up,1)),
+    tile('DAKs', fmtNum(id.n_daks), null, 'neutral'), tile('Sakshma Didis', fmtNum(id.n_sds), null, 'neutral'),
+  ];
+  const built = caseMetricSectionsHtml(STATE_DATA, 'state');
+  document.getElementById('state-panel-overview').innerHTML = `
+    <section><div class="section-head"><h2 class="serif">Statewide Snapshot</h2></div>
+      <div class="panel"><div class="tiles">${kpiTiles.join('')}</div></div>
+    </section>
+    ${built.html}
+    <section><div class="section-head"><h2 class="serif">% DAK Set Up — by Block</h2><span class="hint">all 534 blocks statewide, all-time &middot; red = not disbursed, yellow = disbursed but no DAK, green = DAK set up</span></div>
+      <div class="panel"><div id="state-dak-setup-map"></div></div>
+      <div class="panel" style="margin-top:12px;" id="state-dak-setup-table"></div>
+    </section>`;
+  drawCaseMetricCharts(built, 'state');
+  renderDakSetupChoropleth('state-dak-setup-map', STATE_DATA.dak_setup_blocks, loadGeoBlocks, 'block_id');
+  renderDakSetupDistrictTable('state-dak-setup-table', STATE_DATA.dak_setup_district_table);
+}
+function renderStateCases(){
+  const backlog = currentPeriod(STATE_DATA).backlog_aging;
+  const backlogMax = Math.max(...backlog.map(b=>b.n), 1);
+  const backlogRows = backlog.map(b=>barRow(b.label, b.n, backlogMax, b.label==='90+ days'?'var(--low)':(b.label==='31-90 days'?'var(--gold)':'var(--primary)'), fmtNum(b.n))).join('');
+  document.getElementById('state-panel-cases').innerHTML = `
+    <section><div class="section-head"><h2 class="serif tip" data-tip="${TIPS['Backlog Aging']}">Backlog Aging</h2><span class="hint">of cases filed in the selected period, still pending as of today</span></div>
+      <div class="panel"><div class="bar-list">${backlogRows}</div></div>
+    </section>
+    <section><div class="section-head"><h2 class="serif">Case Count — by District</h2><span class="hint">choose a category to color-rank districts</span></div>
+      <div class="panel" id="state-case-heatmap"></div>
+    </section>`;
+  renderCaseHeatmapSection('state-case-heatmap', 'District', currentPeriod(STATE_DATA).case_heatmap, loadGeoDistricts, 'district_name');
+}
+function renderStateScoring(sub){
+  sub = sub || CURRENT_STATE_SUBTAB || 'dak';
+  CURRENT_STATE_SUBTAB = sub;
+  const scoring = currentPeriod(STATE_DATA).scoring;
+  document.getElementById('state-subtabbar').style.display = 'flex';
+  document.getElementById('state-subtabbar').innerHTML = `
+    <button class="subtabbtn ${sub==='dak'?'active':''}" data-sub="dak">DAK Ranking</button>
+    <button class="subtabbtn ${sub==='district'?'active':''}" data-sub="district">District Rankings</button>`;
+  document.querySelectorAll('#state-subtabbar .subtabbtn').forEach(b=> b.addEventListener('click', ()=> renderStateScoring(b.dataset.sub)));
+  if(sub==='dak'){
+    document.getElementById('state-panel-scoring').innerHTML = `
+      <section><div class="section-head"><h2 class="serif">DAK Ranking</h2><span class="hint">all ${scoring.dak_ranking.length} DAKs statewide &middot; click a row to open it</span></div>
+        <div class="panel" id="state-dak-table"></div>
+      </section>`;
+    renderDakRankingTable('state-dak-table', scoring.dak_ranking, true);
+  } else {
+    document.getElementById('state-panel-scoring').innerHTML = `
+      <section><div class="section-head"><h2 class="serif">District Rankings</h2><span class="hint">all ${scoring.district_ranking.length} districts &middot; click a row to open it</span></div>
+        <div class="panel" id="state-district-table"></div>
+      </section>`;
+    renderDistrictRankingTable('state-district-table', scoring.district_ranking);
+  }
+}
+
+function renderStateAltServices(sub){
+  sub = sub || CURRENT_STATE_ALT_SUBTAB || 'dak';
+  CURRENT_STATE_ALT_SUBTAB = sub;
+  const alt = currentPeriod(STATE_DATA).alt_services;
+  const nActive = alt.dak_ranking.filter(r=>r.total_txn>0).length;
+  const kpiTiles = [
+    tile('Total Transactions', fmtNum(alt.kpi.total_txn)),
+    tile('Total Amount', fmtRs(alt.kpi.total_amount)),
+    tile('Service Types Used', fmtNum(alt.kpi.n_service_types), null, 'neutral'),
+    tile('DAKs With Activity', `${nActive} of ${alt.dak_ranking.length}`, null, 'neutral'),
+  ];
+  const mixMax = alt.service_mix.length ? alt.service_mix[0].n : 1;
+  const mixRows = alt.service_mix.slice(0,10).map(m=>barRow(m.label, m.n, mixMax, 'var(--primary)')).join('');
+
+  document.getElementById('state-subtabbar').style.display = 'flex';
+  document.getElementById('state-subtabbar').innerHTML = `
+    <button class="subtabbtn ${sub==='dak'?'active':''}" data-sub="dak">By DAK</button>
+    <button class="subtabbtn ${sub==='district'?'active':''}" data-sub="district">By District</button>`;
+  document.querySelectorAll('#state-subtabbar .subtabbtn').forEach(b=> b.addEventListener('click', ()=> renderStateAltServices(b.dataset.sub)));
+
+  document.getElementById('state-panel-altservices').innerHTML = `
+    <section><div class="section-head"><h2 class="serif">Alternate Services Snapshot</h2><span class="hint">CSC/VLE services beyond core casework</span></div>
+      <div class="panel"><div class="tiles">${kpiTiles.join('')}</div></div>
+    </section>
+    <section><div class="section-head"><h2 class="serif">Transactions Over Time</h2><span class="hint">not affected by the period picker above</span></div>
+      <div class="panel" id="state-alt-trend"></div>
+    </section>
+    <section><div class="section-head"><h2 class="serif">By District</h2><span class="hint">all 38 districts statewide &middot; choose Count or Amount</span></div>
+      <div class="panel"><div id="state-alt-map"></div></div>
+    </section>
+    <section><div class="section-head"><h2 class="serif">Service Type Breakdown</h2><span class="hint">ranked by transaction count</span></div>
+      <div class="panel"><div class="bar-list">${mixRows || '<div class="hint">No activity in the selected period.</div>'}</div></div>
+    </section>
+    <section><div class="section-head"><h2 class="serif">${sub==='dak'?'By DAK':'By District'}</h2><span class="hint">click a row to open it</span></div>
+      <div class="panel" id="state-alt-rank-table"></div>
+    </section>`;
+  renderAltServicesTrendChart('state-alt-trend', STATE_DATA);
+  renderCaseHeatmapSection('state-alt-map', 'District', alt.district_totals, loadGeoDistricts, 'district_name');
+  if(sub==='dak') renderAltDakRankingTable('state-alt-rank-table', alt.dak_ranking, true);
+  else renderAltDistrictRankingTable('state-alt-rank-table', alt.district_ranking);
+}
+
+function renderStateTraining(sub){
+  sub = sub || CURRENT_STATE_TRAINING_SUBTAB || 'dak';
+  CURRENT_STATE_TRAINING_SUBTAB = sub;
+  const training = currentPeriod(STATE_DATA).training;
+  const compliance = STATE_DATA.training_capacity.compliance;
+  const nActive = training.dak_ranking.filter(r=>r.bmmu_staff_trained>0 || r.brps_trained>0 || r.brps_deployed>0).length;
+  const kpiTiles = [
+    tile('BMMU Staff Trained', fmtNum(training.kpi.bmmu_staff_trained)),
+    tile('BRPs Trained', fmtNum(training.kpi.brps_trained)),
+    tile('BRPs Deployed', fmtNum(training.kpi.brps_deployed)),
+    tile('DAKs With Submissions', `${nActive} of ${training.dak_ranking.length}`, null, 'neutral'),
+  ];
+
+  document.getElementById('state-subtabbar').style.display = 'flex';
+  document.getElementById('state-subtabbar').innerHTML = `
+    <button class="subtabbtn ${sub==='dak'?'active':''}" data-sub="dak">By DAK</button>
+    <button class="subtabbtn ${sub==='district'?'active':''}" data-sub="district">By District</button>`;
+  document.querySelectorAll('#state-subtabbar .subtabbtn').forEach(b=> b.addEventListener('click', ()=> renderStateTraining(b.dataset.sub)));
+
+  document.getElementById('state-panel-training').innerHTML = `
+    <section><div class="section-head"><h2 class="serif">Training Capacity Snapshot</h2><span class="hint">BMMU/BRP Gender-training counts, from the Monthly Progress Report (MPR)</span></div>
+      <div class="panel"><div class="tiles">${kpiTiles.join('')}</div></div>
+    </section>
+    <section><div class="section-head"><h2 class="serif">Reporting Compliance</h2><span class="hint">all-time, not affected by the period picker above</span></div>
+      <div class="panel">${trainingComplianceHtml(compliance)}</div>
+    </section>
+    <section><div class="section-head"><h2 class="serif">Training Counts Over Time</h2><span class="hint">not affected by the period picker above &middot; gaps mark months with no submitted report</span></div>
+      <div class="panel" id="state-training-trend"></div>
+    </section>
+    <section><div class="section-head"><h2 class="serif">By District</h2><span class="hint">all 38 districts statewide &middot; choose a category to color-rank districts</span></div>
+      <div class="panel"><div id="state-training-map"></div></div>
+    </section>
+    <section><div class="section-head"><h2 class="serif">${sub==='dak'?'By DAK':'By District'}</h2><span class="hint">click a row to open it</span></div>
+      <div class="panel" id="state-training-rank-table"></div>
+    </section>`;
+  renderTrainingTrendChart('state-training-trend', STATE_DATA);
+  renderCaseHeatmapSection('state-training-map', 'District', training.district_totals, loadGeoDistricts, 'district_name');
+  if(sub==='dak') renderTrainDakRankingTable('state-training-rank-table', training.dak_ranking, true);
+  else renderTrainDistrictRankingTable('state-training-rank-table', training.district_ranking);
 }
 
 // ---------------------------------------------------------------- finder / directory
@@ -785,33 +1773,34 @@ function populateSelect(sel, options, placeholder){
 }
 
 function initFinderControls(){
+  // Matches the CLF tracker's own cascading selects: no separate "View"
+  // button anywhere - picking the final (DAK) select navigates immediately.
   const selDistrict = document.getElementById('sel-district');
   const selBlock = document.getElementById('sel-block');
   const selDak = document.getElementById('sel-dak');
-  const btnView = document.getElementById('btn-view-dak');
 
   populateSelect(selDistrict, districtsInManifest().map(d=>({value:d, label:toTitleCase(d)})), 'Select District…');
 
   selDistrict.addEventListener('change', ()=>{
     populateSelect(selBlock, selDistrict.value ? blocksInDistrict(selDistrict.value).map(b=>({value:b, label:toTitleCase(b)})) : [], selDistrict.value ? 'Select Block…' : 'Select District first…');
     populateSelect(selDak, [], 'Select Block first…');
-    btnView.disabled = true;
   });
   selBlock.addEventListener('change', ()=>{
     const opts = (selDistrict.value && selBlock.value) ? daksInBlock(selDistrict.value, selBlock.value).map(d=>({value:d.slug, label:toTitleCase(d.dak_name)})) : [];
     populateSelect(selDak, opts, selBlock.value ? 'Select DAK…' : 'Select Block first…');
-    btnView.disabled = true;
   });
-  selDak.addEventListener('change', ()=>{ btnView.disabled = !selDak.value; });
-  btnView.addEventListener('click', ()=>{ if(selDak.value) loadDak(selDak.value); });
+  selDak.addEventListener('change', ()=>{ if(selDak.value) loadDak(selDak.value); });
 }
 
 function renderDirectory(filterText){
   filterText = (filterText||'').trim().toLowerCase();
-  const rows = MANIFEST.daks.filter(d=>{
-    if(!filterText) return true;
-    return d.district.toLowerCase().includes(filterText) || d.block.toLowerCase().includes(filterText) || d.dak_name.toLowerCase().includes(filterText);
-  });
+  const container = document.getElementById('directory-table');
+  if(!filterText){
+    container.innerHTML = '<p class="disclaimer">Start typing above to search, or use the District / Block / DAK dropdowns to browse.</p>';
+    return;
+  }
+  const rows = MANIFEST.daks.filter(d=>
+    d.district.toLowerCase().includes(filterText) || d.block.toLowerCase().includes(filterText) || d.dak_name.toLowerCase().includes(filterText));
   const cols = [
     {label:'District', key:'district'},
     {label:'Block', key:'block'},
@@ -824,10 +1813,196 @@ function renderDirectory(filterText){
   makeSortableTable('directory-table', cols, rows, rowBuilder, { enabled: ()=>true, handler: (d)=> loadDak(d.slug) });
 }
 
-function showFinder(){
-  document.getElementById('view-finder').style.display = 'block';
-  document.getElementById('view-dashboard').style.display = 'none';
+// ---------------------------------------------------------------- Excel export
+// Client-side (SheetJS, loaded from cdnjs), not a server-built file - the
+// export is built at click time from whichever of DATA/DISTRICT_DATA/
+// STATE_DATA is currently on the page. This means it automatically inherits
+// whatever PII the currently-served JSON does or doesn't contain: on the
+// scrubbed public copy, the export is scrubbed too, for free, since it never
+// sees any field the public JSON didn't already include.
+function excelDownload(sheets, filename){
+  const wb = XLSX.utils.book_new();
+  Object.entries(sheets).forEach(([name, rows])=>{
+    const ws = XLSX.utils.json_to_sheet(rows.length ? rows : [{'No data':''}]);
+    XLSX.utils.book_append_sheet(wb, ws, name.slice(0,31)); // Excel sheet-name limit
+  });
+  XLSX.writeFile(wb, filename);
+}
+
+function exportExcelDak(){
+  const d = DATA, p = currentPeriod(d);
+  const overviewRows = [
+    {Metric:'DAK', Value: toTitleCase(d.identity.dak_name)},
+    {Metric:'District', Value: toTitleCase(d.identity.district)}, {Metric:'Block', Value: toTitleCase(d.identity.block)},
+    {Metric:'Period', Value: SELECTED_PERIOD},
+    {Metric:'Total Cases', Value: p.overview.kpi.total_cases}, {Metric:'Resolved', Value: p.overview.kpi.resolved},
+    {Metric:'Pending', Value: p.overview.kpi.pending}, {Metric:'Resolution Rate %', Value: p.overview.kpi.resolution_rate_pct},
+    {Metric:'Entitlement Cases', Value: p.overview.kpi.n_entitlement}, {Metric:'Gender Cases', Value: p.overview.kpi.n_gender},
+    {Metric:'Amount Received (all-time)', Value: d.total_amount_received},
+  ];
+  const rosterRows = d.roster.map(r=>({
+    Name: toTitleCase(r.name), DOJ: r.doj, Mobile: r.mobile,
+    'Own CLF': r.own_clf, 'Own VO': r.own_vo, 'Own SHG': r.own_shg, 'Amount Received': r.incentive_amount,
+  }));
+  const caseRows = d.cases.map(c=>({
+    'Case ID': c.case_id, 'Sakshma Didi': toTitleCase(c.sd_name), Type: c.kind, 'Gender Type': c.violence_type || '-',
+    'Application Date': c.application_date, Status: c.status, 'Days Open': c.days_open,
+  }));
+  // Per-SD rows carry the sub-metrics behind each category score (Resolution
+  // Rate/Median Days/Backlog Age), not just the final score - plus one
+  // summary row for the DAK as a whole, from the same dak_scoring object the
+  // Scoring & Ranking tab renders. Both scoped to the selected period.
+  const scoringRows = p.scoring.sd_ranking.map(r=>({
+    'Sakshma Didi': toTitleCase(r.sd_name),
+    'Entitlement Cases': r.entitlement ? r.entitlement.n : 0, 'Entitlement Resolution Rate': r.entitlement ? r.entitlement.resolution_rate : null,
+    'Entitlement Median Days': r.entitlement ? r.entitlement.median_days : null, 'Entitlement Backlog Age': r.entitlement ? r.entitlement.backlog_age : null,
+    'Entitlement Score': r.entitlement ? r.entitlement.category_score : null,
+    'Gender Cases': r.gender ? r.gender.n : 0, 'Gender Resolution Rate': r.gender ? r.gender.resolution_rate : null,
+    'Gender Median Days': r.gender ? r.gender.median_days : null, 'Gender Backlog Age': r.gender ? r.gender.backlog_age : null,
+    'Gender Score': r.gender ? r.gender.category_score : null,
+    'Self-Sourced Rate': r.self_sourced_rate, 'Origination Index': r.origination_index, 'Unified Score': r.unified_score,
+  }));
+  const s = p.scoring.dak_ranking;
+  scoringRows.push({
+    'Sakshma Didi': `[DAK TOTAL] ${toTitleCase(d.identity.dak_name)}`,
+    'Entitlement Cases': s.entitlement.n, 'Entitlement Resolution Rate': s.entitlement.resolution_rate,
+    'Entitlement Median Days': s.entitlement.median_days, 'Entitlement Backlog Age': s.entitlement.backlog_age, 'Entitlement Score': s.entitlement.category_score,
+    'Gender Cases': s.gender.n, 'Gender Resolution Rate': s.gender.resolution_rate,
+    'Gender Median Days': s.gender.median_days, 'Gender Backlog Age': s.gender.backlog_age, 'Gender Score': s.gender.category_score,
+    'Self-Sourced Rate': null, 'Origination Index': null, 'Unified Score': s.unified_score,
+  });
+  const altRows = p.alt_services.service_mix.map(r=>({
+    Service: r.label, Transactions: r.n, '% of Total': r.pct, Amount: r.amount,
+  }));
+  const trainingRows = [
+    {Metric:'BMMU Staff Trained', Value: p.training_kpi.bmmu_staff_trained},
+    {Metric:'BRPs Trained', Value: p.training_kpi.brps_trained},
+    {Metric:'BRPs Deployed', Value: p.training_kpi.brps_deployed},
+    {Metric:'Months Submitted (all-time)', Value: `${d.training_capacity.compliance.n_submitted} of ${d.training_capacity.compliance.n_window}`},
+    {Metric:'Last Submitted', Value: d.training_capacity.compliance.last_submitted || 'Never'},
+  ];
+  excelDownload(
+    { 'Overview': overviewRows, 'Sakshma Didi Roster': rosterRows, 'Case List': caseRows, 'Scoring': scoringRows, 'Alternate Services': altRows, 'Training Capacity': trainingRows },
+    `DAK_${toTitleCase(d.identity.dak_name).replace(/\s+/g,'_')}_${SELECTED_PERIOD}.xlsx`
+  );
+}
+
+function exportExcelDistrict(){
+  const d = DISTRICT_DATA, p = currentPeriod(d);
+  const overviewRows = [
+    {Metric:'District', Value: toTitleCase(d.identity.district)},
+    {Metric:'DAKs', Value: d.identity.n_daks}, {Metric:'Sakshma Didis', Value: d.identity.n_sds},
+    {Metric:'Period', Value: SELECTED_PERIOD},
+    {Metric:'Total Cases', Value: p.overview.kpi.total_cases}, {Metric:'Resolved', Value: p.overview.kpi.resolved},
+    {Metric:'Pending', Value: p.overview.kpi.pending}, {Metric:'Resolution Rate %', Value: p.overview.kpi.resolution_rate_pct},
+    {Metric:'% DAK Set Up (all-time)', Value: d.pct_dak_set_up}, {Metric:'Amount Received (all-time)', Value: d.total_amount_received},
+  ];
+  const dakRankRows = p.scoring.dak_ranking.map(r=>({
+    DAK: toTitleCase(r.dak_name), Block: toTitleCase(r.block), Status: r.status || 'OK',
+    Cases: r.n_cases, 'Sakshma Didis': r.n_sd, 'Entitlement Score': r.entitlement.category_score,
+    'Gender Score': r.gender.category_score, 'Outreach Share': r.outreach_share, 'Unified Score': r.unified_score,
+  }));
+  const sdRankRows = p.scoring.sd_ranking.map(r=>({
+    'Sakshma Didi': toTitleCase(r.sd_name),
+    'Entitlement Score': r.entitlement ? r.entitlement.category_score : null,
+    'Gender Score': r.gender ? r.gender.category_score : null, 'Unified Score': r.unified_score,
+  }));
+  const caseHeatRows = p.case_heatmap.map(r=>({ Block: toTitleCase(r.label), ...Object.fromEntries(Object.entries(r).filter(([k])=>k!=='label' && k!=='block_id')) }));
+  const setupRows = d.dak_setup_blocks.map(r=>({ Block: toTitleCase(r.label), Status: DAK_SETUP_LABELS[r.status] }));
+  const altMixRows = p.alt_services.service_mix.map(r=>({ Service: r.label, Transactions: r.n, '% of Total': r.pct, Amount: r.amount }));
+  const altDakRows = p.alt_services.dak_ranking.map(r=>({
+    DAK: toTitleCase(r.dak_name), Block: toTitleCase(r.block), Transactions: r.total_txn, Amount: r.total_amount, 'Service Types': r.n_service_types,
+  }));
+  const trainingDakRows = p.training.dak_ranking.map(r=>({
+    DAK: toTitleCase(r.dak_name), Block: toTitleCase(r.block),
+    'BMMU Staff Trained': r.bmmu_staff_trained, 'BRPs Trained': r.brps_trained, 'BRPs Deployed': r.brps_deployed,
+    'Months Submitted': `${r.n_submitted} of ${r.n_window}`, 'Last Submitted': r.last_submitted || 'Never',
+  }));
+  excelDownload(
+    { 'Overview': overviewRows, 'DAK Ranking': dakRankRows, 'SD Ranking': sdRankRows, 'Case Heatmap': caseHeatRows, 'DAK Setup Heatmap': setupRows,
+      'Alt Services Mix': altMixRows, 'Alt Services by DAK': altDakRows, 'Training Capacity by DAK': trainingDakRows },
+    `District_${toTitleCase(d.identity.district).replace(/\s+/g,'_')}_${SELECTED_PERIOD}.xlsx`
+  );
+}
+
+function exportExcelState(){
+  const d = STATE_DATA, p = currentPeriod(d);
+  const overviewRows = [
+    {Metric:'Districts', Value: d.identity.n_districts}, {Metric:'DAKs', Value: d.identity.n_daks}, {Metric:'Sakshma Didis', Value: d.identity.n_sds},
+    {Metric:'Period', Value: SELECTED_PERIOD},
+    {Metric:'Total Cases', Value: p.overview.kpi.total_cases}, {Metric:'Resolved', Value: p.overview.kpi.resolved},
+    {Metric:'Pending', Value: p.overview.kpi.pending}, {Metric:'Resolution Rate %', Value: p.overview.kpi.resolution_rate_pct},
+    {Metric:'% DAK Set Up (all-time)', Value: d.pct_dak_set_up}, {Metric:'Amount Received (all-time)', Value: d.total_amount_received},
+  ];
+  const dakRankRows = p.scoring.dak_ranking.map(r=>({
+    DAK: toTitleCase(r.dak_name), District: toTitleCase(r.district), Block: toTitleCase(r.block), Status: r.status || 'OK',
+    Cases: r.n_cases, 'Sakshma Didis': r.n_sd, 'Entitlement Score': r.entitlement.category_score,
+    'Gender Score': r.gender.category_score, 'Outreach Share': r.outreach_share, 'Unified Score': r.unified_score,
+  }));
+  const districtRankRows = p.scoring.district_ranking.map(r=>({
+    District: toTitleCase(r.district), DAKs: r.n_daks, 'Sakshma Didis': r.n_sds, Cases: r.n_cases,
+    'Entitlement Score': r.entitlement_score, 'Gender Score': r.gender_score, 'Outreach Share': r.outreach_share,
+    'Unified Score': r.unified_score, 'State Rank': r.rank_state ? r.rank_state.rank : null,
+  }));
+  const caseHeatRows = p.case_heatmap.map(r=>({ District: toTitleCase(r.label), ...Object.fromEntries(Object.entries(r).filter(([k])=>k!=='label' && k!=='district_name')) }));
+  const setupRows = d.dak_setup_district_table.map(r=>({
+    District: toTitleCase(r.label), 'Total Blocks': r.n_blocks_total,
+    'Blocks Disbursed': r.n_blocks_disbursed, 'Blocks DAK Set Up': r.n_blocks_dak_set_up,
+  }));
+  const altMixRows = p.alt_services.service_mix.map(r=>({ Service: r.label, Transactions: r.n, '% of Total': r.pct, Amount: r.amount }));
+  const altDakRows = p.alt_services.dak_ranking.map(r=>({
+    DAK: toTitleCase(r.dak_name), District: toTitleCase(r.district), Block: toTitleCase(r.block),
+    Transactions: r.total_txn, Amount: r.total_amount, 'Service Types': r.n_service_types,
+  }));
+  const altDistrictRows = p.alt_services.district_ranking.map(r=>({
+    District: toTitleCase(r.district), Transactions: r.total_txn, Amount: r.total_amount, 'Service Types': r.n_service_types,
+  }));
+  const trainingDakRows = p.training.dak_ranking.map(r=>({
+    DAK: toTitleCase(r.dak_name), District: toTitleCase(r.district), Block: toTitleCase(r.block),
+    'BMMU Staff Trained': r.bmmu_staff_trained, 'BRPs Trained': r.brps_trained, 'BRPs Deployed': r.brps_deployed,
+    'Months Submitted': `${r.n_submitted} of ${r.n_window}`, 'Last Submitted': r.last_submitted || 'Never',
+  }));
+  const trainingDistrictRows = p.training.district_ranking.map(r=>({
+    District: toTitleCase(r.district), 'BMMU Staff Trained': r.bmmu_staff_trained, 'BRPs Trained': r.brps_trained, 'BRPs Deployed': r.brps_deployed,
+  }));
+  excelDownload(
+    { 'Overview': overviewRows, 'DAK Ranking': dakRankRows, 'District Ranking': districtRankRows, 'Case Heatmap': caseHeatRows, 'DAK Setup Heatmap': setupRows,
+      'Alt Services Mix': altMixRows, 'Alt Services by DAK': altDakRows, 'Alt Services by District': altDistrictRows,
+      'Training Capacity by DAK': trainingDakRows, 'Training Capacity by District': trainingDistrictRows },
+    `Statewide_DAK_Tracker_${SELECTED_PERIOD}.xlsx`
+  );
+}
+
+function exportExcel(){
+  if(CURRENT_SCOPE==='dak') exportExcelDak();
+  else if(CURRENT_SCOPE==='district') exportExcelDistrict();
+  else if(CURRENT_SCOPE==='state') exportExcelState();
+}
+
+// ---------------------------------------------------------------- top-level navigation
+// One unified landing page (view-finder), matching the sibling CLF/VRF
+// tracker's own landing layout: browse/search panel + a second panel to
+// jump straight to a District or the Statewide tracker. No separate
+// "choose tracker type" gate - all 4 main views live in the DOM at once,
+// this just toggles which is visible.
+const ALL_VIEWS = ['view-finder','view-dashboard','view-district','view-state'];
+function hideAllMainViews(){
+  ALL_VIEWS.forEach(id=> document.getElementById(id).style.display = 'none');
+}
+function hideScopedTopButtons(){
   document.getElementById('btn-print').style.display = 'none';
+  document.getElementById('btn-export-excel').style.display = 'none';
+  CURRENT_SCOPE = null;
+}
+function showScopedTopButtons(scope){
+  document.getElementById('btn-print').style.display = 'inline-flex';
+  document.getElementById('btn-export-excel').style.display = 'inline-flex';
+  CURRENT_SCOPE = scope;
+}
+function showFinder(){
+  hideAllMainViews();
+  document.getElementById('view-finder').style.display = 'block';
+  hideScopedTopButtons();
   history.replaceState(null, '', location.pathname + location.search);
 }
 
@@ -836,23 +2011,72 @@ function loadDak(slug){
     .then(r=>{ if(!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
     .then(d=>{
       DATA = d;
-      sdById = {};
-      (DATA.scoring.sd_ranking||[]).forEach(r=>{ sdById[r.sd_id] = r; });
-      document.getElementById('view-finder').style.display = 'none';
+      hideAllMainViews();
       document.getElementById('view-dashboard').style.display = 'block';
-      document.getElementById('btn-print').style.display = 'inline-flex';
+      showScopedTopButtons('dak');
       history.replaceState(null, '', location.pathname + location.search + '#' + slug);
+      CURRENT_TAB = 'overview';
       renderMasthead();
-      switchTab('overview');
+      refreshDakView();
     })
     .catch(err=>{
       alert(`Could not load this DAK's data (${err.message}). It may not be built yet, or the page needs to be served over http:// (see the note at the bottom of the directory).`);
     });
 }
 
+function loadDistrict(slug){
+  fetch(`data/districts/${slug}.json`, {cache:'no-store'})
+    .then(r=>{ if(!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+    .then(d=>{
+      DISTRICT_DATA = d;
+      hideAllMainViews();
+      document.getElementById('view-district').style.display = 'block';
+      showScopedTopButtons('district');
+      history.replaceState(null, '', location.pathname + location.search + '#d-' + slug);
+      CURRENT_DISTRICT_TAB = 'overview';
+      renderDistrictMasthead();
+      refreshDistrictView();
+    })
+    .catch(err=>{
+      alert(`Could not load this district's data (${err.message}). It may not be built yet, or the page needs to be served over http://.`);
+    });
+}
+
+function loadState(){
+  fetch(`data/state.json`, {cache:'no-store'})
+    .then(r=>{ if(!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+    .then(d=>{
+      STATE_DATA = d;
+      hideAllMainViews();
+      document.getElementById('view-state').style.display = 'block';
+      showScopedTopButtons('state');
+      history.replaceState(null, '', location.pathname + location.search + '#state');
+      CURRENT_STATE_TAB = 'overview';
+      renderStateMasthead();
+      refreshStateView();
+    })
+    .catch(err=>{
+      alert(`Could not load statewide data (${err.message}). It may not be built yet, or the page needs to be served over http://.`);
+    });
+}
+
+function initDistrictFinderControls(){
+  // Selecting a district in this second panel jumps straight into its
+  // tracker, no separate "View" button click - matches the CLF tracker's
+  // own "OR track CLFs within a district or state" panel exactly.
+  const sel = document.getElementById('sel-district-only');
+  const opts = (MANIFEST.districts||[]).map(d=>({value:d.slug, label:toTitleCase(d.district)})).sort((a,b)=>a.label.localeCompare(b.label));
+  populateSelect(sel, opts, 'Select District to view its Tracker…');
+  sel.addEventListener('change', ()=>{ if(sel.value) loadDistrict(sel.value); });
+}
+
 document.getElementById('btn-back-finder').addEventListener('click', showFinder);
+document.getElementById('btn-back-choose-district-2').addEventListener('click', showFinder);
+document.getElementById('btn-back-choose-state').addEventListener('click', showFinder);
+document.getElementById('btn-view-state').addEventListener('click', loadState);
 document.getElementById('directory-search').addEventListener('input', (e)=> renderDirectory(e.target.value));
 document.getElementById('btn-print').addEventListener('click', ()=> window.print());
+document.getElementById('btn-export-excel').addEventListener('click', exportExcel);
 
 // ---------------------------------------------------------------- boot
 initTooltips();
@@ -860,13 +2084,16 @@ fetch('data/manifest.json', {cache:'no-store'})
   .then(r=>{ if(!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
   .then(m=>{
     MANIFEST = m;
-    const nDaks = m.daks.length;
+    const nDaks = m.daks.length, nDistricts = (m.districts||[]).length;
     document.getElementById('finder-coverage-note').textContent = `Live for ${nDaks} DAK${nDaks===1?'':'s'} (generated ${m.generated_at})`;
     document.getElementById('finder-foot-note').textContent = `Directory + per-DAK data computed by build_dak_statewide_data.py. Every Sakshma Didi/DAK with at least one case of a kind is scored, regardless of case volume.`;
     initFinderControls();
+    initDistrictFinderControls();
     renderDirectory('');
-    const hashSlug = location.hash ? decodeURIComponent(location.hash.slice(1)) : '';
-    if(hashSlug && m.daks.some(d=>d.slug===hashSlug)) loadDak(hashSlug);
+    const hash = location.hash ? decodeURIComponent(location.hash.slice(1)) : '';
+    if(hash === 'state') loadState();
+    else if(hash.startsWith('d-') && m.districts.some(d=>d.slug===hash.slice(2))) loadDistrict(hash.slice(2));
+    else if(hash && m.daks.some(d=>d.slug===hash)) loadDak(hash);
   })
   .catch(err=>{
     document.getElementById('finder-coverage-note').innerHTML = `<span style="color:var(--low);">Could not load the DAK directory (${err.message}).</span>`;
