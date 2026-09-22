@@ -1165,15 +1165,29 @@ function renderDakSetupBlockTable(containerId, rows){
   makeSortableTable(containerId, cols, rows, rowBuilder, null);
 }
 
-// State scope's table view beneath its statewide block map: the 3-column
-// per-district summary Mohan asked for (not a 534-row block list).
+// State scope's table view beneath its statewide block map: per-district
+// summary with a Rank column (position by pct_dak_set_up_of_disbursed,
+// descending, nulls last) as the default view - the table is still fully
+// sortable by any other column via makeSortableTable's own click-to-sort
+// (Rank itself has no `key`, so it's not independently sortable, same as
+// every other ranking table's Rank column in this tracker - it's a derived
+// position, not a data field).
 function renderDakSetupDistrictTable(containerId, rows){
+  const items = sortDescByKey(rows, 'pct_dak_set_up_of_disbursed').map((r,i)=>({...r, _idx:i}));
   const cols = [
-    {label:'District', key:'label'}, {label:'Total Blocks', key:'n_blocks_total', num:true},
-    {label:'Blocks Disbursed', key:'n_blocks_disbursed', num:true}, {label:'Blocks DAK Set Up', key:'n_blocks_dak_set_up', num:true},
+    {label:'Rank', num:true},
+    {label:'District', key:'label'},
+    {label:'Total Blocks', key:'n_blocks_total', num:true},
+    {label:'Blocks Disbursed', key:'n_blocks_disbursed', num:true},
+    {label:'% Disbursed', key:'pct_disbursed', num:true},
+    {label:'Blocks DAK Set Up', key:'n_blocks_dak_set_up', num:true},
+    {label:'% DAK Set Up (of Disbursed)', key:'pct_dak_set_up_of_disbursed', num:true},
   ];
-  const rowBuilder = (r)=>[toTitleCase(r.label), fmtNum(r.n_blocks_total), fmtNum(r.n_blocks_disbursed), fmtNum(r.n_blocks_dak_set_up)];
-  makeSortableTable(containerId, cols, rows, rowBuilder, null);
+  const rowBuilder = (r, idx)=>[
+    idx+1, toTitleCase(r.label), fmtNum(r.n_blocks_total), fmtNum(r.n_blocks_disbursed),
+    fmtPct(r.pct_disbursed,0), fmtNum(r.n_blocks_dak_set_up), fmtPct(r.pct_dak_set_up_of_disbursed,0),
+  ];
+  makeSortableTable(containerId, cols, items, rowBuilder, null);
 }
 
 function dakStatusBadge(status){
@@ -1945,9 +1959,10 @@ function exportExcelState(){
     'Unified Score': r.unified_score, 'State Rank': r.rank_state ? r.rank_state.rank : null,
   }));
   const caseHeatRows = p.case_heatmap.map(r=>({ District: toTitleCase(r.label), ...Object.fromEntries(Object.entries(r).filter(([k])=>k!=='label' && k!=='district_name')) }));
-  const setupRows = d.dak_setup_district_table.map(r=>({
-    District: toTitleCase(r.label), 'Total Blocks': r.n_blocks_total,
-    'Blocks Disbursed': r.n_blocks_disbursed, 'Blocks DAK Set Up': r.n_blocks_dak_set_up,
+  const setupRows = sortDescByKey(d.dak_setup_district_table, 'pct_dak_set_up_of_disbursed').map((r,i)=>({
+    Rank: i+1, District: toTitleCase(r.label), 'Total Blocks': r.n_blocks_total,
+    'Blocks Disbursed': r.n_blocks_disbursed, '% Disbursed': r.pct_disbursed,
+    'Blocks DAK Set Up': r.n_blocks_dak_set_up, '% DAK Set Up (of Disbursed)': r.pct_dak_set_up_of_disbursed,
   }));
   const altMixRows = p.alt_services.service_mix.map(r=>({ Service: r.label, Transactions: r.n, '% of Total': r.pct, Amount: r.amount }));
   const altDakRows = p.alt_services.dak_ranking.map(r=>({
