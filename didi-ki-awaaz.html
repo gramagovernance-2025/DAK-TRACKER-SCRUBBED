@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Didi ki Awaaz Helpline — DAK Tracker</title>
+<style>
+/* Design tokens + components copied from Statewide/index.html (duplicated, not
+   shared - same precedent as the rest of this project). Keep in sync by hand. */
+:root{
+  --ground:#FFFFFF; --panel:#FFFFFF; --panel-alt:#FAF9F4; --ink:#33413A; --ink-soft:#7C8B81;
+  --primary:#2F9C74; --primary-soft:#E7F5EF; --gold:#CE9C3C; --gold-soft:#FBF1DA;
+  --line:#EAE4D5; --line-strong:#DCD2BB; --low:#C55F49; --low-soft:#FBE8E1;
+  --grey:#B7BEB7; --grey-soft:#EFF1EE;
+}
+*{ box-sizing:border-box; }
+html{ -webkit-text-size-adjust:100%; text-size-adjust:100%; }
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:"Noto Sans Devanagari","Nirmala UI",-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:15px; line-height:1.5; padding:18px 16px 50px;
+}
+.page{ max-width:1040px; margin:0 auto; }
+.serif{ font-family:"Iowan Old Style","Palatino Linotype",Georgia,"Noto Sans Devanagari",serif; }
+.top-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+.badge{ display:inline-flex; align-items:center; gap:6px; font-size:11px; letter-spacing:.08em; text-transform:uppercase; font-weight:700; color:var(--primary); background:var(--primary-soft); border:1px solid var(--line-strong); border-radius:999px; padding:5px 12px; }
+.badge::before{ content:"\25CF"; font-size:8px; }
+.icon-btn{ appearance:none; cursor:pointer; font-family:inherit; font-size:12.5px; font-weight:600; color:var(--ink-soft); background:var(--panel-alt); border:1px solid var(--line-strong); border-radius:999px; padding:7px 14px; display:inline-flex; align-items:center; gap:6px; }
+.icon-btn:hover{ color:var(--ink); border-color:var(--ink-soft); }
+header.masthead{ border-bottom:1px solid var(--line); padding-bottom:14px; margin-bottom:16px; }
+h1{ font-weight:600; font-size:clamp(24px,5vw,32px); margin:2px 0 4px 0; text-wrap:balance; letter-spacing:-0.01em; }
+.crumbs{ color:var(--ink-soft); font-size:13.5px; }
+.crumbs b{ color:var(--ink); font-weight:600; }
+.back-link{ appearance:none; border:none; background:none; cursor:pointer; font-family:inherit; font-size:13px; font-weight:600; color:var(--primary); padding:0; margin-bottom:8px; display:inline-flex; align-items:center; gap:4px; text-decoration:none; }
+.back-link:hover{ text-decoration:underline; }
+.tabbar{ display:flex; gap:4px; margin-bottom:6px; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+.tabbtn{ appearance:none; border:none; background:none; cursor:pointer; font-family:inherit; font-size:14.5px; font-weight:600; color:var(--ink-soft); padding:11px 4px; margin-right:20px; border-bottom:2px solid transparent; min-height:42px; }
+@media (max-width:640px){
+  .tabbar{ flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .tabbtn{ white-space:nowrap; flex:none; }
+}
+.tabbtn:hover{ color:var(--ink); }
+.tabbtn.active{ color:var(--primary); border-bottom-color:var(--primary); }
+.tabpanel{ display:none; padding-top:12px; } .tabpanel.active{ display:block; }
+section{ margin-bottom:30px; }
+.section-head{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:12px; flex-wrap:wrap; }
+.section-head h2{ font-size:18px; font-weight:600; margin:0; }
+.section-head .hint{ font-size:12.5px; color:var(--ink-soft); }
+.panel{ background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:20px 22px; }
+.panel-highlight{ background:var(--primary-soft); border:1.5px solid var(--primary); }
+.cat-block{ padding-top:20px; margin-top:20px; border-top:1px solid var(--line); }
+.cat-block:first-child{ padding-top:0; margin-top:0; border-top:none; }
+.cat-block-head{ font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); margin-bottom:10px; }
+.tiles{ display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; }
+.tile{ border:1px solid var(--line); border-radius:8px; padding:12px 14px; background:var(--panel); }
+.tile .label{ font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:6px; }
+.tile .label.tip{ cursor:help; text-decoration:underline dotted var(--line-strong); text-underline-offset:3px; }
+.tile .value{ font-size:21px; font-weight:600; font-variant-numeric:tabular-nums; color:var(--primary); word-break:break-word; }
+.tile.neutral .value{ color:var(--ink); }
+.tile.neg .value{ color:var(--low); } .tile.warn .value{ color:var(--gold); }
+.tile .sub{ font-size:12px; color:var(--ink-soft); margin-top:4px; }
+.table-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+table{ width:100%; border-collapse:collapse; }
+thead th{ text-align:left; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); font-weight:600; padding:0 10px 9px; border-bottom:1px solid var(--line-strong); white-space:nowrap; }
+thead th.num, tbody td.num{ text-align:right; }
+tbody tr{ border-bottom:1px solid var(--line); } tbody tr:last-child{ border-bottom:none; }
+tbody tr:hover{ background:var(--panel-alt); cursor:default; }
+tbody tr.clickable:hover{ cursor:pointer; }
+tbody td{ padding:9px 10px; vertical-align:middle; font-variant-numeric:tabular-nums; }
+th.sortable{ cursor:pointer; user-select:none; }
+th.sortable:hover{ color:var(--ink); }
+.sort-arrow{ font-size:9px; margin-left:4px; color:var(--line-strong); display:inline-block; }
+.sort-arrow.active{ color:var(--primary); }
+.score-cell{ display:flex; align-items:center; gap:10px; justify-content:flex-end; }
+.score-bar{ width:56px; height:6px; border-radius:999px; background:var(--line); position:relative; flex:none; }
+.score-bar .fill{ position:absolute; left:0; top:0; bottom:0; border-radius:999px; background:var(--primary); }
+.score-num{ width:38px; text-align:right; font-weight:600; }
+.status-tag{ font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:999px; white-space:nowrap; display:inline-block; }
+.status-tag.na{ color:var(--ink-soft); background:var(--grey-soft); }
+.bar-list{ display:flex; flex-direction:column; gap:9px; }
+.bar-row{ display:grid; grid-template-columns:190px 1fr 110px; gap:12px; align-items:center; }
+@media (max-width:560px){ .bar-row{ grid-template-columns:1fr; gap:3px; } .bar-row .bval{ text-align:left; } }
+.bar-row .blabel{ font-size:13px; color:var(--ink); }
+.bar-track{ position:relative; height:8px; border-radius:999px; background:var(--grey-soft); }
+.bar-track .fill{ position:absolute; left:0; top:0; bottom:0; border-radius:999px; }
+.bar-row .bval{ font-size:12.5px; font-weight:700; text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.donut-row{ display:flex; gap:20px; flex-wrap:wrap; justify-content:center; align-items:center; }
+.donut-wrap{ position:relative; margin:0 auto; }
+.donut-slice{ cursor:pointer; }
+.donut-legend{ display:flex; flex-direction:column; gap:7px; }
+.legend-row{ display:flex; align-items:center; gap:8px; font-size:12.5px; }
+.legend-swatch{ width:10px; height:10px; border-radius:3px; flex:none; }
+.legend-row .amt{ margin-left:auto; font-variant-numeric:tabular-nums; color:var(--ink-soft); padding-left:6px; }
+.legend-row-wrap{ display:flex; flex-wrap:wrap; gap:8px 20px; margin-top:12px; }
+.foot-note{ margin-top:20px; font-size:12.5px; color:var(--ink-soft); border-top:1px solid var(--line); padding-top:12px; }
+.note-inline{ font-size:13px; line-height:1.55; color:var(--ink-soft); background:var(--panel-alt); border-left:3px solid var(--line-strong); border-radius:0 8px 8px 0; padding:10px 14px; margin:16px 0 0; }
+.note-inline b{ color:var(--ink); }
+.chart-head{ font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); margin:24px 0 6px; }
+.seg-toggle{ display:inline-flex; gap:2px; background:var(--grey-soft); border-radius:999px; padding:3px; flex-wrap:wrap; }
+.seg-toggle button{ appearance:none; border:none; background:none; cursor:pointer; font-family:inherit; font-size:12.5px; font-weight:600; color:var(--ink-soft); padding:6px 12px; border-radius:999px; }
+.seg-toggle button:hover{ color:var(--ink); }
+.seg-toggle button.on{ background:var(--panel); color:var(--primary); box-shadow:0 1px 2px rgba(0,0,0,.08); }
+.donut-grid{ display:grid; grid-template-columns:minmax(260px,1fr) 1.1fr; gap:24px; align-items:center; }
+@media (max-width:760px){ .donut-grid{ grid-template-columns:1fr; } }
+.topic-key{ display:flex; flex-direction:column; gap:14px; }
+.topic-key-row{ display:flex; gap:10px; align-items:flex-start; font-size:14px; }
+.topic-key-row .legend-swatch{ margin-top:5px; }
+.topic-key-desc{ font-size:12.5px; color:var(--ink-soft); margin-top:2px; }
+.md-grid{ display:grid; grid-template-columns:1fr 1fr; gap:28px; align-items:start; }
+@media (max-width:760px){ .md-grid{ grid-template-columns:1fr; } }
+.chart-head .soft, .soft{ text-transform:none; letter-spacing:0; font-weight:400; color:var(--ink-soft); }
+.chart-head a{ color:var(--primary); }
+#chart-districts .bars path{ cursor:pointer; }
+.dak-bar-head{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:6px; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); }
+.source-line{ font-size:12.5px; color:var(--ink-soft); margin:-8px 2px 24px; }
+.callout-attn{ text-align:center; font-size:13.5px; font-weight:700; margin:0 0 8px; padding:11px 16px; background:var(--primary-soft); color:#1f6b4d; border-radius:8px; }
+.callout-attn.low{ background:var(--low-soft); color:#8a3226; }
+.cat-block .callout-attn{ margin:12px 0 0; }
+.disclaimer{ font-size:13px; color:var(--gold); background:var(--gold-soft); border-radius:8px; padding:9px 13px; }
+.status-banner{ display:flex; align-items:flex-start; gap:10px; font-size:13.5px; font-weight:700; padding:12px 16px; background:var(--low-soft); color:#8a3226; border:1px solid var(--low); border-radius:8px; margin-bottom:16px; }
+.modal-backdrop{ display:none; position:fixed; inset:0; background:rgba(30,35,32,0.45); z-index:100; align-items:center; justify-content:center; padding:20px; }
+.modal-backdrop.open{ display:flex; }
+.modal{ background:var(--panel); border-radius:14px; max-width:580px; width:100%; max-height:88vh; overflow-y:auto; padding:24px 26px; box-shadow:0 20px 60px rgba(0,0,0,0.25); }
+.modal-head{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom:14px; }
+.modal-head h3{ font-size:17px; font-weight:600; margin:0; }
+.modal-close{ appearance:none; border:none; background:none; cursor:pointer; font-size:22px; line-height:1; color:var(--ink-soft); padding:2px 6px; }
+.modal-close:hover{ color:var(--ink); }
+.mini-tiles{ display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:10px; margin-bottom:14px; }
+.mini-tile{ border:1px solid var(--line); border-radius:7px; padding:9px 11px; }
+.mini-tile .label{ font-size:10.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:4px; }
+.mini-tile .value{ font-size:16px; font-weight:600; color:var(--ink); }
+.rank3-table{ width:100%; border-collapse:collapse; margin-top:6px; font-size:12.5px; }
+.rank3-table th{ text-align:left; color:var(--ink-soft); font-weight:600; padding:4px 6px; font-size:10.5px; text-transform:uppercase; letter-spacing:.04em; border-bottom:1px solid var(--line-strong); }
+.rank3-table td{ padding:6px; border-bottom:1px solid var(--line); }
+.rank3-table td.num, .rank3-table th.num{ text-align:right; font-variant-numeric:tabular-nums; }
+.modal-subhead{ font-size:12.5px; font-weight:700; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.05em; margin:16px 0 8px; }
+.tooltip-box{ position:fixed; z-index:999; max-width:250px; background:var(--ink); color:#fff; font-size:12.5px;
+  line-height:1.45; padding:8px 11px; border-radius:6px; pointer-events:none; opacity:0; transition:opacity .12s ease;
+  transform:translate(-50%,calc(-100% - 10px)); }
+.tooltip-box.visible{ opacity:1; }
+[data-tip]{ cursor:help; }
+.tip{ text-decoration:underline dotted var(--line-strong); text-underline-offset:3px; }
+.heatmap-cell{ font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:6px; display:inline-block; min-width:44px; text-align:center; }
+.heatmap-cell.zero{ color:var(--ink-soft); background:var(--grey-soft); font-weight:400; }
+.masthead-row{ display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; }
+.masthead-titleblock{ min-width:0; flex:1 1 auto; }
+.period-picker{ display:flex; gap:8px; flex:none; margin-top:2px; }
+.period-select{ font-family:inherit; font-size:13px; font-weight:600; color:var(--ink); background:var(--panel); border:1.5px solid var(--line-strong); border-radius:8px; padding:8px 10px; min-height:38px; }
+.two-col{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.sub-chart-label{ font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); margin:6px 0 0 58px; }
+details.more-table{ margin-top:12px; }
+details.more-table summary{ cursor:pointer; font-size:13px; font-weight:600; color:var(--primary); padding:6px 0; }
+details.more-table summary:hover{ text-decoration:underline; }
+details.more-table[open] summary{ margin-bottom:8px; }
+.sm-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:12px; }
+.sm-card{ border:1px solid var(--line); border-radius:8px; padding:10px 12px 2px; cursor:pointer; transition:border-color .12s, background .12s; }
+.sm-card:hover{ border-color:var(--line-strong); background:var(--panel-alt); }
+.sm-title{ display:flex; align-items:center; gap:7px; flex-wrap:wrap; font-size:13.5px; font-weight:600; }
+.sm-sub{ font-size:12px; font-weight:400; color:var(--ink-soft); margin-left:auto; }
+@media (max-width:760px){ .two-col{ grid-template-columns:1fr; } }
+.panel.two-col{ gap:28px; }
+@media print{
+  .tabbar, .icon-btn, #modal-backdrop, .period-picker{ display:none !important; }
+  .tabpanel{ display:block !important; margin-bottom:34px; page-break-inside:avoid; }
+  body{ padding:0; }
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.35.0/plotly.min.js"></script>
+</head>
+<body>
+<div class="page">
+  <div class="top-row">
+    <span class="badge">DAK Tracker &middot; Didi ki Awaaz</span>
+    <button class="icon-btn" id="btn-print">&#128424;&#65039; Print / Save as PDF</button>
+  </div>
+  <a class="back-link" href="index.html">&larr; DAK Tracker</a>
+  <div id="banner"></div>
+  <header class="masthead" id="masthead"></header>
+  <div class="tabbar" id="tabbar"></div>
+  <div class="tabpanel active" id="panel-overview"></div>
+  <div class="tabpanel" id="panel-where"></div>
+  <div class="tabpanel" id="panel-about"></div>
+  <div class="tabpanel" id="panel-agents"></div>
+  <div class="tabpanel" id="panel-missed"></div>
+  <div class="tabpanel" id="panel-patterns"></div>
+  <div class="foot-note" id="foot-note">Didi ki Awaaz helpline. Incoming calls scraped from the Smartflo (Tata Tele) call-records portal, built by <code>build_didi_ki_awaaz_data.py</code>. Caller phone numbers are never included in this page &mdash; each caller is an anonymous ID, used only to count repeat callers.</div>
+</div>
+<div id="modal-backdrop" class="modal-backdrop"><div class="modal"><div class="modal-head"><h3 id="modal-title"></h3><button class="modal-close" id="modal-close">&times;</button></div><div id="modal-body"></div></div></div>
+<div class="tooltip-box" id="tooltip-box"></div>
+<script>
+let DATA = null;
+let PERIOD = 'cumulative';   // 'cumulative' | 'YYYY' | 'YYYY-MM' - same keys as the DAK dashboard's period picker
+let ACTIVE_TAB = 'overview';
+const MONTH_NAMES = {'01':'Jan','02':'Feb','03':'Mar','04':'Apr','05':'May','06':'Jun','07':'Jul','08':'Aug','09':'Sep','10':'Oct','11':'Nov','12':'Dec'};
+const WEEKDAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const C_ANS = '#2F9C74', C_MISS = '#C55F49', C_GOLD = '#CE9C3C', C_BLUE = '#2A5C8C';
+const MISS_REASONS = {
+  before_ring:      {label:'Hung up before any agent was rung', color:'#C55F49'},
+  while_ringing:    {label:'Hung up while agents were ringing', color:'#CE9C3C'},
+  rang_out:         {label:'Rang out — no agent picked up',     color:'#8A6A1F'},
+  line_unavailable: {label:'Agent line unavailable',            color:'#B7BEB7'},
+};
+
+// ---------------------------------------------------------------- helpers (same as Statewide/index.html)
+function fmtNum(v){ return v===null||v===undefined ? '—' : Math.round(v).toLocaleString('en-IN'); }
+function fmtF(v,d){ return v===null||v===undefined||isNaN(v) ? '—' : v.toFixed(d===undefined?1:d); }
+function fmtPct(v,d){ return v===null||v===undefined||isNaN(v) ? '—' : v.toFixed(d===undefined?1:d)+'%'; }
+function ord(n){ if(n===null||n===undefined) return ''; const s=['th','st','nd','rd'], v=Math.round(n)%100; return s[(v-20)%10]||s[v]||s[0]; }
+function grade(pct){ if(pct===null||pct===undefined) return 'var(--grey)'; if(pct>=66) return 'var(--primary)'; if(pct>=33) return 'var(--gold)'; return 'var(--low)'; }
+function gradeSoft(pct){ if(pct===null||pct===undefined) return 'var(--grey-soft)'; if(pct>=66) return 'var(--primary-soft)'; if(pct>=33) return 'var(--gold-soft)'; return 'var(--low-soft)'; }
+function gradeCls(pct){ if(pct===null||pct===undefined) return 'neutral'; if(pct>=66) return ''; if(pct>=33) return 'warn'; return 'neg'; }
+function esc(s){ return String(s===null||s===undefined?'':s).replace(/[&<>"]/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch])); }
+function median(arr){
+  if(!arr.length) return null;
+  const s = arr.slice().sort((a,b)=>a-b), mid = Math.floor(s.length/2);
+  return s.length%2 ? s[mid] : (s[mid-1]+s[mid])/2;
+}
+function mean(arr){ return arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : null; }
+function pct(a,b){ return b ? 100*a/b : null; }
+function fmtSecs(s){ if(s===null||s===undefined) return '—'; s=Math.round(s); return s<60 ? `${s}s` : `${Math.floor(s/60)}m ${String(s%60).padStart(2,'0')}s`; }
+function monthLabel(m){ const [y,mm]=m.split('-'); return `${MONTH_NAMES[mm]} '${y.slice(2)}`; }
+function monthLong(m){ const [y,mm]=m.split('-'); return `${MONTH_NAMES[mm]} ${y}`; }
+function dateLabel(d){ const [y,m,dd]=d.split('-'); return `${+dd} ${MONTH_NAMES[m]} ${y}`; }
+
+const TIPS = {
+  'Answer Rate': 'Share of incoming calls that an agent picked up.',
+  'Callers Never Reached': 'Callers who called at least once in this period and never got through on any call.',
+  'Median Wait': 'Middle value of how long an answered caller waited — from the call connecting to an agent picking up.',
+  'Avg Talk Time': 'Average conversation length on answered calls.',
+  'Repeat Callers': 'Callers who called more than once in this period.',
+  'First-Ring Pickup': 'Of calls where at least one agent was rung, the share picked up by the very first agent tried.',
+  'Performance Score': 'Score = the average of her pickup rate and her resolved rate (50/50), both on her own calls - so getting fewer calls does not count against her. Agents with no coded calls yet are scored on pickup alone.',
+  'Pickup Rate': 'Of the calls that rang this agent’s phone, the share she answered.',
+  'Pickup Speed': 'Median seconds her phone rang before she answered (lower is faster).',
+  'Share of Answered': 'Her share of all calls the team answered.',
+  'Active Days': 'Days on which she answered at least one call.',
+};
+
+function tile(label, value, sub, cls, tip){
+  const t = tip || TIPS[label];
+  const v = (value===null||value===undefined) ? '—' : value;
+  const l = t ? `<div class="label tip" data-tip="${t}">${label}</div>` : `<div class="label">${label}</div>`;
+  return `<div class="tile ${cls||''}">${l}<div class="value">${v}</div>${sub?`<div class="sub">${sub}</div>`:''}</div>`;
+}
+function miniTile(label, value, tip){
+  const t = tip || TIPS[label];
+  const l = t ? `<div class="label tip" data-tip="${t}">${label}</div>` : `<div class="label">${label}</div>`;
+  return `<div class="mini-tile">${l}<div class="value">${value===null||value===undefined?'—':value}</div></div>`;
+}
+function barRow(label, val, max, color, valLabel, tip){
+  const lbl = tip ? `<span class="tip" data-tip="${tip}">${label}</span>` : label;
+  const w = max>0 ? Math.min(val/max*100,100) : 0;
+  return `<div class="bar-row"><div class="blabel">${lbl}</div><div class="bar-track"><div class="fill" style="width:${w}%;background:${color}"></div></div><div class="bval">${valLabel!==undefined?valLabel:fmtNum(val)}</div></div>`;
+}
+function stackedBarChart(segments){
+  const entries = segments.filter(s=>s.value>0);
+  const total = entries.reduce((a,s)=>a+s.value,0);
+  if(!total) return '<p class="disclaimer">No calls to show.</p>';
+  const bar = `<div style="display:flex;height:26px;border-radius:7px;overflow:hidden;">
+    ${entries.map(s=>`<div data-tip="${s.label}: ${fmtNum(s.value)} (${(s.value/total*100).toFixed(1)}%)" style="width:${(s.value/total*100).toFixed(2)}%;background:${s.color};"></div>`).join('')}
+  </div>`;
+  const legend = `<div class="legend-row-wrap">${entries.map(s=>`<div class="legend-row" data-tip="${s.label}: ${fmtNum(s.value)} (${(s.value/total*100).toFixed(1)}%)"><span class="legend-swatch" style="background:${s.color}"></span>${s.label}<span class="amt">${fmtNum(s.value)}</span></div>`).join('')}</div>`;
+  return bar + legend;
+}
+function makeSortableTable(containerId, cols, data, rowBuilder, onRowClick){
+  const state = { col: null, dir: 1 };
+  function draw(){
+    const sorted = state.col === null ? data : data.slice().sort((a,b)=>{
+      let av=a[cols[state.col].key], bv=b[cols[state.col].key];
+      if(typeof av==='string'){ av=av.toUpperCase(); bv=(bv||'').toUpperCase(); }
+      if(av==null) return 1; if(bv==null) return -1;
+      if(av<bv) return -1*state.dir; if(av>bv) return 1*state.dir; return 0;
+    });
+    const theadHtml = `<tr>${cols.map((c,i)=>{
+      const cls=[c.num?'num':'', c.key?'sortable':''].filter(Boolean).join(' ');
+      const arrow = c.key ? ` <span class="sort-arrow${state.col===i?' active':''}">${state.col===i?(state.dir===1?'▲':'▼'):'⇅'}</span>` : '';
+      const lbl = c.tip ? `<span class="tip" data-tip="${c.tip}">${c.label}</span>` : c.label;
+      return `<th${cls?` class="${cls}"`:''}${c.key?` data-colidx="${i}"`:''}>${lbl}${arrow}</th>`;
+    }).join('')}</tr>`;
+    const tbodyHtml = sorted.map((item,idx)=>{
+      const r = rowBuilder(item, idx);
+      const cls = onRowClick && onRowClick.enabled(item) ? ' class="clickable"' : '';
+      return `<tr${cls} data-idx="${idx}">${r.map((v,i)=>`<td${cols[i].num?' class="num"':''}>${v}</td>`).join('')}</tr>`;
+    }).join('');
+    document.getElementById(containerId).innerHTML = `<div class="table-wrap"><table><thead>${theadHtml}</thead><tbody>${tbodyHtml}</tbody></table></div>`;
+    document.querySelectorAll(`#${containerId} th.sortable`).forEach(th=>{
+      th.addEventListener('click', ()=>{
+        const idx = +th.dataset.colidx;
+        if(state.col===idx) state.dir*=-1; else { state.col=idx; state.dir=1; }
+        draw();
+      });
+    });
+    if(onRowClick){
+      document.querySelectorAll(`#${containerId} tbody tr.clickable`).forEach(tr=>{
+        tr.addEventListener('click', ()=> onRowClick.handler(sorted[+tr.dataset.idx]));
+      });
+    }
+  }
+  draw();
+}
+function initTooltips(){
+  const box = document.getElementById('tooltip-box');
+  function place(e){ box.style.left = e.clientX+'px'; box.style.top = (e.clientY-8)+'px'; }
+  document.addEventListener('mouseover', e=>{
+    const el = e.target.closest('[data-tip]'); if(!el) return;
+    box.textContent = el.getAttribute('data-tip'); box.classList.add('visible'); place(e);
+  });
+  document.addEventListener('mousemove', e=>{ if(e.target.closest('[data-tip]')) place(e); });
+  document.addEventListener('mouseout', e=>{ if(e.target.closest('[data-tip]')) box.classList.remove('visible'); });
+}
+function openModal(title, html){
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = html;
+  document.getElementById('modal-backdrop').classList.add('open');
+}
+function closeModal(){ document.getElementById('modal-backdrop').classList.remove('open'); }
+function plotlyBarLayout(yTitle){
+  return {
+    autosize:true, margin:{t:10,b:50,l:55,r:20}, height:280, paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)',
+    xaxis:{automargin:true}, yaxis:{title:{text:yTitle}, automargin:true},
+    legend:{orientation:'h', y:-0.3}, font:{family:'"Noto Sans Devanagari","Nirmala UI","Segoe UI",Roboto,Arial,sans-serif', size:12, color:'#33413A'},
+  };
+}
+// Every Plotly chart goes through here: no zoom/pan (drag, scroll or double-click),
+// no toolbar - hover tooltips stay on.
+function plot(id, traces, layout){
+  const l = {font:FONT, hoverlabel:{bgcolor:INK, bordercolor:INK, font:{color:'#FFFFFF', size:12.5, family:FONT.family}}, ...layout, dragmode:false};
+  Object.keys(l).filter(k=>/^[xy]axis\d*$/.test(k)).forEach(k=>{ l[k] = {...l[k], fixedrange:true}; });
+  ['xaxis','yaxis'].forEach(k=>{ l[k] = {...(l[k]||{}), fixedrange:true}; });
+  return Plotly.newPlot(id, traces, l, {displayModeBar:false, responsive:true, scrollZoom:false, doubleClick:false});
+}
+
+const INK = '#33413A', GRID = '#EAE4D5';
+const FONT = {family:'"Noto Sans Devanagari","Nirmala UI","Segoe UI",Roboto,Arial,sans-serif', size:12, color:INK};
+// On phones, long category labels wrap onto two lines instead of being cut off.
+const NARROW = () => window.innerWidth < 600;
+function fitLabel(t){
+  t = String(t);
+  if(!NARROW() || t.length <= 18) return t;
+  const words = t.split(' '); let a = '';
+  while(words.length && (a + ' ' + words[0]).trim().length <= Math.ceil(t.length/2)) a = (a + ' ' + words.shift()).trim();
+  return words.length ? `${a}<br>${words.join(' ')}` : a;
+}
+// Horizontal bar layout: categories down the side, no value axis (values are written at the bar ends
+// and in the hover), room on the right for those labels.
+function hbarLayout(n, o){
+  o = o || {};
+  const legendH = o.showlegend ? 34 : 0;
+  return {autosize:true, height: 24 + (NARROW() ? 44 : 34)*n + legendH, bargap:0.38, barmode:o.barmode,
+    margin:{t: 6 + legendH, b: 6, l: 10, r: NARROW() ? 96 : 150}, paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)', font:FONT,
+    showlegend: !!o.showlegend, legend: {traceorder:'normal', ...(o.legend||{})},
+    xaxis:{visible:false, range: o.xmax ? [0, o.xmax] : undefined, autorange: o.xmax ? false : true, fixedrange:true},
+    yaxis:{automargin:true, ticks:'', tickfont:{size:12.5, color:INK}, fixedrange:true},
+    hoverlabel:{bgcolor:INK, bordercolor:INK, font:{color:'#FFFFFF', size:12.5, family:FONT.family}}};
+}
+// One-series ranked bars: entries [[fullLabel, count], ...] largest first; share = count / base.
+function hbar(id, entries, o){
+  o = o || {};
+  const el = document.getElementById(id); if(!el) return;
+  if(!entries.length){ el.innerHTML = '<p class="disclaimer">Nothing to show for this period.</p>'; return; }
+  const rows = entries.slice().reverse();
+  const base = o.base || rows.reduce((a,e)=>a+e[1],0);
+  plot(id, [{y: rows.map(e=>fitLabel(shortLabel(e[0]))), x: rows.map(e=>e[1]), type:'bar', orientation:'h',
+    marker:{color: o.color || C_ANS},
+    text: rows.map(e=>`  ${e[1]}  ·  ${fmtPct(pct(e[1], base),0)}`), textposition:'outside', cliponaxis:false, textfont:{size:12, color:INK},
+    hovertext: rows.map(e=>`<b>${esc(e[0])}</b><br>${e[1]} calls (${fmtPct(pct(e[1], base),0)})`), hovertemplate:'%{hovertext}<extra></extra>'}],
+    hbarLayout(rows.length));
+}
+
+// Donut/pie - same drawing as drawDonut() in index.html. segs: [{label, value, color}]
+function drawDonut(svgId, segments){
+  const svg=document.getElementById(svgId); if(!svg) return;
+  const r=65,cx=95,cy=95,C=2*Math.PI*r,sw=50; let off=0,html='';
+  segments.forEach(seg=>{
+    const frac = Math.max(seg.frac,0), len=frac*C;
+    html+=`<circle class="donut-slice" data-tip="${seg.label}: ${(seg.frac*100).toFixed(1)}%" cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${seg.color}" stroke-width="${sw}" stroke-dasharray="${len.toFixed(1)} ${C.toFixed(1)}" stroke-dashoffset="${(-off).toFixed(1)}" transform="rotate(-90 ${cx} ${cy})"/>`;
+    if(frac>=0.05){
+      const midAngleDeg = ((off+len/2)/C)*360 - 90, rad = midAngleDeg*Math.PI/180;
+      const lx = cx + r*Math.cos(rad), ly = cy + r*Math.sin(rad);
+      html += `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" font-size="13" font-weight="600" fill="#fff" text-anchor="middle" dominant-baseline="middle" style="pointer-events:none;">${Math.round(frac*100)}%</text>`;
+    }
+    off += len;
+  });
+  svg.innerHTML = html;
+}
+function donutHtml(svgId, segs){
+  const total = segs.reduce((a,s)=>a+s.value,0);
+  if(!total) return '<p class="disclaimer">No calls to show.</p>';
+  const legend = segs.filter(s=>s.value>0).map(s=>`<div class="legend-row" data-tip="${esc(s.label)}: ${fmtNum(s.value)} (${fmtPct(100*s.value/total,1)})"><span class="legend-swatch" style="background:${s.color}"></span>${esc(s.label)}<span class="amt">${fmtNum(s.value)} &middot; ${fmtPct(100*s.value/total,0)}</span></div>`).join('');
+  return `<div class="donut-row"><div class="donut-wrap"><svg id="${svgId}" width="180" height="180" viewBox="0 0 190 190"></svg></div><div class="donut-legend">${legend}</div></div>`;
+}
+function drawDonutSegs(svgId, segs){
+  const total = segs.reduce((a,s)=>a+s.value,0);
+  if(total) drawDonut(svgId, segs.filter(s=>s.value>0).map(s=>({frac:s.value/total, color:s.color, label:esc(s.label)})));
+}
+// One fixed colour per agent (by all-time calls answered) so pie and line chart agree.
+const AGENT_PALETTE = ['#2F9C74','#CE9C3C','#2A5C8C','#C55F49','#8A6A1F','#5B8AA6','#7C8B81','#B7BEB7'];
+let AGENT_COLORS = null;
+function agentColor(name){
+  if(!AGENT_COLORS){
+    AGENT_COLORS = {};
+    agentStats(DATA.calls).slice().sort((a,b)=>b.ans-a.ans || b.rung-a.rung).forEach((r,i)=>{ AGENT_COLORS[r.name] = AGENT_PALETTE[i % AGENT_PALETTE.length]; });
+  }
+  return AGENT_COLORS[name] || '#B7BEB7';
+}
+
+// Call volume and answer rate as TWO stacked charts on the same x-axis - one scale
+// each (a dual-axis chart invites reading relationships the scales invent).
+function volumeRateChart(id, labels, ans, miss){
+  const host = document.getElementById(id);
+  host.innerHTML = `<div id="${id}-vol"></div><div class="sub-chart-label">Answer rate</div><div id="${id}-rate"></div>`;
+  const tot = labels.map((_,i)=>ans[i]+miss[i]);
+  const rate = labels.map((_,i)=> tot[i] ? Math.round(100*ans[i]/tot[i]) : null);
+  const margin = {t:10, b:30, l:58, r:16};   // identical margins so the two x-axes line up
+  const x = {type:'category', automargin:false, showgrid:false};
+  plot(`${id}-vol`, [
+    {x:labels, y:ans, name:'Answered', type:'bar', marker:{color:C_ANS, line:{color:'#FFFFFF', width:1.5}}, customdata:tot, hovertemplate:'%{x}: %{y} answered of %{customdata}<extra></extra>'},
+    {x:labels, y:miss, name:'Missed', type:'bar', marker:{color:C_MISS, line:{color:'#FFFFFF', width:1.5}}, customdata:tot, hovertemplate:'%{x}: %{y} missed of %{customdata}<extra></extra>'},
+  ], {...plotlyBarLayout('Calls'), barmode:'stack', height:230, margin, xaxis:{...x, showticklabels:false},
+      legend:{orientation:'h', x:0, y:1.12, traceorder:'normal'}});
+  plot(`${id}-rate`, [
+    {x:labels, y:rate, name:'Answer rate', type:'scatter', mode:'lines+markers', line:{color:'#33413A', width:2},
+     marker:{size:8, color:'#33413A', line:{color:'#FFFFFF', width:2}}, connectgaps:false,
+     customdata: labels.map((_,i)=>[ans[i], tot[i]]),
+     hovertemplate:'%{x}: %{y}% answered<br>(%{customdata[0]} of %{customdata[1]} calls)<extra></extra>'},
+  ], {...plotlyBarLayout(''), height:150, margin, showlegend:false, xaxis:x,
+      yaxis:{range:[0,100], tickvals:[0,50,100], ticksuffix:'%', gridcolor:'#EAE4D5', zeroline:false}});
+}
+
+// ---------------------------------------------------------------- aggregation
+function months(){ return [...new Set(DATA.calls.map(c=>c.d.slice(0,7)))].sort(); }
+function callsInPeriod(){ return PERIOD==='cumulative' ? DATA.calls : DATA.calls.filter(c=>c.d.startsWith(PERIOD)); }
+// Calls per calendar day in the selected period, clipped to the dates the data covers.
+function perDay(calls){
+  const start = PERIOD==='cumulative' ? DATA.date_min : (PERIOD.length===4 ? `${PERIOD}-01-01` : `${PERIOD}-01`);
+  let end;
+  if(PERIOD==='cumulative') end = DATA.date_max;
+  else if(PERIOD.length===4) end = `${PERIOD}-12-31`;
+  else { const [y,m] = PERIOD.split('-').map(Number); end = `${PERIOD}-${String(new Date(y, m, 0).getDate()).padStart(2,'0')}`; }
+  const s = start < DATA.date_min ? DATA.date_min : start, e = end > DATA.date_max ? DATA.date_max : end;
+  const days = Math.max(1, Math.round((new Date(e+'T00:00:00') - new Date(s+'T00:00:00'))/86400000) + 1);
+  const byDay = {};
+  calls.forEach(c=>{ byDay[c.d] = (byDay[c.d]||0) + 1; });
+  const top = Object.entries(byDay).sort((a,b)=>b[1]-a[1])[0];
+  return {days, avg: calls.length/days, avgAns: calls.filter(c=>c.a).length/days, max: top ? top[1] : 0, maxDay: top ? top[0] : null};
+}
+function periodLabel(){ return PERIOD==='cumulative' ? 'cumulative' : (PERIOD.length===4 ? PERIOD : monthLong(PERIOD)); }
+
+function headline(calls){
+  const ans = calls.filter(c=>c.a), miss = calls.filter(c=>!c.a);
+  const byCaller = {};
+  calls.forEach(c=>{ (byCaller[c.c] = byCaller[c.c] || []).push(c); });
+  const callers = Object.values(byCaller);
+  const withMiss = callers.filter(v=>v.some(c=>!c.a));
+  const never = callers.filter(v=>!v.some(c=>c.a));
+  const waits = ans.map(c=>c.wait).filter(w=>w!==null);
+  const rungCalls = calls.filter(c=>c.rung.length);
+  return {
+    total: calls.length, ans: ans.length, miss: miss.length, rate: pct(ans.length, calls.length),
+    callers: callers.length, withMiss: withMiss.length, never: never.length,
+    recovered: withMiss.length - withMiss.filter(v=>!v.some(c=>c.a)).length,
+    repeat: callers.filter(v=>v.length>1).length,
+    waitMed: median(waits),
+    talkAvg: mean(ans.map(c=>c.talk)), talkHrs: ans.reduce((a,c)=>a+c.talk,0)/3600,
+    firstRing: pct(rungCalls.filter(c=>c.rung[0][1]).length, rungCalls.length),
+    shortTalk: ans.filter(c=>c.talk<10).length,
+  };
+}
+
+
+function agentStats(calls){
+  const teamAns = calls.filter(c=>c.a).length;
+  const by = {};
+  const get = n => by[n] = by[n] || {name:n, rung:0, ans:0, rings:[], talk:[], days:new Set(), months:{}, resKnown:0, resYes:0, resPart:0};
+  calls.forEach(c=>{
+    const seen = new Set();
+    c.rung.forEach(([n])=>{ if(!seen.has(n)){ seen.add(n); get(n).rung++; } });
+    if(c.a && c.ag){
+      const s = get(c.ag); s.ans++; s.talk.push(c.talk); s.days.add(c.d);
+      // resolved on the call - only calls whose outcome could be told from listening / the transcript
+      // (callbacks and wrong numbers have nothing to resolve, so they are left out)
+      const res = c.lc && /^yes/i.test(c.lc.rc||'') && !/^(Callback only|Wrong number)/.test(c.lc.th||'') ? c.lc.res : null;
+      if(['Yes','Partly','No'].includes(res)){ s.resKnown++; if(res==='Yes') s.resYes++; if(res==='Partly') s.resPart++; }
+      if(c.ring!==null) s.rings.push(c.ring);
+      if(!seen.has(c.ag)) s.rung++;     // answered without appearing in the ring list
+    }
+  });
+  const rows = Object.values(by).map(s=>({
+    name: s.name, rung: s.rung, ans: s.ans, missed: s.rung - s.ans,
+    pickup: pct(s.ans, s.rung), ringMed: median(s.rings),
+    talkAvg: mean(s.talk), talkHrs: s.talk.reduce((a,b)=>a+b,0)/3600,
+    share: pct(s.ans, teamAns), days: s.days.size,
+    resKnown: s.resKnown, resYes: s.resYes, resPart: s.resPart, resolved: s.resKnown ? pct(s.resYes, s.resKnown) : null,
+    fewCalls: s.rung < DATA.rank_floor,   // still scored and ranked - flagged so readers know the rate is thin
+  }));
+  // Score = simple average of two rates, both measured on HER OWN calls (so low demand is not penalised):
+  //   pickup rate   = calls she answered / calls that rang her
+  //   resolved rate = calls fully resolved / her answered calls whose outcome is known (coded calls)
+  // 50/50, no other weights (the reviewer's choice, 2026-10-07). An agent with no coded calls is scored
+  // on pickup alone and tagged. Speed and talk time are context only.
+  // (Tried and dropped: a weighted index with a volume term, which penalised low demand; a within-20s pickup rate.)
+  rows.forEach(r=>{ r.pickupOnly = r.resolved===null || r.resolved===undefined;
+    r.score = r.pickup===null ? null : (r.pickupOnly ? r.pickup : (r.pickup + r.resolved)/2);
+    r.fewCoded = !r.pickupOnly && r.resKnown < DATA.rank_floor; });
+  // ties broken by more calls rung (a rate on more calls is the more reliable one)
+  rows.sort((a,b)=> (b.score??-1)-(a.score??-1) || b.rung-a.rung).forEach((r,i)=>{ r.rank = i+1; });
+  return rows;
+}
+
+// ---------------------------------------------------------------- masthead + tabs
+// Year + Month selects, same behaviour as populatePeriodPicker() in index.html:
+// Year = Cumulative | YYYY; Month = Full Year | month (disabled under Cumulative).
+function renderMasthead(){
+  const ms = months();
+  const years = [...new Set(ms.map(m=>m.slice(0,4)))].sort();
+  const range = PERIOD==='cumulative' ? `${dateLabel(DATA.date_min)} – ${dateLabel(DATA.date_max)}` : periodLabel();
+  document.getElementById('masthead').innerHTML = `<div class="masthead-row">
+    <div class="masthead-titleblock">
+      <h1 class="serif">Didi ki Awaaz Helpline</h1>
+      <div class="crumbs">Incoming calls answered by Sakshma Didis &middot; <b>${range}</b> &middot; data as of ${esc(DATA.generated_at)}</div>
+    </div>
+    <div class="period-picker">
+      <select class="period-select" id="period-year"><option value="cumulative">Cumulative</option>${years.slice().reverse().map(y=>`<option value="${y}">${y}</option>`).join('')}</select>
+      <select class="period-select" id="period-month"></select>
+    </div>
+  </div>`;
+  const yearSel = document.getElementById('period-year'), monthSel = document.getElementById('period-month');
+  const year = PERIOD==='cumulative' ? 'cumulative' : PERIOD.slice(0,4);
+  yearSel.value = year;
+  if(year==='cumulative'){ monthSel.disabled = true; }
+  else {
+    monthSel.innerHTML = `<option value="${year}">Full Year</option>` + ms.filter(m=>m.startsWith(year)).map(m=>`<option value="${m}">${MONTH_NAMES[m.slice(5)]}</option>`).join('');
+    monthSel.value = PERIOD;
+  }
+  const apply = p => { PERIOD = p; renderMasthead(); renderTab(ACTIVE_TAB); };
+  yearSel.addEventListener('change', ()=> apply(yearSel.value));
+  monthSel.addEventListener('change', ()=> apply(monthSel.value));
+}
+const TABS = [['overview','Overview'],['where','Who & Where'],['about','What Calls Are About'],['agents','Agent Performance'],['missed','Missed Calls'],['patterns','When Calls Come In']];
+function renderTabbar(){
+  document.getElementById('tabbar').innerHTML = TABS.map(([k,l])=>`<button class="tabbtn${k===ACTIVE_TAB?' active':''}" data-tab="${k}">${l}</button>`).join('');
+  document.querySelectorAll('.tabbtn').forEach(b=>b.addEventListener('click', ()=>{
+    ACTIVE_TAB = b.dataset.tab;
+    document.querySelectorAll('.tabbtn').forEach(x=>x.classList.toggle('active', x===b));
+    document.querySelectorAll('.tabpanel').forEach(p=>p.classList.toggle('active', p.id==='panel-'+ACTIVE_TAB));
+    renderTab(ACTIVE_TAB);
+    history.replaceState(null, '', '#'+ACTIVE_TAB);
+  }));
+}
+function renderTab(k){ ({overview:renderOverview, where:renderWhoWhere, about:renderAbout, agents:renderAgents, missed:renderMissed, patterns:renderPatterns})[k](); }
+
+// ---------------------------------------------------------------- Overview
+function renderOverview(){
+  const calls = callsInPeriod(), h = headline(calls);
+  const perTen = h.total ? Math.round(10*h.miss/h.total) : 0;
+  const el = document.getElementById('panel-overview');
+  el.innerHTML = `
+    <section><div class="section-head"><h2 class="serif">Helpline Snapshot</h2><span class="hint">${periodLabel()} &middot; hover a label to see what it means</span></div>
+      <div class="panel">
+        <div class="cat-block"><div class="cat-block-head">Volume</div><div class="tiles">
+          ${tile('Total Calls', fmtNum(h.total), null, 'neutral')}
+          ${tile('Answered', fmtNum(h.ans))}
+          ${tile('Missed', fmtNum(h.miss), null, 'neg')}
+          ${tile('Answer Rate', fmtPct(h.rate), null, gradeCls(h.rate))}
+          ${(()=>{ const dd = perDay(calls); return tile('Calls per Day', fmtF(dd.avg,1),
+              `${fmtF(dd.avgAns,1)} answered per day &middot; busiest: ${fmtNum(dd.max)} on ${dd.maxDay ? dateLabel(dd.maxDay) : '—'}`, 'neutral',
+              'Average over every calendar day in the selected period (including days with no calls), from the first to the last day covered by the data.'); })()}
+        </div>
+          <div class="callout-attn ${h.rate<50?'low':''}">${perTen} of every 10 calls go unanswered &mdash; ${fmtNum(h.miss)} missed out of ${fmtNum(h.total)}.</div>
+        </div>
+        <div class="cat-block"><div class="cat-block-head">Callers</div><div class="tiles">
+          ${tile('Unique Callers', fmtNum(h.callers), null, 'neutral', 'Distinct phone numbers that called in this period.')}
+          ${tile('Repeat Callers', fmtNum(h.repeat), `${fmtPct(pct(h.repeat,h.callers),0)} of callers`, 'neutral')}
+          ${tile('Callers Never Reached', fmtNum(h.never), `${fmtPct(pct(h.never,h.callers),0)} of callers`, 'neg')}
+          ${tile('Missed, Then Reached', fmtNum(h.recovered), `of ${fmtNum(h.withMiss)} callers who had a missed call`, 'warn', 'Callers who had at least one missed call but got through on another call in this period.')}
+        </div>
+          <div class="callout-attn ${h.never>h.callers/3?'low':''}">${fmtNum(h.never)} of ${fmtNum(h.callers)} callers (${fmtPct(pct(h.never,h.callers),0)}) never got through on any call.</div>
+        </div>
+        <div class="cat-block"><div class="cat-block-head">Service</div><div class="tiles">
+          ${tile('Median Wait', fmtSecs(h.waitMed), 'before an agent picks up', 'neutral')}
+          ${tile('First-Ring Pickup', fmtPct(h.firstRing,0), null, gradeCls(h.firstRing))}
+          ${tile('Avg Talk Time', fmtSecs(h.talkAvg), `${fmtF(h.talkHrs,1)} hours in total`, 'neutral')}
+        </div></div>
+      </div>
+    </section>
+    <section><div class="section-head"><h2 class="serif">Calls Over Time</h2><span class="hint">by week (Monday start) &middot; calls on top, answer rate below</span></div>
+      <div class="panel"><div id="chart-weekly"></div></div></section>
+    <section><div class="section-head"><h2 class="serif">Month by Month</h2><span class="hint">cumulative, not affected by the period picker</span></div>
+      <div class="panel"><div id="table-monthly"></div></div></section>`;
+
+  const weeks = {};
+  calls.forEach(c=>{
+    const d = new Date(c.d+'T00:00:00'); d.setDate(d.getDate() - ((d.getDay()+6)%7));
+    const k = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; // local date - toISOString() shifts IST back a day
+    const w = weeks[k] = weeks[k] || {a:0,m:0}; c.a ? w.a++ : w.m++;
+  });
+  const wk = Object.keys(weeks).sort();
+  volumeRateChart('chart-weekly', wk.map(k=>{ const [y,m,d]=k.split('-'); return `${+d} ${MONTH_NAMES[m]}`; }), wk.map(k=>weeks[k].a), wk.map(k=>weeks[k].m));
+
+  const mrows = months().map(m=>{
+    const hh = headline(DATA.calls.filter(c=>c.d.slice(0,7)===m));
+    return {m, label:monthLong(m), total:hh.total, ans:hh.ans, miss:hh.miss, rate:hh.rate, callers:hh.callers, never:hh.never, talk:hh.talkHrs};
+  });
+  makeSortableTable('table-monthly', [
+    {label:'Month', key:'m'}, {label:'Calls', key:'total', num:true}, {label:'Answered', key:'ans', num:true},
+    {label:'Missed', key:'miss', num:true}, {label:'Answer Rate', key:'rate', num:true},
+    {label:'Callers', key:'callers', num:true}, {label:'Never Reached', key:'never', num:true}, {label:'Talk Hours', key:'talk', num:true},
+  ], mrows, r=>[r.label, fmtNum(r.total), fmtNum(r.ans), fmtNum(r.miss),
+    `<span style="color:${grade(r.rate)};font-weight:700">${fmtPct(r.rate)}</span>`, fmtNum(r.callers), fmtNum(r.never), fmtF(r.talk,1)]);
+}
+
+// ---------------------------------------------------------------- Agent Performance
+function scoreCell(v, r){
+  if(v===null||v===undefined) return '—';
+  const tip = !r ? '' : r.pickupOnly ? `Pickup ${fmtPct(r.pickup,0)} (no coded calls yet, so pickup only)`
+    : `Average of pickup ${fmtPct(r.pickup,0)} (${r.ans}/${r.rung}) and resolved ${fmtPct(r.resolved,0)} (${r.resYes}/${r.resKnown})`;
+  return `<div class="score-cell"${tip ? ` data-tip="${tip}"` : ''}><div class="score-bar"><div class="fill" style="width:${v}%;background:${grade(v)}"></div></div><span class="score-num" style="color:${grade(v)}">${fmtF(v,0)}%</span></div>`;
+}
+function renderAgents(){
+  const calls = callsInPeriod(), rows = agentStats(calls), h = headline(calls);
+  const el = document.getElementById('panel-agents');
+  const whoSegs = rows.filter(r=>r.ans>0).sort((a,b)=>b.ans-a.ans).map(r=>({label:r.name, value:r.ans, color:agentColor(r.name)}));
+  el.innerHTML = `
+    <section><div class="section-head"><h2 class="serif tip" data-tip="${TIPS['Performance Score']}">Agent Ranking</h2><span class="hint">${periodLabel()} &middot; click a row for her full breakdown</span></div>
+      <div class="panel">
+        <p class="crumbs" style="margin:0 0 14px;">Score = the average of two rates, each on her own calls: <b>pickup rate</b> (calls she answered, of those that rang her) and <b>resolved rate</b> (calls fully resolved, of her answered calls where the outcome is known). <span class="status-tag na">few calls</span> = a rate on fewer than ${DATA.rank_floor} calls; <span class="status-tag na">pickup only</span> = no coded calls yet.</p>
+        <div id="table-agents"></div>
+      </div>
+    </section>
+    <section><div class="section-head"><h2 class="serif">Who Answers the Calls</h2><span class="hint">workload only, not scored &middot; share of the ${fmtNum(h.ans)} answered calls</span></div>
+      <div class="panel">${donutHtml('svg-who-answers', whoSegs)}</div></section>
+    <section><div class="section-head"><h2 class="serif">Pickup Rate by Month</h2><span class="hint">cumulative, not affected by the period picker &middot; hover a point for calls &middot; click a card for her full breakdown</span></div>
+      <div class="panel">
+        <div class="legend-row-wrap" style="margin:0 0 12px;">
+          <div class="legend-row"><span class="legend-swatch" style="background:#33413A"></span>Her pickup rate (each card)</div>
+          <div class="legend-row"><span style="width:18px;border-top:2px dashed #B7BEB7;display:inline-block"></span>Whole team</div>
+        </div>
+        <div class="sm-grid" id="agent-months-grid"></div>
+      </div></section>`;
+
+  makeSortableTable('table-agents', [
+    {label:'Rank', key:'rank', num:true}, {label:'Agent', key:'name'},
+    {label:'Score', key:'score', num:true, tip:TIPS['Performance Score']},
+    {label:'Pickup Rate', key:'pickup', num:true, tip:TIPS['Pickup Rate']},
+    {label:'Rung', key:'rung', num:true, tip:'Calls on which her phone rang.'},
+    {label:'Answered', key:'ans', num:true},
+    {label:'Median Speed', key:'ringMed', num:true, tip:TIPS['Pickup Speed']+' Shown for context, not scored.'},
+    {label:'Avg Talk', key:'talkAvg', num:true, tip:'Average conversation length on the calls she answered. Shown for context, not scored — a longer call is not automatically a better one.'},
+    {label:'Resolved Rate', key:'resolved', num:true, tip:'Of her answered calls where the outcome could be told (from listening or the transcript), the share fully resolved during the call. Half of the score. Note: it depends partly on what callers ask - a wallet-recharge problem often needs the CLF or bank, not the didi.'},
+  ], rows, r=>[r.rank ?? '—', esc(r.name) + (r.pickupOnly ? ' <span class="status-tag na">pickup only</span>' : ''), scoreCell(r.score, r),
+    `<span style="color:${grade(r.pickup)};font-weight:600">${fmtPct(r.pickup,0)}</span>`,
+    fmtNum(r.rung) + (r.fewCalls ? ` <span class="status-tag na" data-tip="Rate based on fewer than ${DATA.rank_floor} calls - treat with caution.">few calls</span>` : ''),
+    fmtNum(r.ans), fmtSecs(r.ringMed), fmtSecs(r.talkAvg),
+    r.resKnown ? `<span data-tip="Fully resolved ${r.resYes}, partly ${r.resPart}, of ${r.resKnown} calls where the outcome was clear"><span style="color:${grade(r.resolved)};font-weight:600">${fmtPct(r.resolved,0)}</span> <span class="soft">(${r.resYes}/${r.resKnown})</span>${r.fewCoded ? ' <span class="status-tag na">few calls</span>' : ''}</span>` : '<span class="soft">—</span>'],
+    {enabled:()=>true, handler:r=>openAgentModal(r)});
+
+  drawDonutSegs('svg-who-answers', whoSegs);
+
+  // Pickup rate over time as small multiples - one card per didi, her line + the
+  // dashed team line, same 0-100% axis on every card so they compare directly.
+  // (One chart with 7 crossing lines was unreadable.)
+  const ms = months();
+  const x = ms.map(monthLabel);
+  const monthly = ms.map(m=>agentStats(DATA.calls.filter(c=>c.d.startsWith(m))));
+  const team = ms.map(m=>{ const t = teamStats(DATA.calls.filter(c=>c.d.startsWith(m))); return t.pickup===null ? null : Math.round(t.pickup); });
+  const allTime = agentStats(DATA.calls).slice().sort((a,b)=>b.ans-a.ans || b.rung-a.rung);
+  const grid = document.getElementById('agent-months-grid');
+  grid.innerHTML = allTime.map((r,i)=>`<div class="sm-card" data-agent="${esc(r.name)}" title="Click for ${esc(r.name)}'s full breakdown">
+      <div class="sm-title"><span class="legend-swatch" style="background:${agentColor(r.name)}"></span>${esc(r.name)}
+        <span class="sm-sub">${fmtPct(r.pickup,0)} overall &middot; ${fmtNum(r.ans)} of ${fmtNum(r.rung)} calls${r.fewCalls?' &middot; few calls':''}</span></div>
+      <div id="sm-chart-${i}"></div></div>`).join('');
+  allTime.forEach((r,i)=>{
+    const pts = monthly.map(rs=>rs.find(s=>s.name===r.name));
+    const y = pts.map(s=>s && s.rung ? Math.round(s.pickup) : null);
+    plot(`sm-chart-${i}`, [
+      {x, y: team, name:'Whole team', type:'scatter', mode:'lines', line:{color:'#B7BEB7', width:2, dash:'dash'},
+       hovertemplate:'Team: %{y}%<extra></extra>'},
+      {x, y, name:r.name, type:'scatter', mode:'lines+markers+text', line:{color:agentColor(r.name), width:2},
+       marker:{size:9, color:agentColor(r.name), line:{color:'#FFFFFF', width:2}},
+       text: y.map(v=>v===null?'':`${v}%`), textposition:'top center', textfont:{size:12, color:'#33413A'},
+       customdata: pts.map(s=>s && s.rung ? [s.ans, s.rung] : [0,0]),
+       hovertemplate:`<b>${esc(r.name)}: %{y}%</b><br>answered %{customdata[0]} of %{customdata[1]} calls<extra></extra>`, connectgaps:false},
+    ], {...plotlyBarLayout(''), height:190, margin:{t:14,b:28,l:40,r:14}, showlegend:false, hovermode:'x unified',
+        xaxis:{type:'category', automargin:true, showgrid:false},
+        yaxis:{range:[0,110], tickvals:[0,50,100], ticksuffix:'%', gridcolor:'#EAE4D5', zeroline:false, automargin:true}});
+  });
+  grid.querySelectorAll('.sm-card').forEach(card=>card.addEventListener('click', ()=>{
+    const r = agentStats(callsInPeriod()).find(s=>s.name===card.dataset.agent) || allTime.find(s=>s.name===card.dataset.agent);
+    openAgentModal(r);
+  }));
+}
+// Factual comparison with the team for the same period - this is feedback about a real person, so it states numbers, not judgements.
+function agentInsight(r, team){
+  const cmp = (v, t, higherBetter) => v===null||t===null ? '' : (Math.round(v)===Math.round(t) ? 'in line with' : ((v>t)===higherBetter ? 'better than' : 'below'));
+  return `<div class="note-inline">She answers <b>${fmtPct(r.pickup,0)}</b> of the calls that ring her &mdash; ${cmp(r.pickup, team.pickup, true)} the team's ${fmtPct(team.pickup,0)}. Her median pickup time is <b>${fmtSecs(r.ringMed)}</b> (team: ${fmtSecs(team.ringMed)}).</div>`;
+}
+function teamStats(calls){
+  const rungTotal = agentStats(calls).reduce((a,r)=>a+r.rung,0);
+  const ansTotal = calls.filter(c=>c.a && c.ag).length;
+  return { pickup: pct(ansTotal, rungTotal), ringMed: median(calls.filter(c=>c.a && c.ring!==null).map(c=>c.ring)) };
+}
+function openAgentModal(r){
+  let html = `<div class="mini-tiles">
+    ${miniTile('Team Rank', r.rank ? `${r.rank}${ord(r.rank)}` : '—', 'Rank by pickup rate among all agents for the selected period.')}
+    ${miniTile('Calls Rung', fmtNum(r.rung), 'Calls on which her phone rang.')}
+    ${miniTile('Answered', fmtNum(r.ans))}
+    ${miniTile('Pickup Rate', fmtPct(r.pickup,0))}
+    ${miniTile('Pickup Speed', fmtSecs(r.ringMed))}
+    ${miniTile('Avg Talk Time', fmtSecs(r.talkAvg))}
+    ${miniTile('Share of Answered', fmtPct(r.share,0))}
+    ${miniTile('Active Days', fmtNum(r.days))}
+    ${miniTile('Resolved on the Call', r.resKnown ? `${fmtPct(r.resolved,0)} (${r.resYes}/${r.resKnown})` : '—', 'Of her answered calls where the outcome was clear, the share fully resolved during the call (partly resolved: '+(r.resPart||0)+'). Not scored - it depends on what callers ask.')}
+  </div>`;
+  html += agentInsight(r, teamStats(callsInPeriod()));
+  if(r.fewCalls) html += `<div class="note-inline">Her rate is based on only ${fmtNum(r.rung)} call${r.rung===1?'':'s'} in this period, so treat it with caution.</div>`;
+  const rowsM = months().map(m=>{ const s = agentStats(DATA.calls.filter(c=>c.d.slice(0,7)===m)).find(x=>x.name===r.name); return {m, s}; }).filter(x=>x.s && x.s.rung);
+  html += `<div class="modal-subhead">Month by month</div><table class="rank3-table"><thead><tr><th>Month</th><th class="num">Rung</th><th class="num">Answered</th><th class="num">Pickup</th><th class="num">Talk (min)</th></tr></thead><tbody>
+    ${rowsM.map(({m,s})=>`<tr><td>${monthLong(m)}</td><td class="num">${s.rung}</td><td class="num">${s.ans}</td><td class="num" style="color:${grade(s.pickup)};font-weight:700">${fmtPct(s.pickup,0)}</td><td class="num">${fmtF(s.talkHrs*60,0)}</td></tr>`).join('')}
+  </tbody></table>`;
+  openModal(r.name, html);
+}
+
+// ---------------------------------------------------------------- Missed Calls
+function renderMissed(){
+  const calls = callsInPeriod(), miss = calls.filter(c=>!c.a), h = headline(calls);
+  const count = k => miss.filter(c=>c.why===k).length;
+  const triedSegs = [['None — lost before any agent rang', 0, '#C55F49'], ['1 agent', 1, '#CE9C3C'], ['2 agents', 2, '#2A5C8C'], ['3 or more', 3, '#7C8B81']]
+    .map(([label, n, color])=>({label, color, value: miss.filter(c=> n<3 ? c.rung.length===n : c.rung.length>=3).length}));
+  const holdBins = [[0,5],[5,10],[10,20],[20,30],[30,60],[60,Infinity]];
+  const binLabel = ([lo,hi]) => hi===Infinity ? `${lo}s+` : `${lo}–${hi}s`;
+  const el = document.getElementById('panel-missed');
+  // calls dropped before any phone rang: Sunday-holiday / outside 9:30-17:30 / other calls in progress / agents free
+  const HOLIDAYS = ['2026-08-15','2026-10-02'];
+  const early = miss.filter(c=>c.why==='before_ring');
+  const earlyKind = c => (c.wd===6 || HOLIDAYS.includes(c.d)) ? 'off' : (c.mi < 570 || c.mi >= 1050) ? 'after' : c.busy > 0 ? 'busy' : 'free';
+  const earlyN = k => early.filter(c=>earlyKind(c)===k).length;
+  const perDayN = {}; calls.forEach(c=>{ perDayN[c.d] = (perDayN[c.d]||0) + 1; });
+  const sp = calls.filter(c=>perDayN[c.d]>=20), ot = calls.filter(c=>perDayN[c.d]<20);
+  const spikeRate = sp.length ? pct(sp.filter(c=>c.a).length, sp.length) : null, otherRate = pct(ot.filter(c=>c.a).length, ot.length);
+  el.innerHTML = `
+    <section><div class="section-head"><h2 class="serif">Why Calls Are Missed</h2><span class="hint">${fmtNum(miss.length)} missed calls &middot; ${periodLabel()}</span></div>
+      <div class="panel">
+        <div class="tiles" style="margin-bottom:16px;">
+          ${Object.entries(MISS_REASONS).map(([k,v])=>tile(v.label, fmtNum(count(k)), `${fmtPct(pct(count(k),miss.length),0)} of missed`, k==='line_unavailable'?'neutral':(k==='before_ring'?'neg':'warn'))).join('')}
+        </div>
+        ${stackedBarChart(Object.entries(MISS_REASONS).map(([k,v])=>({label:v.label, value:count(k), color:v.color})))}
+        <p class="note-inline"><b>Rang out</b>: every agent's phone rang and nobody picked up &mdash; the biggest reason calls are lost.</p>
+      </div></section>
+    <section><div class="section-head"><h2 class="serif">Calls Lost Before Any Phone Rang &mdash; When?</h2><span class="hint">${fmtNum(early.length)} calls &middot; ${periodLabel()}</span></div>
+      <div class="panel">
+        <div id="chart-early"></div>
+        <p class="note-inline">Most were lost <b>during working hours with no other call going on</b>, after about ${fmtSecs(median(early.map(c=>c.dur)))} on the line &mdash; so not because agents were busy. Worth checking the call-routing set-up (welcome message, queue, agents logged in). Busy days are not the problem either: on days with 20+ calls, ${fmtPct(spikeRate,0)} were answered vs ${fmtPct(otherRate,0)} on other days.</p>
+      </div></section>
+    <section><div class="section-head"><h2 class="serif">Agents Tried Before the Call Was Lost</h2><span class="hint">share of the ${fmtNum(miss.length)} missed calls</span></div>
+      <div class="panel">${donutHtml('svg-agents-tried', triedSegs)}</div></section>
+    <section><div class="section-head"><h2 class="serif">How Long Callers Held</h2><span class="hint">seconds before the missed call ended &middot; grouped by month</span></div>
+      <div class="panel"><div id="chart-hold"></div></div></section>
+    <section><div class="section-head"><h2 class="serif">Did Callers Get Through Later?</h2><span class="hint">callers who had at least one missed call</span></div>
+      <div class="panel">
+        <div class="tiles">
+          ${tile('Callers With a Missed Call', fmtNum(h.withMiss), null, 'neutral')}
+          ${tile('Got Through on Another Call', fmtNum(h.recovered), fmtPct(pct(h.recovered,h.withMiss),0), '')}
+          ${tile('Never Got Through', fmtNum(h.withMiss-h.recovered), fmtPct(pct(h.withMiss-h.recovered,h.withMiss),0), 'neg')}
+        </div>
+        <p class="note-inline">Counts incoming calls only &mdash; callbacks made by the helpline aren't in this data yet.</p>
+      </div></section>`;
+
+  drawDonutSegs('svg-agents-tried', triedSegs);
+  const earlyRows = [['free','In working hours, no other call going on'], ['busy','In working hours, agents on other calls'],
+                     ['after','Outside 9:30 am – 5:30 pm'], ['off','Sunday or holiday']].map(([k,l])=>[l, earlyN(k)]).filter(e=>e[1]);
+  hbar('chart-early', earlyRows, {base: early.length, color:C_MISS});
+
+  // Grouped vertical bars: x = hold-time band, one bar per month in the selected period
+  const MONTH_COLORS = ['#2F9C74','#CE9C3C','#2A5C8C','#C55F49','#8A6A1F','#5B8AA6','#7C8B81','#B7BEB7','#1F6B4D','#E0B96A','#6E97BF','#D98A77'];
+  const periodMonths = [...new Set(miss.map(c=>c.d.slice(0,7)))].sort();
+  const x = holdBins.map(binLabel);
+  const traces = periodMonths.map((m,i)=>{
+    const mm = miss.filter(c=>c.d.startsWith(m));
+    const counts = holdBins.map(([lo,hi])=>mm.filter(c=>c.dur>=lo && c.dur<hi).length);
+    return {x, y: counts, name: monthLabel(m), type:'bar', marker:{color: MONTH_COLORS[i % MONTH_COLORS.length]},
+      customdata: counts.map(n=>fmtPct(pct(n, mm.length),0)),
+      hovertemplate:`${monthLong(m)}<br>held %{x}: %{y} calls (%{customdata} of that month's missed)<extra></extra>`};
+  });
+  plot('chart-hold', traces, {...plotlyBarLayout('Missed calls'), barmode:'group',
+    xaxis:{type:'category', automargin:true, title:{text:'How long the caller held'}}});
+}
+
+// ---------------------------------------------------------------- Who & Where
+// Caller type + DAK come from matching the caller's phone number against DAK records (done in
+// build_didi_ki_awaaz_data.py; only the result is in the data). District comes from that DAK, or
+// from a person's listening code when the caller said where she is from.
+const CT_ORDER = ['C','S','A','U'];
+const CT_COLOR = {C:'#2563A6', U:'#2F9C74', A:'#CE9C3C', S:'#7C8B81'};
+let GEO = null;
+async function loadGeo(){
+  if(GEO) return GEO;
+  if(window.EMBEDDED_GEO){ GEO = window.EMBEDDED_GEO; return GEO; }
+  try{ const r = await fetch('data/geo/districts_38.geojson'); if(r.ok) GEO = await r.json(); }catch(e){}
+  return GEO;
+}
+const normDist = s => s ? String(s).toUpperCase().replace(/\s+/g,' ').trim() : null;
+function callDistrict(c){
+  const lc = c.lc;
+  if(lc && lc.dist && !/not said|outside/i.test(lc.dist)) return {d: normDist(lc.dist), src:'listening'};
+  if(c.dk !== null && c.dk !== undefined) return {d: normDist(DATA.daks[c.dk].district), src:'phone'};
+  return null;
+}
+let DAK_DISTRICT = '';
+async function renderWhoWhere(){
+  const calls = callsInPeriod();
+  const el = document.getElementById('panel-where');
+  const typeStats = CT_ORDER.map(k=>{
+    const cs = calls.filter(c=>c.ct===k);
+    return {k, label: DATA.caller_types[k], calls: cs.length, ans: cs.filter(c=>c.a).length, callers: new Set(cs.map(c=>c.c)).size};
+  });
+  const located = calls.map(c=>({c, loc: callDistrict(c)})).filter(x=>x.loc);
+  const callsByDak = {};
+  calls.filter(c=>c.dk!==null && c.dk!==undefined).forEach(c=>{
+    const s = callsByDak[c.dk] = callsByDak[c.dk] || {calls:0, ans:0, coord:0}; s.calls++; if(c.a) s.ans++; if(c.ct==='C') s.coord++; });
+  const withNo = DATA.daks.map((d,i)=>({...d, i, hc: callsByDak[i] || {calls:0, ans:0, coord:0}})).filter(d=>d.has_coord_no);
+  const called = withNo.filter(d=>d.hc.calls>0);
+
+  el.innerHTML = `
+    <section><div class="section-head"><h2 class="serif">Who Is Calling</h2><span class="hint">${periodLabel()} &middot; ${fmtNum(calls.length)} calls</span></div>
+      <div class="panel">
+        <div class="donut-grid"><div id="chart-caller-types"></div>
+          <div class="topic-key">${typeStats.filter(t=>t.calls).map(t=>`<div class="topic-key-row"><span class="legend-swatch" style="background:${CT_COLOR[t.k]}"></span><div><b>${t.label}</b> &middot; ${fmtNum(t.calls)} calls<div class="topic-key-desc">${fmtNum(t.callers)} phone${t.callers===1?'':'s'} &middot; ${fmtPct(pct(t.ans,t.calls),0)} of their calls answered</div></div></div>`).join('')}</div>
+        </div>
+        <p class="note-inline">Found by matching each caller's phone number with the numbers in DAK records. Most callers <b>not in DAK records</b> turn out to be JEEViKA staff on other phones, not women from the community.</p>
+      </div></section>
+    <section><div class="section-head"><h2 class="serif">Where Calls Come From</h2><span class="hint">${fmtNum(located.length)} of ${fmtNum(calls.length)} calls could be placed (${fmtPct(pct(located.length, calls.length),0)})</span></div>
+      <div class="panel"><div id="map-where"></div>
+        <details class="more-table"><summary>Show calls by district (table)</summary><div id="table-where-district"></div></details></div></section>
+    <section><div class="section-head"><h2 class="serif">DAKs That Call the Helpline</h2><span class="hint">${periodLabel()} &middot; ${fmtNum(called.length)} DAKs with calls</span></div>
+      <div class="panel">
+        <div class="md-grid">
+          <div><div class="chart-head" style="margin-top:0">Districts <span class="soft">&middot; click one</span></div><div id="chart-districts"></div></div>
+          <div><div class="chart-head" style="margin-top:0" id="dak-detail-title"></div><div id="chart-daks"></div></div>
+        </div>
+        <details class="more-table"><summary>Show all ${fmtNum(called.length)} DAKs as a table</summary><div id="table-dak-callers"></div></details>
+      </div></section>`;
+
+  // caller types: donut
+  const tsd = typeStats.filter(t=>t.calls);
+  plot('chart-caller-types', [donutTrace(tsd.map(t=>t.label), tsd.map(t=>t.calls), tsd.map(t=>CT_COLOR[t.k]),
+    tsd.map(t=>`<b>${t.label}</b><br>${t.calls} calls · ${fmtPct(pct(t.ans,t.calls),0)} answered`))],
+    {...donutLayout(calls.length, 'calls'), showlegend:false});
+
+  // Districts (all 38, including ones with no calls) on the left; the chosen district's DAKs on the right
+  // (before a click: the 12 DAKs with most calls across Bihar). One colour; calls + answer rate at the bar end.
+  const byDist = {};
+  DATA.daks.forEach(d=>{ byDist[toTitle(d.district)] = byDist[toTitle(d.district)] || []; });
+  called.forEach(d=>{ byDist[toTitle(d.district)].push(d); });
+  const distRows = Object.entries(byDist).map(([k, ds])=>({k, calls: ds.reduce((a,d)=>a+d.hc.calls,0), ans: ds.reduce((a,d)=>a+d.hc.ans,0), n: ds.length}))
+    .sort((a,b)=>b.calls-a.calls || a.k.localeCompare(b.k));
+  const barChart = (id, rows, label, hover, opts) => {
+    const rr = rows.slice().reverse();
+    const l = hbarLayout(rr.length);
+    plot(id, [{y: rr.map(r=>fitLabel(label(r))), x: rr.map(r=>r.calls), type:'bar', orientation:'h',
+      marker:{color: rr.map(r=>opts && opts.hi && opts.hi(r) ? C_GOLD : ((opts && opts.color) || C_ANS))},
+      text: rr.map(r=>r.calls ? `  ${r.calls} · ${fmtPct(pct(r.ans, r.calls),0)} ans.` : '  no calls'), textposition:'outside', cliponaxis:false,
+      textfont:{size:11.5, color:INK}, hovertext: rr.map(hover), hovertemplate:'%{hovertext}<extra></extra>'}],
+      {...l, height: 20 + 24*rr.length, bargap:0.3, margin:{...l.margin, r: 110},
+       yaxis:{...l.yaxis, type:'category', tickfont:{size:11.5, color:INK}}});
+  };
+  const drawDaks = () => {
+    const title = document.getElementById('dak-detail-title');
+    let rows, label;
+    if(!DAK_DISTRICT){
+      rows = called.map(d=>({...d, calls:d.hc.calls, ans:d.hc.ans})).sort((a,b)=>b.calls-a.calls || b.ans-a.ans).slice(0,12);
+      title.innerHTML = `DAKs with the most calls <span class="soft">&middot; all districts</span>`;
+      label = d=>`${toTitle(d.block)}, ${toTitle(d.district)}`;
+    } else {
+      rows = byDist[DAK_DISTRICT].map(d=>({...d, calls:d.hc.calls, ans:d.hc.ans})).sort((a,b)=>b.calls-a.calls);
+      title.innerHTML = `${esc(DAK_DISTRICT)} <span class="soft">&middot; ${rows.length} DAK${rows.length===1?'':'s'} with calls &middot; <a href="#" id="dak-reset">show all districts</a></span>`;
+      label = d=>toTitle(d.block);
+    }
+    if(!rows.length){ document.getElementById('chart-daks').innerHTML = '<p class="disclaimer">No DAK in this district has called the helpline yet.</p>'; }
+    else barChart('chart-daks', rows, label, d=>`<b>${toTitle(d.name)}</b><br>${toTitle(d.block)}, ${toTitle(d.district)}<br>${d.calls} calls · ${d.ans} answered`, {color:'#2563A6'});
+    const reset = document.getElementById('dak-reset');
+    if(reset) reset.addEventListener('click', e=>{ e.preventDefault(); DAK_DISTRICT = ''; drawAll(); });
+  };
+  const drawAll = () => {
+    barChart('chart-districts', distRows, r=>r.k, r=>`<b>${r.k}</b><br>${r.calls} calls from ${r.n} DAK${r.n===1?'':'s'} · ${r.ans} answered<br>click to see its DAKs`,
+      {hi: r=>r.k===DAK_DISTRICT});
+    document.getElementById('chart-districts').on('plotly_click', ev=>{ DAK_DISTRICT = distRows.slice().reverse()[ev.points[0].pointIndex].k; drawAll(); });
+    drawDaks();
+  };
+  drawAll();
+
+  makeSortableTable('table-dak-callers', [
+    {label:'DAK', key:'name'}, {label:'District', key:'district'}, {label:'Block', key:'block'},
+    {label:'Calls', key:'calls', num:true}, {label:'Answered', key:'ans', num:true},
+  ], called.map(d=>({...d, calls:d.hc.calls, ans:d.hc.ans})).sort((a,b)=>b.calls-a.calls),
+  r=>[esc(toTitle(r.name)), esc(toTitle(r.district)), esc(toTitle(r.block)), fmtNum(r.calls), fmtNum(r.ans)]);
+
+  // district table + map
+  const dist = {};
+  located.forEach(({c, loc})=>{ const s = dist[loc.d] = dist[loc.d] || {d:loc.d, calls:0, ans:0, coord:0, other:0}; s.calls++; if(c.a) s.ans++; c.ct==='C' ? s.coord++ : s.other++; });
+  const dakByDist = {};
+  DATA.daks.forEach(d=>{ const k = normDist(d.district); const s = dakByDist[k] = dakByDist[k] || {daks:0}; s.daks++; });
+  const drows = Object.keys(dakByDist).sort().map(k=>({d:k, ...(dist[k]||{calls:0, ans:0, coord:0, other:0}), ...dakByDist[k]}));
+  makeSortableTable('table-where-district', [
+    {label:'District', key:'d'}, {label:'Calls', key:'calls', num:true}, {label:'Answered', key:'ans', num:true}, {label:'DAKs', key:'daks', num:true},
+  ], drows.sort((a,b)=>b.calls-a.calls),
+  r=>[esc(toTitle(r.d)), fmtNum(r.calls), fmtNum(r.ans), fmtNum(r.daks)]);
+
+  const geo = await loadGeo();
+  if(geo && document.getElementById('map-where')){
+    const names = geo.features.map(f=>f.properties.district_name);
+    plot('map-where', [{type:'choropleth', geojson:geo, featureidkey:'properties.district_name', locations:names,
+      z: names.map(n=>(dist[normDist(n)]||{calls:0}).calls),
+      text: names.map(n=>{ const s = dist[normDist(n)]; return `<b>${toTitle(n)}</b><br>${s?s.calls:0} calls` + (s?` · ${s.ans} answered`:''); }),
+      hovertemplate:'%{text}<extra></extra>', colorscale:[[0,'#F2F4F1'],[0.0001,'#D6EEE3'],[1,'#1F6B4D']], zmin:0,
+      marker:{line:{color:'#FFFFFF', width:0.8}}, colorbar:{title:{text:'Calls'}, thickness:10, len:0.55, outlinewidth:0}}],
+      {height:440, margin:{t:0,b:0,l:0,r:0}, paper_bgcolor:'rgba(0,0,0,0)', font:FONT,
+       geo:{fitbounds:'locations', visible:false, bgcolor:'rgba(0,0,0,0)'}});
+  } else if(document.getElementById('map-where')){
+    document.getElementById('map-where').innerHTML = '<p class="disclaimer">Map not available here - the district table has the same numbers.</p>';
+  }
+}
+
+// ---------------------------------------------------------------- What Calls Are About
+// Topics per call come from build_didi_ki_awaaz_data.py <- combine_call_coding.py: codes from a person's
+// listening/review where available, otherwise Claude's reading of the redacted transcript. List values
+// only - no notes, typed text or transcript text ever reach this page.
+const CSC_THEME = 'CSC / VLE services (ID, registration, KYC, wallet recharge)';
+const WOMEN_THEMES = ['Domestic violence','Dowry harassment','Harassment / threats / assault','Marriage / maintenance / divorce',
+  'Child marriage','Cyber harassment / fake profile','Pension (old age / widow / disability)','Ration card / PDS','Housing (Awas Yojana)',
+  'MGNREGA / wages / job card','Health / Ayushman card','Education / scholarship','Documents (Aadhaar, certificates, bank)',
+  'Land / property dispute','Legal advice / police / court'];
+// Calls with no actual question (returning a missed call, wrong number, telemarketing) are not a topic.
+const NO_QUERY = ['Callback only (will call back / who called me)', 'Wrong number / spam / telemarketing'];
+// short display names (the full name shows on hover)
+const SHORT_LABEL = {
+  'Pension (old age / widow / disability)': 'Pension', 'Documents (Aadhaar, certificates, bank)': 'Documents',
+  'Cyber harassment / fake profile': 'Cyber harassment', 'Marriage / maintenance / divorce': 'Marriage dispute',
+  'Wallet recharge (CLF cheque, beneficiary name, account, returned transfer)': 'Wallet recharge',
+  "ID registration rejected / wrong account / can't register": 'ID registration rejected',
+  'Waiting for ID approval / whitelisting': 'Waiting for ID approval', 'KYC / fingerprint / computer / login': 'KYC / login / computer',
+  'Problems delivering a service (IRCTC, Tele-Law)': 'Using a service (IRCTC, Tele-Law)',
+  'Took down details / registered the case': 'Took down details', 'Referred to block / government office': 'Referred to an office',
+  'Referred to police / court / legal aid': 'Referred to police / legal aid', 'Just asked questions, nothing to resolve': 'Only asked questions',
+  'Gave information / advice': 'Gave information', 'Help to solve a problem': 'Help with a problem',
+  'Follow-up on an earlier case': 'Follow-up on a case', 'Complaint about a service or official': 'Complaint',
+};
+const shortLabel = s => SHORT_LABEL[s] || s;
+const isWomen = c => WOMEN_THEMES.includes(c.lc.th) || WOMEN_THEMES.includes(c.lc.th2);
+// Topic groups, checked in this order (a call about a woman's case counts there even if it came up during a
+// case follow-up). Fixed colours, validated for colour-blind separation in this order.
+const TOPIC_GROUPS = [
+  ['Violence & entitlement cases', isWomen, '#C55F49', 'Domestic violence, dowry, harassment, family disputes, pension, documents - when it is the main or second topic of the call'],
+  ['CSC set-up', c=>c.lc.th===CSC_THEME, '#CE9C3C', 'Setting up CSC services at the DAK: ID registration and approval, KYC, wallet recharge'],
+  ['Case entry & follow-up', c=>['DAK case entry / MIS portal','DAK case follow-up'].includes(c.lc.th), '#2563A6', 'Entering or updating DAK cases in the MIS portal, and follow-ups on pending cases'],
+  ['Programme admin & reports', c=>c.lc.th==='Programme admin (forms, data, meetings, training)', '#2F9C74', 'Forms, data and report requests, meetings, training'],
+  ['Other', c=>true, '#B7BEB7', 'Programme information, funds, SHG and other topics'],
+];
+const isReal = c => c.lc && c.lc.th && /^yes/i.test(c.lc.rc||'');
+const isTopical = c => isReal(c) && !NO_QUERY.includes(c.lc.th) && !/^can't tell$/i.test(c.lc.th);
+const isChecked = c => c.lc && (c.lc.src==='listened' || c.lc.src==='reviewed');
+const groupOf = c => TOPIC_GROUPS.find(g=>g[1](c));
+let ABOUT_MONTH = 'all';
+
+function donutTrace(labels, values, colors, hover){
+  return {type:'pie', hole:0.58, labels, values, sort:false, direction:'clockwise', rotation:0,
+    marker:{colors, line:{color:'#FFFFFF', width:2}}, texttemplate:'%{percent:.0%}', textposition:'inside', insidetextorientation:'horizontal',
+    textfont:{color:'#FFFFFF', size:13}, hovertext:hover, hovertemplate:'%{hovertext}<extra></extra>'};
+}
+function donutLayout(total, word){
+  return {height:330, margin:{t:10,b:10,l:10,r:10}, paper_bgcolor:'rgba(0,0,0,0)', showlegend:true,
+    legend:{orientation:'v', x:1.02, y:0.5, yanchor:'middle', font:{size:13}},
+    annotations:[{text:`<b>${fmtNum(total)}</b><br><span style="font-size:12px;color:#7C8B81">${word}</span>`, showarrow:false, font:{size:22, color:INK}}]};
+}
+
+function renderAbout(){
+  const el = document.getElementById('panel-about');
+  const all = DATA.calls.filter(isTopical);
+  const ms = [...new Set(all.map(c=>c.d.slice(0,7)))].sort();
+  if(ABOUT_MONTH !== 'all' && !ms.includes(ABOUT_MONTH)) ABOUT_MONTH = 'all';
+  const calls = ABOUT_MONTH==='all' ? all : all.filter(c=>c.d.startsWith(ABOUT_MONTH));
+  const periodName = ABOUT_MONTH==='all' ? `${monthLabel(ms[0])} – ${monthLabel(ms[ms.length-1])}` : monthLong(ABOUT_MONTH);
+  const noQuery = DATA.calls.filter(c=>isReal(c) && NO_QUERY.includes(c.lc.th) && (ABOUT_MONTH==='all' || c.d.startsWith(ABOUT_MONTH))).length;
+  const count = (list, f) => { const m = {}; list.forEach(c=>{ [].concat(f(c)).filter(Boolean).forEach(v=>{ m[v] = (m[v]||0) + 1; }); }); return Object.entries(m).sort((a,b)=>b[1]-a[1]); };
+  const women = calls.filter(isWomen);
+  const csc = calls.filter(c=>c.lc.th===CSC_THEME);
+  const toggle = `<div class="seg-toggle" id="about-month">${[['all','All months'], ...ms.map(m=>[m, monthLabel(m)])].map(([k,l])=>
+    `<button class="${k===ABOUT_MONTH?'on':''}" data-m="${k}">${l}</button>`).join('')}</div>`;
+
+  el.innerHTML = `
+    <section><div class="section-head"><h2 class="serif">What Calls Are About</h2>${toggle}</div>
+      <div class="panel">
+        <div class="donut-grid"><div id="chart-topic-donut"></div>
+          <div class="topic-key">${TOPIC_GROUPS.map(([name,,color,desc])=>{ const n = calls.filter(c=>groupOf(c)[0]===name).length;
+            return `<div class="topic-key-row"><span class="legend-swatch" style="background:${color}"></span><div><b>${name}</b> &middot; ${fmtNum(n)} call${n===1?'':'s'}<div class="topic-key-desc">${desc}</div></div></div>`; }).join('')}</div>
+        </div>
+        <p class="note-inline">${fmtNum(calls.length)} calls with a real question in ${periodName}. Not counted: ${fmtNum(noQuery)} short calls with no question (returning a missed call, wrong numbers), and calls that were silent, cut or too noisy.</p>
+      </div></section>
+    <section><div class="section-head"><h2 class="serif">Violence &amp; Entitlement Cases</h2><span class="hint">${fmtNum(women.length)} calls &middot; ${periodName}</span></div>
+      <div class="panel"><div id="chart-women"></div>
+        <p class="note-inline">Almost all are raised by a DAK coordinator or Sakshma Didi on the woman's behalf &mdash; often while following up a pending case &mdash; rather than by the woman herself (${fmtNum(women.filter(c=>/^woman/i.test(c.lc.who||'')).length)} call${women.filter(c=>/^woman/i.test(c.lc.who||'')).length===1?'':'s'}).</p></div></section>
+    <section><div class="section-head"><h2 class="serif">CSC Set-up Problems</h2><span class="hint">${fmtNum(csc.length)} calls &middot; ${periodName}</span></div>
+      <div class="panel"><div id="chart-csc"></div>
+        <p class="note-inline">The same few questions keep coming back &mdash; the wallet cheque, which bank account to use, the centre name, how long approval takes. A one-page FAQ checked by the CSC team could answer most of them.</p></div></section>
+    <section><div class="section-head"><h2 class="serif">Did Callers Get Help?</h2><span class="hint">${periodName}</span></div>
+      <div class="panel two-col">
+        <div><div class="chart-head" style="margin-top:0">Resolved on the call, by what the caller wanted</div><div id="chart-resolved"></div></div>
+        <div><div class="chart-head" style="margin-top:0">How the didi responded</div><div id="chart-resp"></div></div>
+      </div></section>`;
+
+  el.querySelectorAll('#about-month button').forEach(b=>b.addEventListener('click', ()=>{ ABOUT_MONTH = b.dataset.m; renderAbout(); }));
+
+  // topic donut
+  const g = TOPIC_GROUPS.map(([name,,color])=>({name, color, n: calls.filter(c=>groupOf(c)[0]===name).length})).filter(x=>x.n);
+  plot('chart-topic-donut', [donutTrace(g.map(x=>x.name), g.map(x=>x.n), g.map(x=>x.color),
+    g.map(x=>`<b>${x.name}</b><br>${x.n} calls · ${fmtPct(pct(x.n, calls.length),0)}`))],
+    {...donutLayout(calls.length, 'calls'), showlegend:false});
+
+  // women's cases: which issue (main or second topic), one bar each
+  hbar('chart-women', count(women, c=>[c.lc.th, c.lc.th2].filter(t=>WOMEN_THEMES.includes(t))), {base: women.length, color:'#C55F49', unit:'calls'});
+  hbar('chart-csc', count(csc, c=>c.lc.sub || 'Not specified'), {base: csc.length, color:C_GOLD});
+
+  // resolved, by what the caller wanted: 100% stacked bars (status colours: yes / partly / no / unclear)
+  const RES = [['Yes','Resolved',C_ANS], ['Partly','Partly',C_GOLD], ['No','Not resolved',C_MISS], ['?',"Couldn't tell",'#D9DDD8']];
+  const resOf = c => ['Yes','Partly','No'].includes(c.lc.res) ? c.lc.res : '?';
+  const wants = count(calls, c=>c.lc.want && !/can't tell/i.test(c.lc.want) ? c.lc.want : null).map(e=>e[0]).slice(0,5).reverse();
+  plot('chart-resolved', RES.map(([k,label,color])=>{
+    const n = wants.map(w=>calls.filter(c=>c.lc.want===w && resOf(c)===k).length);
+    const tot = wants.map(w=>calls.filter(c=>c.lc.want===w).length);
+    return {y: wants.map(w=>fitLabel(shortLabel(w))), x: n.map((v,i)=>pct(v, tot[i])), name:label, type:'bar', orientation:'h',
+      marker:{color, line:{color:'#FFFFFF', width:1.5}},
+      hovertext: n.map((v,i)=>`<b>${shortLabel(wants[i])}</b><br>${label}: ${v} of ${tot[i]} calls`), hovertemplate:'%{hovertext}<extra></extra>'};
+  }), (()=>{ const l = hbarLayout(wants.length, {barmode:'stack', xmax:100});
+      return {...l, height: l.height + 70, showlegend:true, legend:{orientation:'h', x:0, y:-0.08, yanchor:'top', traceorder:'normal'},
+              margin:{t:6, b:70, l:10, r:10}}; })());
+
+  // didi's response: donut
+  const resp = count(calls, c=>c.lc.resp && !/can't tell/i.test(c.lc.resp) ? c.lc.resp : null);
+  const RESP_COLORS = ['#2F9C74','#CE9C3C','#2563A6','#C55F49','#7C8B81','#B7BEB7'];
+  const top = resp.slice(0,5), rest = resp.slice(5).reduce((a,e)=>a+e[1],0);
+  const rows = rest ? [...top, ['Other responses', rest]] : top;
+  const rTot = rows.reduce((a,e)=>a+e[1],0);
+  plot('chart-resp', [donutTrace(rows.map(e=>shortLabel(e[0])), rows.map(e=>e[1]), RESP_COLORS.slice(0, rows.length),
+    rows.map(e=>`<b>${esc(e[0])}</b><br>${e[1]} calls · ${fmtPct(pct(e[1], rTot),0)}`))],
+    {...donutLayout(rTot, 'calls'), height:300, legend:{orientation:'h', x:0, y:-0.05, font:{size:12}}});
+}
+function toTitle(s){ return String(s||'').toLowerCase().replace(/\b\w/g, ch=>ch.toUpperCase()); }
+
+// ---------------------------------------------------------------- When Calls Come In
+function renderPatterns(){
+  const calls = callsInPeriod();
+  const el = document.getElementById('panel-patterns');
+  const hours = [...new Set(calls.map(c=>c.h))].sort((a,b)=>a-b);
+  const lines = DATA.lines.map((n,i)=>{ const cs = calls.filter(c=>c.ln===i); return {n, total:cs.length, ans:cs.filter(c=>c.a).length}; }).filter(x=>x.total).sort((a,b)=>b.total-a.total);
+  el.innerHTML = `
+    <section><div class="section-head"><h2 class="serif">By Hour of Day</h2><span class="hint">calls on top, answer rate below &middot; hover for counts</span></div>
+      <div class="panel"><div id="chart-hour"></div></div></section>
+    <section><div class="section-head"><h2 class="serif">By Day of Week</h2><span class="hint">calls on top, answer rate below &middot; hover for counts</span></div>
+      <div class="panel"><div id="chart-weekday"></div></div></section>
+    <section><div class="section-head"><h2 class="serif">By Helpline Number</h2><span class="hint">which number the caller dialled</span></div>
+      <div class="panel"><div id="chart-lines"></div></div></section>`;
+  const fmtLine = n => String(n).replace(/^\+91(\d{5})(\d{5})$/, '+91 $1 $2');
+  plot('chart-lines', [{y: lines.slice().reverse().map(x=>fmtLine(x.n)), x: lines.slice().reverse().map(x=>x.total), type:'bar', orientation:'h', marker:{color:C_BLUE},
+    text: lines.slice().reverse().map(x=>`  ${fmtNum(x.total)} calls · ${fmtPct(pct(x.ans,x.total),0)} answered`), textposition:'outside', cliponaxis:false, textfont:{size:12, color:INK},
+    hovertext: lines.slice().reverse().map(x=>`<b>${x.n}</b><br>${x.total} calls, ${x.ans} answered`), hovertemplate:'%{hovertext}<extra></extra>'}],
+    (()=>{ const l = hbarLayout(lines.length); return {...l, margin:{t:6, b:6, l:40, r:220}, yaxis:{...l.yaxis, type:'category', automargin:true}}; })());
+  const hl = h => `${String(h).padStart(2,'0')}:00`;
+  volumeRateChart('chart-hour', hours.map(hl), hours.map(h=>calls.filter(c=>c.h===h&&c.a).length), hours.map(h=>calls.filter(c=>c.h===h&&!c.a).length));
+  volumeRateChart('chart-weekday', WEEKDAYS, WEEKDAYS.map((_,i)=>calls.filter(c=>c.wd===i&&c.a).length), WEEKDAYS.map((_,i)=>calls.filter(c=>c.wd===i&&!c.a).length));
+}
+
+// ---------------------------------------------------------------- boot
+async function boot(){
+  initTooltips();
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  document.getElementById('modal-backdrop').addEventListener('click', e=>{ if(e.target.id==='modal-backdrop') closeModal(); });
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+  document.getElementById('btn-print').addEventListener('click', ()=>window.print());
+  // Standalone review copy (export_didi_ki_awaaz_standalone.py) embeds the payload here - no fetch, works by double-click.
+  if(window.EMBEDDED_DATA){
+    DATA = window.EMBEDDED_DATA;
+    document.querySelector('.back-link').style.display = 'none';
+  }else if(location.protocol==='file:'){
+    document.getElementById('banner').innerHTML = `<div class="status-banner">This page loads its data with fetch(), which browsers block for files opened directly. Serve the folder instead: run <code>python -m http.server</code> in the Statewide folder and open http://localhost:8000/didi-ki-awaaz.html</div>`;
+    return;
+  }
+  if(!DATA) try{
+    const r = await fetch('data/didi_ki_awaaz.json', {cache:'no-store'});
+    if(!r.ok) throw new Error(r.status);
+    DATA = await r.json();
+  }catch(e){
+    document.getElementById('banner').innerHTML = `<div class="status-banner">Couldn't load data/didi_ki_awaaz.json (${esc(e.message)}). Run build_didi_ki_awaaz_data.py first.</div>`;
+    return;
+  }
+  const hash = location.hash.slice(1);
+  if(TABS.some(([k])=>k===hash)) ACTIVE_TAB = hash;
+  document.querySelectorAll('.tabpanel').forEach(p=>p.classList.toggle('active', p.id==='panel-'+ACTIVE_TAB));
+  renderMasthead(); renderTabbar(); renderTab(ACTIVE_TAB);
+}
+boot();
+</script>
+</body>
+</html>
