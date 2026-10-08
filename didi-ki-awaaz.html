@@ -180,6 +180,7 @@ details.more-table[open] summary{ margin-bottom:8px; }
   <div class="tabpanel active" id="panel-overview"></div>
   <div class="tabpanel" id="panel-where"></div>
   <div class="tabpanel" id="panel-about"></div>
+  <div class="tabpanel" id="panel-outgoing"></div>
   <div class="tabpanel" id="panel-agents"></div>
   <div class="tabpanel" id="panel-missed"></div>
   <div class="tabpanel" id="panel-patterns"></div>
@@ -536,7 +537,7 @@ function renderMasthead(){
   yearSel.addEventListener('change', ()=> apply(yearSel.value));
   monthSel.addEventListener('change', ()=> apply(monthSel.value));
 }
-const TABS = [['overview','Overview'],['where','Who & Where'],['about','What Calls Are About'],['agents','Agent Performance'],['missed','Missed Calls'],['patterns','When Calls Come In']];
+const TABS = [['overview','Overview'],['where','Who & Where'],['about','What Calls Are About'],['outgoing','Outgoing Calls'],['agents','Agent Performance'],['missed','Missed Calls'],['patterns','When Calls Come In']];
 function renderTabbar(){
   document.getElementById('tabbar').innerHTML = TABS.map(([k,l])=>`<button class="tabbtn${k===ACTIVE_TAB?' active':''}" data-tab="${k}">${l}</button>`).join('');
   document.querySelectorAll('.tabbtn').forEach(b=>b.addEventListener('click', ()=>{
@@ -547,7 +548,7 @@ function renderTabbar(){
     history.replaceState(null, '', '#'+ACTIVE_TAB);
   }));
 }
-function renderTab(k){ ({overview:renderOverview, where:renderWhoWhere, about:renderAbout, agents:renderAgents, missed:renderMissed, patterns:renderPatterns})[k](); }
+function renderTab(k){ ({overview:renderOverview, where:renderWhoWhere, about:renderAbout, outgoing:renderOutgoing, agents:renderAgents, missed:renderMissed, patterns:renderPatterns})[k](); }
 
 // ---------------------------------------------------------------- Overview
 function renderOverview(){
@@ -766,7 +767,7 @@ function renderMissed(){
       </div></section>`;
 
   drawDonutSegs('svg-agents-tried', triedSegs);
-  const earlyRows = [['free','In working hours, no other call going on'], ['busy','In working hours, agents on other calls'],
+  const earlyRows = [['free','In working hours, no other call going on'], ['busy','In working hours, a didi on another call (incoming or outgoing)'],
                      ['after','Outside 9:30 am – 5:30 pm'], ['off','Sunday or holiday']].map(([k,l])=>[l, earlyN(k)]).filter(e=>e[1]);
   hbar('chart-early', earlyRows, {base: early.length, color:C_MISS});
 
@@ -1042,6 +1043,150 @@ function renderAbout(){
   plot('chart-resp', [donutTrace(rows.map(e=>shortLabel(e[0])), rows.map(e=>e[1]), RESP_COLORS.slice(0, rows.length),
     rows.map(e=>`<b>${esc(e[0])}</b><br>${e[1]} calls · ${fmtPct(pct(e[1], rTot),0)}`))],
     {...donutLayout(rTot, 'calls'), height:300, legend:{orientation:'h', x:0, y:-0.05, font:{size:12}}});
+}
+// ---------------------------------------------------------------- Outgoing Calls
+// Calls the helpline makes ("Click to Call" in the portal). Who was called comes ONLY from matching the
+// number with DAK records (done in the build script - numbers never reach this page). What was said on
+// these calls is not analysed: their recordings have not been transcribed.
+const OUT_COLOR = '#2563A6';
+const OUT_TYPE_COLOR = {C:'#2563A6', A:'#C55F49', S:'#CE9C3C', U:'#2F9C74', N:'#B7BEB7'};
+const OUT_TYPE_DESC = {
+  C: "the coordinator's mobile number in DAK records",
+  A: 'the contact number on a DAK case, not a staff number - may be the woman, a relative or a village worker',
+  S: "a Sakshma Didi's mobile number in DAK records",
+  U: 'not found in DAK records - often staff on other phones; could include women whose number is not on record',
+  N: 'no number recorded',
+};
+let OUT_DISTRICT = '';
+// outgoing calls clipped to the dates the incoming data covers, so the two compare fairly
+function outCalls(){
+  const all = (DATA.out_calls || []).filter(c=>c.d >= DATA.date_min && c.d <= DATA.date_max);
+  return PERIOD==='cumulative' ? all : all.filter(c=>c.d.startsWith(PERIOD));
+}
+function renderOutgoing(){
+  const el = document.getElementById('panel-outgoing');
+  const out = outCalls(), inc = callsInPeriod();
+  if(!(DATA.out_calls || []).length){
+    el.innerHTML = `<section><div class="panel"><p class="disclaimer">No outgoing calls in the data yet. Run the scraper with --direction outbound and rebuild.</p></div></section>`;
+    return;
+  }
+  const picked = out.filter(c=>c.a).length;
+  const ratio = inc.length ? out.length / inc.length : null;
+  const types = ['C','A','S','U','N'].map(k=>{ const cs = out.filter(c=>c.ct===k);
+    return {k, label: DATA.out_types[k], calls: cs.length, ans: cs.filter(c=>c.a).length, nums: new Set(cs.map(c=>c.c)).size}; }).filter(t=>t.calls);
+  const withNo = DATA.daks.map((d,i)=>({...d, i})).filter(d=>d.has_coord_no);
+  const coordCalls = out.filter(c=>c.ct==='C' && c.dk!==null && c.dk!==undefined);
+  const dakCalled = new Set(coordCalls.map(c=>c.dk)), dakSpoke = new Set(coordCalls.filter(c=>c.a).map(c=>c.dk));
+  const missed = inc.filter(c=>!c.a && 'cb' in c);
+  const cbBand = c => c.cb!==null && c.cb<=1 ? 'within 1 hour' : c.cb!==null && c.cb<=24 ? 'within 24 hours' : c.cb!==null && c.cb<=72 ? 'within 3 days'
+    : c.rg ? 'not called back - got through by calling again' : c.cb!==null ? 'after more than 3 days' : 'not called back, did not get through';
+  const BANDS = [['within 1 hour','#2F9C74'], ['within 24 hours','#7FBF9F'], ['within 3 days','#CE9C3C'], ['after more than 3 days','#D98A77'],
+                 ['not called back - got through by calling again','#B7BEB7'], ['not called back, did not get through','#C55F49']];
+  const cbs = missed.map(c=>c.cb).filter(v=>v!==null);
+  const never = missed.filter(c=>cbBand(c)==='not called back, did not get through').length;
+
+  el.innerHTML = `
+    <section><div class="section-head"><h2 class="serif">Calls the Helpline Makes</h2><span class="hint">${periodLabel()} &middot; calls placed from the portal (&ldquo;Click to Call&rdquo;) &middot; data to ${dateLabel(DATA.date_max)}</span></div>
+      <div class="panel">
+        <div id="chart-out-volume"></div>
+        <p class="note-inline">${ratio ? `For every call it received, the helpline made about <b>${fmtF(ratio,1)}</b> calls. ` : ''}${fmtNum(out.length)} outgoing calls, ${fmtPct(pct(picked, out.length),0)} picked up by the person called.</p>
+      </div></section>
+    <section><div class="section-head"><h2 class="serif">Who the Helpline Calls</h2><span class="hint">${periodLabel()} &middot; ${fmtNum(out.length)} calls</span></div>
+      <div class="panel">
+        <div class="donut-grid"><div id="chart-out-who"></div>
+          <div class="topic-key">${types.map(t=>`<div class="topic-key-row"><span class="legend-swatch" style="background:${OUT_TYPE_COLOR[t.k]}"></span><div><b>${t.label}</b> &middot; ${fmtNum(t.calls)} calls<div class="topic-key-desc">${OUT_TYPE_DESC[t.k]}${t.k==='N' ? '.' : `. ${fmtNum(t.nums)} number${t.nums===1?'':'s'}, ${fmtPct(pct(t.ans,t.calls),0)} picked up.`}</div></div></div>`).join('')}</div>
+        </div>
+        <p class="note-inline">Who was called is known only from the phone number. What was said on these calls is not analysed yet, so their purpose is not shown here.</p>
+      </div></section>
+    <section><div class="section-head"><h2 class="serif">DAKs the Helpline Calls</h2><span class="hint">${periodLabel()} &middot; calls to coordinator numbers &middot; ${fmtNum(dakCalled.size)} of ${fmtNum(withNo.length)} DAKs called, ${fmtNum(dakSpoke.size)} reached</span></div>
+      <div class="panel">
+        <div class="md-grid">
+          <div><div class="chart-head" style="margin-top:0">Districts <span class="soft">&middot; click one</span></div><div id="chart-out-districts"></div></div>
+          <div><div class="chart-head" style="margin-top:0" id="out-dak-title"></div><div id="chart-out-daks"></div></div>
+        </div>
+      </div></section>
+    <section><div class="section-head"><h2 class="serif">Were Missed Calls Called Back?</h2><span class="hint">${periodLabel()} &middot; ${fmtNum(missed.length)} unanswered incoming calls from a known number</span></div>
+      <div class="panel">
+        <div id="chart-callbacks"></div>
+        <p class="note-inline">A callback is any later outgoing call to the same number, whatever it was about. ${cbs.length ? `When there was one, the typical wait was <b>${fmtF(median(cbs) >= 24 ? median(cbs)/24 : median(cbs), median(cbs) >= 24 ? 1 : 0)} ${median(cbs) >= 24 ? 'days' : 'hours'}</b>. ` : ''}${fmtNum(never)} missed calls were neither called back nor followed by a call that got through.</p>
+      </div></section>
+    <section><div class="section-head"><h2 class="serif">Outgoing Calls by Agent</h2><span class="hint">${periodLabel()}</span></div>
+      <div class="panel"><div id="chart-out-agents"></div></div></section>`;
+
+  // 1. outgoing vs incoming by month - grouped bars, one axis
+  const ms = [...new Set([...out, ...inc].map(c=>c.d.slice(0,7)))].sort();
+  plot('chart-out-volume', [
+    {x: ms.map(monthLabel), y: ms.map(m=>out.filter(c=>c.d.startsWith(m)).length), name:'Outgoing', type:'bar', marker:{color:OUT_COLOR},
+     customdata: ms.map(m=>{ const o = out.filter(c=>c.d.startsWith(m)); return fmtPct(pct(o.filter(c=>c.a).length, o.length),0); }),
+     hovertemplate:'<b>Outgoing</b> %{x}: %{y} calls (%{customdata} picked up)<extra></extra>'},
+    {x: ms.map(monthLabel), y: ms.map(m=>inc.filter(c=>c.d.startsWith(m)).length), name:'Incoming', type:'bar', marker:{color:C_ANS},
+     customdata: ms.map(m=>{ const o = inc.filter(c=>c.d.startsWith(m)); return fmtPct(pct(o.filter(c=>c.a).length, o.length),0); }),
+     hovertemplate:'<b>Incoming</b> %{x}: %{y} calls (%{customdata} answered)<extra></extra>'},
+  ], {...plotlyBarLayout('Calls'), barmode:'group', height:290, bargap:0.35, bargroupgap:0.08, margin:{t:36,b:40,l:55,r:20},
+      legend:{orientation:'h', x:0, y:1.16, traceorder:'normal'}, yaxis:{title:{text:'Calls'}, gridcolor:GRID, zeroline:false, automargin:true},
+      xaxis:{type:'category', automargin:true}});
+
+  // 2. who is called - donut
+  plot('chart-out-who', [donutTrace(types.map(t=>t.label), types.map(t=>t.calls), types.map(t=>OUT_TYPE_COLOR[t.k]),
+    types.map(t=>`<b>${t.label}</b><br>${t.calls} calls · ${fmtPct(pct(t.ans,t.calls),0)} picked up`))],
+    {...donutLayout(out.length, 'calls'), showlegend:false});
+
+  // 3. districts -> DAKs (calls to coordinator numbers)
+  const byD = {};
+  DATA.daks.forEach(d=>{ byD[toTitle(d.district)] = byD[toTitle(d.district)] || {k: toTitle(d.district), calls:0, ans:0, daks:{}}; });
+  coordCalls.forEach(c=>{ const d = DATA.daks[c.dk], g = byD[toTitle(d.district)]; g.calls++; if(c.a) g.ans++;
+    const x = g.daks[c.dk] = g.daks[c.dk] || {d, calls:0, ans:0}; x.calls++; if(c.a) x.ans++; });
+  const distRows = Object.values(byD).sort((a,b)=>b.calls-a.calls || a.k.localeCompare(b.k));
+  const bars = (id, rows, label, hover, color, hi) => {
+    const rr = rows.slice().reverse(), l = hbarLayout(rr.length);
+    plot(id, [{y: rr.map(r=>fitLabel(label(r))), x: rr.map(r=>r.calls), type:'bar', orientation:'h',
+      marker:{color: rr.map(r=>hi && hi(r) ? C_GOLD : color)},
+      text: rr.map(r=>r.calls ? `  ${r.calls} · ${fmtPct(pct(r.ans, r.calls),0)} reached` : '  no calls'), textposition:'outside', cliponaxis:false,
+      textfont:{size:11.5, color:INK}, hovertext: rr.map(hover), hovertemplate:'%{hovertext}<extra></extra>'}],
+      {...l, height: 20 + 24*rr.length, bargap:0.3, margin:{...l.margin, r:110}, yaxis:{...l.yaxis, type:'category', tickfont:{size:11.5, color:INK}}});
+  };
+  const drawDaks = () => {
+    const title = document.getElementById('out-dak-title');
+    let rows, label;
+    if(!OUT_DISTRICT){
+      rows = distRows.flatMap(g=>Object.values(g.daks)).sort((a,b)=>b.calls-a.calls).slice(0,12);
+      title.innerHTML = `Most-called DAKs <span class="soft">&middot; all districts</span>`;
+      label = x=>`${toTitle(x.d.block)}, ${toTitle(x.d.district)}`;
+    } else {
+      rows = Object.values(byD[OUT_DISTRICT].daks).sort((a,b)=>b.calls-a.calls);
+      title.innerHTML = `${esc(OUT_DISTRICT)} <span class="soft">&middot; ${rows.length} DAK${rows.length===1?'':'s'} called &middot; <a href="#" id="out-reset">show all districts</a></span>`;
+      label = x=>toTitle(x.d.block);
+    }
+    if(!rows.length) document.getElementById('chart-out-daks').innerHTML = '<p class="disclaimer">The helpline has not called any DAK coordinator in this district.</p>';
+    else bars('chart-out-daks', rows, label, x=>`<b>${toTitle(x.d.name)}</b><br>${toTitle(x.d.block)}, ${toTitle(x.d.district)}<br>${x.calls} calls · ${x.ans} reached`, OUT_COLOR);
+    const r = document.getElementById('out-reset');
+    if(r) r.addEventListener('click', e=>{ e.preventDefault(); OUT_DISTRICT = ''; drawAll(); });
+  };
+  const drawAll = () => {
+    bars('chart-out-districts', distRows, r=>r.k, r=>`<b>${r.k}</b><br>${r.calls} calls to ${Object.keys(r.daks).length} DAK coordinator${Object.keys(r.daks).length===1?'':'s'} · ${r.ans} reached<br>click to see its DAKs`,
+      '#7FA6CF', r=>r.k===OUT_DISTRICT);
+    document.getElementById('chart-out-districts').on('plotly_click', ev=>{ OUT_DISTRICT = distRows.slice().reverse()[ev.points[0].pointIndex].k; drawAll(); });
+    drawDaks();
+  };
+  drawAll();
+
+  // 4. callbacks - one bar per outcome, ordered from best to worst
+  const cbRows = BANDS.map(([k,color])=>({k, color, n: missed.filter(c=>cbBand(c)===k).length})).filter(r=>r.n).reverse();
+  const cl = hbarLayout(cbRows.length);
+  plot('chart-callbacks', [{y: cbRows.map(r=>fitLabel(r.k.charAt(0).toUpperCase()+r.k.slice(1))), x: cbRows.map(r=>r.n), type:'bar', orientation:'h',
+    marker:{color: cbRows.map(r=>r.color)}, text: cbRows.map(r=>`  ${r.n} · ${fmtPct(pct(r.n, missed.length),0)}`), textposition:'outside', cliponaxis:false,
+    textfont:{size:12, color:INK}, hovertext: cbRows.map(r=>`<b>${r.k}</b><br>${r.n} of ${missed.length} missed calls`), hovertemplate:'%{hovertext}<extra></extra>'}],
+    {...cl, yaxis:{...cl.yaxis, type:'category'}});
+
+  // 5. agents
+  const ag = {};
+  out.filter(c=>c.ag).forEach(c=>{ const s = ag[c.ag] = ag[c.ag] || {name:c.ag, calls:0, ans:0, talk:0}; s.calls++; if(c.a) s.ans++; s.talk += c.talk; });
+  const agRows = Object.values(ag).sort((a,b)=>b.calls-a.calls).reverse();
+  const al = hbarLayout(agRows.length);
+  plot('chart-out-agents', [{y: agRows.map(r=>r.name), x: agRows.map(r=>r.calls), type:'bar', orientation:'h', marker:{color:OUT_COLOR},
+    text: agRows.map(r=>`  ${r.calls} calls · ${fmtPct(pct(r.ans, r.calls),0)} picked up`), textposition:'outside', cliponaxis:false, textfont:{size:12, color:INK},
+    hovertext: agRows.map(r=>`<b>${r.name}</b><br>${r.calls} calls made · ${r.ans} picked up<br>${fmtF(r.talk/3600,1)} hours of talk`), hovertemplate:'%{hovertext}<extra></extra>'}],
+    {...al, margin:{...al.margin, r:200}, yaxis:{...al.yaxis, type:'category'}});
 }
 function toTitle(s){ return String(s||'').toLowerCase().replace(/\b\w/g, ch=>ch.toUpperCase()); }
 
