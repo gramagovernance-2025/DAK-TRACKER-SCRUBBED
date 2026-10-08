@@ -166,12 +166,14 @@ details.more-table[open] summary{ margin-bottom:8px; }
 }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.35.0/plotly.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 <div class="page">
   <div class="top-row">
     <span class="badge">DAK Tracker &middot; Didi ki Awaaz</span>
-    <button class="icon-btn" id="btn-print">&#128424;&#65039; Print / Save as PDF</button>
+    <span style="display:inline-flex;gap:8px;"><button class="icon-btn" id="btn-export-excel">&#128190; Download Excel</button>
+    <button class="icon-btn" id="btn-print">&#128424;&#65039; Print / Save as PDF</button></span>
   </div>
   <a class="back-link" href="index.html">&larr; DAK Tracker</a>
   <div id="banner"></div>
@@ -1209,6 +1211,80 @@ function renderOutgoing(){
     hovertext: agRows.map(r=>`<b>${r.name}</b><br>${r.calls} calls made · ${r.ans} picked up<br>${fmtF(r.talk/3600,1)} hours of talk`), hovertemplate:'%{hovertext}<extra></extra>'}],
     {...al, margin:{...al.margin, r:200}, yaxis:{...al.yaxis, type:'category'}});
 }
+// ---------------------------------------------------------------- Excel export (same approach as Statewide/index.html)
+// Summary tables for the selected period only - the same numbers the page shows. No call-by-call rows.
+function excelDownload(sheets, filename){
+  const wb = XLSX.utils.book_new();
+  sheets.forEach(([name, rows])=>{
+    const ws = XLSX.utils.json_to_sheet(rows.length ? rows : [{'No data':''}]);
+    XLSX.utils.book_append_sheet(wb, ws, name.slice(0,31));   // Excel sheet-name limit
+  });
+  XLSX.writeFile(wb, filename);
+}
+function exportExcel(){
+  const inc = callsInPeriod(), out = outCalls(), h = headline(inc);
+  const r1 = v => v===null || v===undefined || isNaN(v) ? null : Math.round(v*10)/10;
+  const period = periodLabel();
+
+  const summary = [
+    {Measure:'Period', Value: PERIOD==='cumulative' ? `${dateLabel(DATA.date_min)} - ${dateLabel(DATA.date_max)}` : period},
+    {Measure:'Incoming calls', Value: h.total}, {Measure:'Incoming answered', Value: h.ans}, {Measure:'Incoming missed', Value: h.miss},
+    {Measure:'Answer rate %', Value: r1(h.rate)}, {Measure:'Different callers', Value: h.callers},
+    {Measure:'Callers never reached', Value: h.never}, {Measure:'Median wait before pickup (sec)', Value: h.waitMed},
+    {Measure:'Outgoing calls', Value: out.length}, {Measure:'Outgoing picked up', Value: out.filter(c=>c.a).length},
+    {Measure:'Outgoing picked up %', Value: r1(pct(out.filter(c=>c.a).length, out.length))},
+    {Measure:'Data as of', Value: DATA.generated_at},
+  ];
+
+  const ms = [...new Set([...inc, ...out].map(c=>c.d.slice(0,7)))].sort();
+  const monthly = ms.map(m=>{ const i = inc.filter(c=>c.d.startsWith(m)), o = out.filter(c=>c.d.startsWith(m));
+    return {Month: monthLong(m), 'Incoming calls': i.length, 'Incoming answered': i.filter(c=>c.a).length,
+      'Answer rate %': r1(pct(i.filter(c=>c.a).length, i.length)), 'Outgoing calls': o.length, 'Outgoing picked up': o.filter(c=>c.a).length}; });
+
+  const outBy = {};
+  out.filter(c=>c.ag).forEach(c=>{ const s = outBy[c.ag] = outBy[c.ag] || {calls:0, ans:0}; s.calls++; if(c.a) s.ans++; });
+  const agents = agentStats(inc).map(r=>({Rank: r.rank, Agent: r.name, 'Score %': r1(r.score), 'Pickup rate %': r1(r.pickup),
+    'Incoming calls rung': r.rung, 'Incoming answered': r.ans, 'Resolved rate %': r1(r.resolved),
+    'Resolved (calls)': r.resKnown ? `${r.resYes} of ${r.resKnown}` : '', 'Median pickup (sec)': r.ringMed,
+    'Avg talk (sec)': r.talkAvg===null ? null : Math.round(r.talkAvg),
+    'Outgoing calls made': (outBy[r.name]||{}).calls || 0, 'Outgoing picked up': (outBy[r.name]||{}).ans || 0}));
+  Object.keys(outBy).filter(n=>!agents.some(a=>a.Agent===n)).forEach(n=>agents.push({Agent:n, 'Outgoing calls made': outBy[n].calls, 'Outgoing picked up': outBy[n].ans}));
+
+  const dk = {};
+  const touch = i => dk[i] = dk[i] || {inc:0, incAns:0, out:0, outAns:0};
+  inc.filter(c=>c.dk!==null && c.dk!==undefined).forEach(c=>{ const s = touch(c.dk); s.inc++; if(c.a) s.incAns++; });
+  out.filter(c=>c.dk!==null && c.dk!==undefined).forEach(c=>{ const s = touch(c.dk); s.out++; if(c.a) s.outAns++; });
+  const daks = Object.entries(dk).map(([i,s])=>{ const d = DATA.daks[i];
+    return {DAK: toTitle(d.name), District: toTitle(d.district), Block: toTitle(d.block), 'Incoming calls': s.inc, 'Incoming answered': s.incAns,
+      'Outgoing calls': s.out, 'Outgoing reached': s.outAns}; }).sort((a,b)=>(b['Incoming calls']+b['Outgoing calls'])-(a['Incoming calls']+a['Outgoing calls']));
+  const dist = {};
+  daks.forEach(r=>{ const s = dist[r.District] = dist[r.District] || {District:r.District, 'DAKs in touch':0, 'Incoming calls':0, 'Incoming answered':0, 'Outgoing calls':0, 'Outgoing reached':0};
+    s['DAKs in touch']++; ['Incoming calls','Incoming answered','Outgoing calls','Outgoing reached'].forEach(k=>{ s[k] += r[k]; }); });
+
+  const topical = inc.filter(isTopical);
+  const topics = TOPIC_GROUPS.map(([name])=>({Topic: name, Calls: topical.filter(c=>groupOf(c)[0]===name).length}));
+  const women = topical.filter(isWomen), wc = {};
+  women.forEach(c=>[c.lc.th, c.lc.th2].filter(t=>WOMEN_THEMES.includes(t)).forEach(t=>{ wc[t] = (wc[t]||0) + 1; }));
+  const csc = topical.filter(c=>c.lc.th===CSC_THEME), cc = {};
+  csc.forEach(c=>{ const k = c.lc.sub || 'Not specified'; cc[k] = (cc[k]||0) + 1; });
+  const topicRows = [...topics, {}, ...Object.entries(wc).sort((a,b)=>b[1]-a[1]).map(([k,v])=>({Topic:`Violence & entitlement: ${k}`, Calls:v})),
+    {}, ...Object.entries(cc).sort((a,b)=>b[1]-a[1]).map(([k,v])=>({Topic:`CSC problem: ${k}`, Calls:v}))];
+
+  const miss = inc.filter(c=>!c.a);
+  const missedRows = Object.entries(MISS_REASONS).map(([k,v])=>({'What happened': v.label, Calls: miss.filter(c=>c.why===k).length}));
+  const known = inc.filter(c=>!c.a && 'cb' in c);
+  const band = c => c.cb!==null && c.cb<=1 ? 'Called back within 1 hour' : c.cb!==null && c.cb<=24 ? 'Called back within 24 hours'
+    : c.cb!==null && c.cb<=72 ? 'Called back within 3 days' : c.rg ? 'Not called back - got through by calling again'
+    : c.cb!==null ? 'Called back after more than 3 days' : 'Not called back, did not get through';
+  const cbc = {}; known.forEach(c=>{ const k = band(c); cbc[k] = (cbc[k]||0) + 1; });
+  const callbackRows = Object.entries(cbc).map(([k,v])=>({'After a missed call (known number)': k, Calls: v}));
+
+  excelDownload([
+    ['Summary', summary], ['By month', monthly], ['Agents', agents], ['DAKs', daks],
+    ['Districts', Object.values(dist).sort((a,b)=>b['Outgoing calls']-a['Outgoing calls'])],
+    ['Topics', topicRows], ['Missed calls', missedRows], ['Callbacks', callbackRows],
+  ], `Didi_ki_Awaaz_Helpline_${PERIOD}.xlsx`);
+}
 function toTitle(s){ return String(s||'').toLowerCase().replace(/\b\w/g, ch=>ch.toUpperCase()); }
 
 // ---------------------------------------------------------------- When Calls Come In
@@ -1241,6 +1317,7 @@ async function boot(){
   document.getElementById('modal-backdrop').addEventListener('click', e=>{ if(e.target.id==='modal-backdrop') closeModal(); });
   document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
   document.getElementById('btn-print').addEventListener('click', ()=>window.print());
+  document.getElementById('btn-export-excel').addEventListener('click', exportExcel);
   // Standalone review copy (export_didi_ki_awaaz_standalone.py) embeds the payload here - no fetch, works by double-click.
   if(window.EMBEDDED_DATA){
     DATA = window.EMBEDDED_DATA;
