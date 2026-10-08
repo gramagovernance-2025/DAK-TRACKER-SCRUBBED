@@ -999,8 +999,7 @@ function renderAbout(){
         <p class="note-inline">${fmtNum(calls.length)} calls with a real question in ${periodName}. Not counted: ${fmtNum(noQuery)} short calls with no question (returning a missed call, wrong numbers), and calls that were silent, cut or too noisy.</p>
       </div></section>
     <section><div class="section-head"><h2 class="serif">Violence &amp; Entitlement Cases</h2><span class="hint">${fmtNum(women.length)} calls &middot; ${periodName}</span></div>
-      <div class="panel"><div id="chart-women"></div>
-        <p class="note-inline">Almost all are raised by a DAK coordinator or Sakshma Didi on the woman's behalf &mdash; often while following up a pending case &mdash; rather than by the woman herself (${fmtNum(women.filter(c=>/^woman/i.test(c.lc.who||'')).length)} call${women.filter(c=>/^woman/i.test(c.lc.who||'')).length===1?'':'s'}).</p></div></section>
+      <div class="panel"><div id="chart-women"></div></div></section>
     <section><div class="section-head"><h2 class="serif">CSC Set-up Problems</h2><span class="hint">${fmtNum(csc.length)} calls &middot; ${periodName}</span></div>
       <div class="panel"><div id="chart-csc"></div>
         <p class="note-inline">The same few questions keep coming back &mdash; the wallet cheque, which bank account to use, the centre name, how long approval takes. A one-page FAQ checked by the CSC team could answer most of them.</p></div></section>
