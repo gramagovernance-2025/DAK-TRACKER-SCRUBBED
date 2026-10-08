@@ -1078,6 +1078,7 @@ function renderOutgoing(){
   const coordCalls = out.filter(c=>c.ct==='C' && c.dk!==null && c.dk!==undefined);
   const dakCalled = new Set(coordCalls.map(c=>c.dk)), dakSpoke = new Set(coordCalls.filter(c=>c.a).map(c=>c.dk));
   const missed = inc.filter(c=>!c.a && 'cb' in c);
+  const placed = out.filter(c=>c.dk!==null && c.dk!==undefined);
   const cbBand = c => c.cb!==null && c.cb<=1 ? 'within 1 hour' : c.cb!==null && c.cb<=24 ? 'within 24 hours' : c.cb!==null && c.cb<=72 ? 'within 3 days'
     : c.rg ? 'not called back - got through by calling again' : c.cb!==null ? 'after more than 3 days' : 'not called back, did not get through';
   const BANDS = [['within 1 hour','#2F9C74'], ['within 24 hours','#7FBF9F'], ['within 3 days','#CE9C3C'], ['after more than 3 days','#D98A77'],
@@ -1098,6 +1099,9 @@ function renderOutgoing(){
         </div>
         <p class="note-inline">Who was called is known only from the phone number. What was said on these calls is not analysed yet, so their purpose is not shown here.</p>
       </div></section>
+    <section><div class="section-head"><h2 class="serif">Where Outgoing Calls Go</h2><span class="hint">${periodLabel()} &middot; ${fmtNum(placed.length)} of ${fmtNum(out.length)} calls went to a number linked to a DAK</span></div>
+      <div class="panel"><div id="map-out"></div>
+        <p class="note-inline">District of the DAK the called number belongs to (coordinator, Sakshma Didi or a number listed on a DAK case). Calls to numbers not in DAK records can't be placed.</p></div></section>
     <section><div class="section-head"><h2 class="serif">DAKs the Helpline Calls</h2><span class="hint">${periodLabel()} &middot; calls to coordinator numbers &middot; ${fmtNum(dakCalled.size)} of ${fmtNum(withNo.length)} DAKs called, ${fmtNum(dakSpoke.size)} reached</span></div>
       <div class="panel">
         <div class="md-grid">
@@ -1125,6 +1129,23 @@ function renderOutgoing(){
   ], {...plotlyBarLayout('Calls'), barmode:'group', height:290, bargap:0.35, bargroupgap:0.08, margin:{t:36,b:40,l:55,r:20},
       legend:{orientation:'h', x:0, y:1.16, traceorder:'normal'}, yaxis:{title:{text:'Calls'}, gridcolor:GRID, zeroline:false, automargin:true},
       xaxis:{type:'category', automargin:true}});
+
+  // map: outgoing calls by district of the DAK the number belongs to (blue = outgoing)
+  const outDist = {};
+  placed.forEach(c=>{ const k = normDist(DATA.daks[c.dk].district); const x = outDist[k] = outDist[k] || {calls:0, ans:0}; x.calls++; if(c.a) x.ans++; });
+  loadGeo().then(geo=>{
+    const host = document.getElementById('map-out');
+    if(!host) return;
+    if(!geo){ host.innerHTML = '<p class="disclaimer">Map not available here - the district chart below has the same numbers.</p>'; return; }
+    const names = geo.features.map(f=>f.properties.district_name);
+    plot('map-out', [{type:'choropleth', geojson:geo, featureidkey:'properties.district_name', locations:names,
+      z: names.map(n=>(outDist[normDist(n)]||{calls:0}).calls),
+      text: names.map(n=>{ const x = outDist[normDist(n)]; return `<b>${toTitle(n)}</b><br>${x ? x.calls : 0} outgoing calls` + (x ? ` · ${x.ans} reached` : ''); }),
+      hovertemplate:'%{text}<extra></extra>', colorscale:[[0,'#F2F4F1'],[0.0001,'#DCE7F3'],[1,'#1F4E86']], zmin:0,
+      marker:{line:{color:'#FFFFFF', width:0.8}}, colorbar:{title:{text:'Calls'}, thickness:10, len:0.55, outlinewidth:0}}],
+      {height:440, margin:{t:0,b:0,l:0,r:0}, paper_bgcolor:'rgba(0,0,0,0)', font:FONT,
+       geo:{fitbounds:'locations', visible:false, bgcolor:'rgba(0,0,0,0)'}});
+  });
 
   // 2. who is called - donut
   plot('chart-out-who', [donutTrace(types.map(t=>t.label), types.map(t=>t.calls), types.map(t=>OUT_TYPE_COLOR[t.k]),
