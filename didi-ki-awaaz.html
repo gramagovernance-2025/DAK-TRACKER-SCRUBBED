@@ -482,7 +482,9 @@ function agentStats(calls){
       const s = get(c.ag); s.ans++; s.talk.push(c.talk); s.days.add(c.d);
       // resolved on the call - only calls whose outcome could be told from listening / the transcript
       // (callbacks and wrong numbers have nothing to resolve, so they are left out)
-      const res = c.lc && /^yes/i.test(c.lc.rc||'') && !/^(Callback only|Wrong number)/.test(c.lc.th||'') ? c.lc.res : null;
+      // follow-ups/updates and helpline check-ins have nothing to resolve either - left out (reviewer's definition)
+      const res = c.lc && /^yes/i.test(c.lc.rc||'') && !/^(Callback only|Wrong number)/.test(c.lc.th||'')
+        && c.lc.want !== 'Follow-up on an earlier case' && c.lc.resp !== 'Just asked questions, nothing to resolve' ? c.lc.res : null;
       if(['Yes','Partly','No'].includes(res)){ s.resKnown++; if(res==='Yes') s.resYes++; if(res==='Partly') s.resPart++; }
       if(c.ring!==null) s.rings.push(c.ring);
       if(!seen.has(c.ag)) s.rung++;     // answered without appearing in the ring list
@@ -1005,7 +1007,7 @@ function renderAbout(){
         <p class="note-inline">The same few questions keep coming back &mdash; the wallet cheque, which bank account to use, the centre name, how long approval takes. A one-page FAQ checked by the CSC team could answer most of them.</p></div></section>
     <section><div class="section-head"><h2 class="serif">Did Callers Get Help?</h2><span class="hint">${periodName}</span></div>
       <div class="panel two-col">
-        <div><div class="chart-head" style="margin-top:0">Resolved on the call, by what the caller wanted</div><div id="chart-resolved"></div></div>
+        <div><div class="chart-head" style="margin-top:0">Resolved on the call, by what the caller wanted <span class="soft">&middot; follow-ups and updates left out</span></div><div id="chart-resolved"></div></div>
         <div><div class="chart-head" style="margin-top:0">How the didi responded</div><div id="chart-resp"></div></div>
       </div></section>`;
 
@@ -1024,10 +1026,12 @@ function renderAbout(){
   // resolved, by what the caller wanted: 100% stacked bars (status colours: yes / partly / no / unclear)
   const RES = [['Yes','Resolved',C_ANS], ['Partly','Partly',C_GOLD], ['No','Not resolved',C_MISS], ['?',"Couldn't tell",'#D9DDD8']];
   const resOf = c => ['Yes','Partly','No'].includes(c.lc.res) ? c.lc.res : '?';
-  const wants = count(calls, c=>c.lc.want && !/can't tell/i.test(c.lc.want) ? c.lc.want : null).map(e=>e[0]).slice(0,5).reverse();
+  // only requests the didi could act on: follow-ups/updates and check-ins are left out (nothing to resolve)
+  const wants = count(calls.filter(c=>c.lc.resp !== 'Just asked questions, nothing to resolve'),
+    c=>c.lc.want && !/can't tell/i.test(c.lc.want) && c.lc.want !== 'Follow-up on an earlier case' ? c.lc.want : null).map(e=>e[0]).slice(0,5).reverse();
   plot('chart-resolved', RES.map(([k,label,color])=>{
-    const n = wants.map(w=>calls.filter(c=>c.lc.want===w && resOf(c)===k).length);
-    const tot = wants.map(w=>calls.filter(c=>c.lc.want===w).length);
+    const n = wants.map(w=>calls.filter(c=>c.lc.resp!=='Just asked questions, nothing to resolve' && c.lc.want===w && resOf(c)===k).length);
+    const tot = wants.map(w=>calls.filter(c=>c.lc.resp!=='Just asked questions, nothing to resolve' && c.lc.want===w).length);
     return {y: wants.map(w=>fitLabel(shortLabel(w))), x: n.map((v,i)=>pct(v, tot[i])), name:label, type:'bar', orientation:'h',
       marker:{color, line:{color:'#FFFFFF', width:1.5}},
       hovertext: n.map((v,i)=>`<b>${shortLabel(wants[i])}</b><br>${label}: ${v} of ${tot[i]} calls`), hovertemplate:'%{hovertext}<extra></extra>'};
