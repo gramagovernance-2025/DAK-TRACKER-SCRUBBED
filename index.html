@@ -163,6 +163,7 @@ th.sortable:hover{ color:var(--ink); }
 .nav-divider::before, .nav-divider::after{ content:""; flex:1; height:1px; background:var(--line-strong); }
 .nav-full-btn{ display:block; width:100%; text-align:center; appearance:none; cursor:pointer; font-family:inherit; font-size:15px; font-weight:700; color:#fff; background:var(--primary); border:none; border-radius:8px; padding:14px 22px; }
 .nav-full-btn:hover{ opacity:.92; }
+.nav-btn-helpline{ background:#2A5C8C; text-decoration:none; box-sizing:border-box; }
 /* heatmap */
 .heatmap-cell{ font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:6px; display:inline-block; min-width:22px; text-align:center; }
 .heatmap-cell.zero{ color:var(--ink-soft); background:var(--grey-soft); font-weight:400; }
@@ -216,6 +217,13 @@ th.sortable:hover{ color:var(--ink); }
         <div class="nav-select-stack"><select id="sel-district-only"><option value="">Select District to view its Tracker&hellip;</option></select></div>
         <div class="nav-divider">OR</div>
         <button class="nav-full-btn" id="btn-view-state">View Bihar Statewide Dashboard</button>
+      </div>
+    </section>
+    <section>
+      <div class="panel">
+        <div class="nav-label">OR LOOK AT THE DIDI KI AWAAZ HELPLINE (CALL CENTRE)</div>
+        <a class="nav-full-btn nav-btn-helpline" href="didi-ki-awaaz.html">View Didi ki Awaaz Helpline Dashboard</a>
+        <div class="crumbs" style="text-align:center;margin-top:10px;">Calls to and from the helpline: who calls, what about, missed calls and callbacks</div>
       </div>
     </section>
     <div class="foot-note" id="finder-foot-note"></div>
