@@ -639,6 +639,9 @@ function renderAgents(){
   const calls = callsInPeriod(), rows = agentStats(calls, outCalls()), h = headline(calls);
   const el = document.getElementById('panel-agents');
   const whoSegs = rows.filter(r=>r.ans>0).sort((a,b)=>b.ans-a.ans).map(r=>({label:r.name, value:r.ans, color:agentColor(r.name)}));
+  // same agents, same colours: who makes the outgoing calls
+  const outSegs = rows.filter(r=>r.outCalls>0).sort((a,b)=>b.outCalls-a.outCalls).map(r=>({label:r.name, value:r.outCalls, color:agentColor(r.name)}));
+  const outTotal = outSegs.reduce((a,x)=>a+x.value,0);
   el.innerHTML = `
     <section><div class="section-head"><h2 class="serif tip" data-tip="${TIPS['Performance Score']}">Agent Ranking</h2><span class="hint">${periodLabel()} &middot; click a row for her full breakdown</span></div>
       <div class="panel">
@@ -646,8 +649,11 @@ function renderAgents(){
         <div id="table-agents"></div>
       </div>
     </section>
-    <section><div class="section-head"><h2 class="serif">Who Answers the Calls</h2><span class="hint">workload only, not scored &middot; share of the ${fmtNum(h.ans)} answered calls</span></div>
-      <div class="panel">${donutHtml('svg-who-answers', whoSegs)}</div></section>
+    <section><div class="section-head"><h2 class="serif">Workload</h2><span class="hint">${periodLabel()} &middot; share of calls handled by each agent</span></div>
+      <div class="panel two-col">
+        <div><div class="chart-head" style="margin-top:0">Incoming calls answered <span class="soft">&middot; ${fmtNum(h.ans)} calls</span></div>${donutHtml('svg-who-answers', whoSegs)}</div>
+        <div><div class="chart-head" style="margin-top:0">Outgoing calls made <span class="soft">&middot; ${fmtNum(outTotal)} calls</span></div>${donutHtml('svg-who-calls', outSegs)}</div>
+      </div></section>
     <section><div class="section-head"><h2 class="serif">Pickup Rate by Month</h2><span class="hint">cumulative, not affected by the period picker &middot; hover a point for calls &middot; click a card for her full breakdown</span></div>
       <div class="panel">
         <div class="legend-row-wrap" style="margin:0 0 12px;">
@@ -675,6 +681,7 @@ function renderAgents(){
     {enabled:()=>true, handler:r=>openAgentModal(r)});
 
   drawDonutSegs('svg-who-answers', whoSegs);
+  drawDonutSegs('svg-who-calls', outSegs);
 
   // Pickup rate over time as small multiples - one card per didi, her line + the
   // dashed team line, same 0-100% axis on every card so they compare directly.
