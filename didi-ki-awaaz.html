@@ -112,6 +112,10 @@ th.sortable:hover{ color:var(--ink); }
 .chart-head a{ color:var(--primary); }
 #chart-districts .bars path{ cursor:pointer; }
 .dak-bar-head{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:6px; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); }
+.cell2{ display:flex; flex-direction:column; align-items:flex-end; line-height:1.25; white-space:nowrap; }
+.cell2 .sub{ font-size:11.5px; color:var(--ink-soft); font-weight:400; }
+.cell2 .status-tag{ margin-top:3px; }
+.nowrap{ white-space:nowrap; }
 .source-line{ font-size:12.5px; color:var(--ink-soft); margin:-8px 2px 24px; }
 .callout-attn{ text-align:center; font-size:13.5px; font-weight:700; margin:0 0 8px; padding:11px 16px; background:var(--primary-soft); color:#1f6b4d; border-radius:8px; }
 .callout-attn.low{ background:var(--low-soft); color:#8a3226; }
@@ -232,7 +236,7 @@ const TIPS = {
   'Avg Talk Time': 'Average conversation length on answered calls.',
   'Repeat Callers': 'Callers who called more than once in this period.',
   'First-Ring Pickup': 'Of calls where at least one agent was rung, the share picked up by the very first agent tried.',
-  'Performance Score': 'Score = the average of her pickup rate and her resolved rate (50/50), both on her own calls - so getting fewer calls does not count against her. Agents with no coded calls yet are scored on pickup alone.',
+  'Performance Score': 'Score = average of three equal parts: pickup rate, resolved rate, and outgoing calls (compared with the agent who made the most = 100%). Pickup and resolved are measured on her own calls, so getting fewer calls does not count against her.',
   'Pickup Rate': 'Of the calls that rang this agent’s phone, the share she answered.',
   'Pickup Speed': 'Median seconds her phone rang before she answered (lower is faster).',
   'Share of Answered': 'Her share of all calls the team answered.',
@@ -471,7 +475,7 @@ function headline(calls){
 }
 
 
-function agentStats(calls){
+function agentStats(calls, outs){
   const teamAns = calls.filter(c=>c.a).length;
   const by = {};
   const get = n => by[n] = by[n] || {name:n, rung:0, ans:0, rings:[], talk:[], days:new Set(), months:{}, resKnown:0, resYes:0, resPart:0};
@@ -498,14 +502,24 @@ function agentStats(calls){
     resKnown: s.resKnown, resYes: s.resYes, resPart: s.resPart, resolved: s.resKnown ? pct(s.resYes, s.resKnown) : null,
     fewCalls: s.rung < DATA.rank_floor,   // still scored and ranked - flagged so readers know the rate is thin
   }));
-  // Score = simple average of two rates, both measured on HER OWN calls (so low demand is not penalised):
-  //   pickup rate   = calls she answered / calls that rang her
-  //   resolved rate = calls fully resolved / her answered calls whose outcome is known (coded calls)
-  // 50/50, no other weights (the reviewer's choice, 2026-10-07). An agent with no coded calls is scored
-  // on pickup alone and tagged. Speed and talk time are context only.
-  // (Tried and dropped: a weighted index with a volume term, which penalised low demand; a within-20s pickup rate.)
+  // outgoing calls she made in the same period (only when the caller passes them - the ranking does)
+  if(outs){
+    const ob = {};
+    outs.filter(c=>c.ag).forEach(c=>{ const o = ob[c.ag] = ob[c.ag] || {calls:0, ans:0, talk:0}; o.calls++; if(c.a){ o.ans++; o.talk += c.talk; } });
+    rows.forEach(r=>{ const o = ob[r.name] || {calls:0, ans:0, talk:0};
+      r.outCalls = o.calls; r.outAns = o.ans; r.outTalkAvg = o.ans ? o.talk / o.ans : null; });
+    const top = Math.max(0, ...rows.map(r=>r.outCalls));
+    rows.forEach(r=>{ r.outScore = top ? pct(r.outCalls, top) : null; });
+  }
+  // Score = simple average of three parts, equal weights (the reviewer's choices, 2026-10-07 / 10-09):
+  //   pickup rate    = calls she answered / calls that rang her (her own calls, so low demand isn't penalised)
+  //   resolved rate  = calls fully resolved / her answered requests whose outcome is known (coded calls)
+  //   outgoing calls = calls she made / calls made by the agent who made the most in the period (top = 100%)
+  // A part that can't be measured (no coded calls; outgoing data not passed) is left out of her average and tagged.
+  // Speed and talk time are context only.
   rows.forEach(r=>{ r.pickupOnly = r.resolved===null || r.resolved===undefined;
-    r.score = r.pickup===null ? null : (r.pickupOnly ? r.pickup : (r.pickup + r.resolved)/2);
+    const parts = [r.pickup, r.resolved, r.outScore].filter(v=>v!==null && v!==undefined);
+    r.score = r.pickup===null ? null : mean(parts);
     r.fewCoded = !r.pickupOnly && r.resKnown < DATA.rank_floor; });
   // ties broken by more calls rung (a rate on more calls is the more reliable one)
   rows.sort((a,b)=> (b.score??-1)-(a.score??-1) || b.rung-a.rung).forEach((r,i)=>{ r.rank = i+1; });
@@ -617,27 +631,18 @@ function renderOverview(){
 // ---------------------------------------------------------------- Agent Performance
 function scoreCell(v, r){
   if(v===null||v===undefined) return '—';
-  const tip = !r ? '' : r.pickupOnly ? `Pickup ${fmtPct(r.pickup,0)} (no coded calls yet, so pickup only)`
-    : `Average of pickup ${fmtPct(r.pickup,0)} (${r.ans}/${r.rung}) and resolved ${fmtPct(r.resolved,0)} (${r.resYes}/${r.resKnown})`;
+  const tip = !r ? '' : `Average of pickup ${fmtPct(r.pickup,0)}` + (r.pickupOnly ? '' : `, resolved ${fmtPct(r.resolved,0)}`)
+    + (r.outScore===null || r.outScore===undefined ? '' : `, outgoing ${fmtPct(r.outScore,0)} of the top`) + (r.pickupOnly ? ' (no coded calls yet)' : '');
   return `<div class="score-cell"${tip ? ` data-tip="${tip}"` : ''}><div class="score-bar"><div class="fill" style="width:${v}%;background:${grade(v)}"></div></div><span class="score-num" style="color:${grade(v)}">${fmtF(v,0)}%</span></div>`;
 }
-// Outgoing calls per agent for the selected period (context only - not part of the score)
-function agentOutgoing(){
-  const by = {};
-  outCalls().filter(c=>c.ag).forEach(c=>{ const s = by[c.ag] = by[c.ag] || {calls:0, ans:0, talk:0, types:{}};
-    s.calls++; if(c.a) s.ans++; s.talk += c.talk; s.types[c.ct] = (s.types[c.ct]||0) + 1; });
-  return by;
-}
 function renderAgents(){
-  const calls = callsInPeriod(), rows = agentStats(calls), h = headline(calls);
-  const outBy = agentOutgoing();
-  rows.forEach(r=>{ const o = outBy[r.name]; r.outCalls = o ? o.calls : 0; r.outTalk = o ? o.talk/3600 : 0; r.out = o; });
+  const calls = callsInPeriod(), rows = agentStats(calls, outCalls()), h = headline(calls);
   const el = document.getElementById('panel-agents');
   const whoSegs = rows.filter(r=>r.ans>0).sort((a,b)=>b.ans-a.ans).map(r=>({label:r.name, value:r.ans, color:agentColor(r.name)}));
   el.innerHTML = `
     <section><div class="section-head"><h2 class="serif tip" data-tip="${TIPS['Performance Score']}">Agent Ranking</h2><span class="hint">${periodLabel()} &middot; click a row for her full breakdown</span></div>
       <div class="panel">
-        <p class="crumbs" style="margin:0 0 14px;">Score = the average of two rates, each on her own calls: <b>pickup rate</b> (calls she answered, of those that rang her) and <b>resolved rate</b> (calls fully resolved, of her answered calls where the outcome is known). <span class="status-tag na">few calls</span> = a rate on fewer than ${DATA.rank_floor} calls; <span class="status-tag na">pickup only</span> = no coded calls yet.</p>
+        <p class="crumbs" style="margin:0 0 14px;">Score = the average of three equal parts: <b>pickup rate</b> (calls she answered, of those that rang her), <b>resolved rate</b> (requests fully resolved, of those where the outcome is known) and <b>outgoing calls</b> (calls she made, compared with the agent who made the most = 100%). <span class="status-tag na">few calls</span> = a rate on fewer than ${DATA.rank_floor} calls.</p>
         <div id="table-agents"></div>
       </div>
     </section>
@@ -652,24 +657,21 @@ function renderAgents(){
         <div class="sm-grid" id="agent-months-grid"></div>
       </div></section>`;
 
+  const few = `<span class="status-tag na" data-tip="Based on fewer than ${DATA.rank_floor} calls - read with care.">few calls</span>`;
   makeSortableTable('table-agents', [
     {label:'Rank', key:'rank', num:true}, {label:'Agent', key:'name'},
     {label:'Score', key:'score', num:true, tip:TIPS['Performance Score']},
-    {label:'Pickup Rate', key:'pickup', num:true, tip:TIPS['Pickup Rate']},
-    {label:'Rung', key:'rung', num:true, tip:'Calls on which her phone rang.'},
-    {label:'Answered', key:'ans', num:true},
-    {label:'Median Speed', key:'ringMed', num:true, tip:TIPS['Pickup Speed']+' Shown for context, not scored.'},
-    {label:'Avg Talk', key:'talkAvg', num:true, tip:'Average conversation length on the calls she answered. Shown for context, not scored — a longer call is not automatically a better one.'},
-    {label:'Outgoing Calls', key:'outCalls', num:true, tip:'Calls she made from the portal (Click to Call) in this period, and the share the person picked up. Not part of the score.'},
-    {label:'Outgoing Talk', key:'outTalk', num:true, tip:'Total talk time on her outgoing calls that were picked up.'},
-    {label:'Resolved Rate', key:'resolved', num:true, tip:'Of her answered calls where the outcome could be told (from listening or the transcript), the share fully resolved during the call. Half of the score. Note: it depends partly on what callers ask - a wallet-recharge problem often needs the CLF or bank, not the didi.'},
-  ], rows, r=>[r.rank ?? '—', esc(r.name) + (r.pickupOnly ? ' <span class="status-tag na">pickup only</span>' : ''), scoreCell(r.score, r),
-    `<span style="color:${grade(r.pickup)};font-weight:600">${fmtPct(r.pickup,0)}</span>`,
-    fmtNum(r.rung) + (r.fewCalls ? ` <span class="status-tag na" data-tip="Rate based on fewer than ${DATA.rank_floor} calls - treat with caution.">few calls</span>` : ''),
-    fmtNum(r.ans), fmtSecs(r.ringMed), fmtSecs(r.talkAvg),
-    r.outCalls ? `${fmtNum(r.outCalls)} <span class="soft">&middot; ${fmtPct(pct(r.out.ans, r.outCalls),0)} picked up</span>` : '<span class="soft">—</span>',
-    r.outCalls ? `${fmtF(r.outTalk,1)} h` : '<span class="soft">—</span>',
-    r.resKnown ? `<span data-tip="Fully resolved ${r.resYes}, partly ${r.resPart}, of ${r.resKnown} calls where the outcome was clear"><span style="color:${grade(r.resolved)};font-weight:600">${fmtPct(r.resolved,0)}</span> <span class="soft">(${r.resYes}/${r.resKnown})</span>${r.fewCoded ? ' <span class="status-tag na">few calls</span>' : ''}</span>` : '<span class="soft">—</span>'],
+    {label:'Pickup Rate', key:'pickup', num:true, tip:'Of the calls that rang her phone, the share she answered. One third of the score.'},
+    {label:'Resolved Rate', key:'resolved', num:true, tip:'Of her answered requests where the outcome could be told, the share fully resolved on the call (follow-ups, updates and callbacks left out). One third of the score. It depends partly on what callers ask - a wallet-recharge problem often needs the CLF or bank.'},
+    {label:'Outgoing Calls', key:'outCalls', num:true, tip:'Calls she made from the portal in this period, and the share picked up. Scored against the agent who made the most (= 100%). One third of the score.'},
+    {label:'Avg Talk (in · out)', key:'talkAvg', num:true, tip:'Average length of an answered incoming call · of a picked-up outgoing call. Context only, not scored.'},
+    {label:'Pickup Speed', key:'ringMed', num:true, tip:TIPS['Pickup Speed']+' Context only, not scored.'},
+  ], rows, r=>[r.rank ?? '—', `<span class="nowrap">${esc(r.name)}</span>`, scoreCell(r.score, r),
+    `<div class="cell2"><span style="color:${grade(r.pickup)};font-weight:700">${fmtPct(r.pickup,0)}</span><span class="sub">${fmtNum(r.ans)} of ${fmtNum(r.rung)}</span>${r.fewCalls ? few : ''}</div>`,
+    r.resKnown ? `<div class="cell2" data-tip="Fully resolved ${r.resYes}, partly ${r.resPart}, of ${r.resKnown} requests where the outcome was clear"><span style="color:${grade(r.resolved)};font-weight:700">${fmtPct(r.resolved,0)}</span><span class="sub">${r.resYes} of ${r.resKnown}</span>${r.fewCoded ? few : ''}</div>` : '<div class="cell2"><span class="soft" data-tip="No coded calls yet - scored on the other two parts">—</span></div>',
+    `<div class="cell2" data-tip="${fmtPct(r.outScore,0)} of the most calls made by one agent"><span style="font-weight:700">${fmtNum(r.outCalls)}</span><span class="sub">${r.outCalls ? fmtPct(pct(r.outAns, r.outCalls),0) + ' picked up' : '&nbsp;'}</span></div>`,
+    `<div class="cell2"><span>${fmtSecs(r.talkAvg)} &middot; ${r.outTalkAvg===null||r.outTalkAvg===undefined ? '—' : fmtSecs(r.outTalkAvg)}</span><span class="sub">incoming &middot; outgoing</span></div>`,
+    fmtSecs(r.ringMed)],
     {enabled:()=>true, handler:r=>openAgentModal(r)});
 
   drawDonutSegs('svg-who-answers', whoSegs);
@@ -718,7 +720,7 @@ function teamStats(calls){
   return { pickup: pct(ansTotal, rungTotal), ringMed: median(calls.filter(c=>c.a && c.ring!==null).map(c=>c.ring)) };
 }
 function openAgentModal(r){
-  if(r.outCalls === undefined){ const o = agentOutgoing()[r.name]; r = {...r, out:o, outCalls: o ? o.calls : 0, outTalk: o ? o.talk/3600 : 0}; }
+  if(r.outCalls === undefined){ r = agentStats(callsInPeriod(), outCalls()).find(x=>x.name===r.name) || r; }
   let html = `<div class="mini-tiles">
     ${miniTile('Team Rank', r.rank ? `${r.rank}${ord(r.rank)}` : '—', 'Rank by pickup rate among all agents for the selected period.')}
     ${miniTile('Calls Rung', fmtNum(r.rung), 'Calls on which her phone rang.')}
@@ -728,8 +730,8 @@ function openAgentModal(r){
     ${miniTile('Avg Talk Time', fmtSecs(r.talkAvg))}
     ${miniTile('Share of Answered', fmtPct(r.share,0))}
     ${miniTile('Active Days', fmtNum(r.days))}
-    ${miniTile('Outgoing Calls', r.outCalls ? `${fmtNum(r.outCalls)} (${fmtPct(pct(r.out.ans, r.outCalls),0)} picked up)` : '—', 'Calls she made from the portal in this period. Not part of the score.')}
-    ${miniTile('Outgoing Talk', r.outCalls ? `${fmtF(r.outTalk,1)} h` : '—')}
+    ${miniTile('Outgoing Calls', r.outCalls ? `${fmtNum(r.outCalls)} (${fmtPct(pct(r.outAns, r.outCalls),0)} picked up)` : '0', 'Calls she made from the portal in this period. One third of the score, compared with the agent who made the most.')}
+    ${miniTile('Avg Outgoing Talk', r.outTalkAvg ? fmtSecs(r.outTalkAvg) : '—', 'Average length of a picked-up outgoing call.')}
     ${miniTile('Resolved on the Call', r.resKnown ? `${fmtPct(r.resolved,0)} (${r.resYes}/${r.resKnown})` : '—', 'Of her answered calls where the outcome was clear, the share fully resolved during the call (partly resolved: '+(r.resPart||0)+'). Not scored - it depends on what callers ask.')}
   </div>`;
   html += agentInsight(r, teamStats(callsInPeriod()));
@@ -1260,14 +1262,12 @@ function exportExcel(){
     return {Month: monthLong(m), 'Incoming calls': i.length, 'Incoming answered': i.filter(c=>c.a).length,
       'Answer rate %': r1(pct(i.filter(c=>c.a).length, i.length)), 'Outgoing calls': o.length, 'Outgoing picked up': o.filter(c=>c.a).length}; });
 
-  const outBy = {};
-  out.filter(c=>c.ag).forEach(c=>{ const s = outBy[c.ag] = outBy[c.ag] || {calls:0, ans:0}; s.calls++; if(c.a) s.ans++; });
-  const agents = agentStats(inc).map(r=>({Rank: r.rank, Agent: r.name, 'Score %': r1(r.score), 'Pickup rate %': r1(r.pickup),
-    'Incoming calls rung': r.rung, 'Incoming answered': r.ans, 'Resolved rate %': r1(r.resolved),
-    'Resolved (calls)': r.resKnown ? `${r.resYes} of ${r.resKnown}` : '', 'Median pickup (sec)': r.ringMed,
-    'Avg talk (sec)': r.talkAvg===null ? null : Math.round(r.talkAvg),
-    'Outgoing calls made': (outBy[r.name]||{}).calls || 0, 'Outgoing picked up': (outBy[r.name]||{}).ans || 0}));
-  Object.keys(outBy).filter(n=>!agents.some(a=>a.Agent===n)).forEach(n=>agents.push({Agent:n, 'Outgoing calls made': outBy[n].calls, 'Outgoing picked up': outBy[n].ans}));
+  const agents = agentStats(inc, out).map(r=>({Rank: r.rank, Agent: r.name, 'Score %': r1(r.score),
+    'Pickup rate %': r1(r.pickup), 'Incoming calls rung': r.rung, 'Incoming answered': r.ans,
+    'Resolved rate %': r1(r.resolved), 'Resolved (requests)': r.resKnown ? `${r.resYes} of ${r.resKnown}` : '',
+    'Outgoing calls made': r.outCalls, 'Outgoing vs top agent %': r1(r.outScore), 'Outgoing picked up': r.outAns,
+    'Avg incoming talk (sec)': r.talkAvg===null ? null : Math.round(r.talkAvg),
+    'Avg outgoing talk (sec)': r.outTalkAvg===null ? null : Math.round(r.outTalkAvg), 'Median pickup (sec)': r.ringMed}));
 
   const dk = {};
   const touch = i => dk[i] = dk[i] || {inc:0, incAns:0, out:0, outAns:0};
