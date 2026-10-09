@@ -621,8 +621,17 @@ function scoreCell(v, r){
     : `Average of pickup ${fmtPct(r.pickup,0)} (${r.ans}/${r.rung}) and resolved ${fmtPct(r.resolved,0)} (${r.resYes}/${r.resKnown})`;
   return `<div class="score-cell"${tip ? ` data-tip="${tip}"` : ''}><div class="score-bar"><div class="fill" style="width:${v}%;background:${grade(v)}"></div></div><span class="score-num" style="color:${grade(v)}">${fmtF(v,0)}%</span></div>`;
 }
+// Outgoing calls per agent for the selected period (context only - not part of the score)
+function agentOutgoing(){
+  const by = {};
+  outCalls().filter(c=>c.ag).forEach(c=>{ const s = by[c.ag] = by[c.ag] || {calls:0, ans:0, talk:0, types:{}};
+    s.calls++; if(c.a) s.ans++; s.talk += c.talk; s.types[c.ct] = (s.types[c.ct]||0) + 1; });
+  return by;
+}
 function renderAgents(){
   const calls = callsInPeriod(), rows = agentStats(calls), h = headline(calls);
+  const outBy = agentOutgoing();
+  rows.forEach(r=>{ const o = outBy[r.name]; r.outCalls = o ? o.calls : 0; r.outTalk = o ? o.talk/3600 : 0; r.out = o; });
   const el = document.getElementById('panel-agents');
   const whoSegs = rows.filter(r=>r.ans>0).sort((a,b)=>b.ans-a.ans).map(r=>({label:r.name, value:r.ans, color:agentColor(r.name)}));
   el.innerHTML = `
@@ -651,11 +660,15 @@ function renderAgents(){
     {label:'Answered', key:'ans', num:true},
     {label:'Median Speed', key:'ringMed', num:true, tip:TIPS['Pickup Speed']+' Shown for context, not scored.'},
     {label:'Avg Talk', key:'talkAvg', num:true, tip:'Average conversation length on the calls she answered. Shown for context, not scored — a longer call is not automatically a better one.'},
+    {label:'Outgoing Calls', key:'outCalls', num:true, tip:'Calls she made from the portal (Click to Call) in this period, and the share the person picked up. Not part of the score.'},
+    {label:'Outgoing Talk', key:'outTalk', num:true, tip:'Total talk time on her outgoing calls that were picked up.'},
     {label:'Resolved Rate', key:'resolved', num:true, tip:'Of her answered calls where the outcome could be told (from listening or the transcript), the share fully resolved during the call. Half of the score. Note: it depends partly on what callers ask - a wallet-recharge problem often needs the CLF or bank, not the didi.'},
   ], rows, r=>[r.rank ?? '—', esc(r.name) + (r.pickupOnly ? ' <span class="status-tag na">pickup only</span>' : ''), scoreCell(r.score, r),
     `<span style="color:${grade(r.pickup)};font-weight:600">${fmtPct(r.pickup,0)}</span>`,
     fmtNum(r.rung) + (r.fewCalls ? ` <span class="status-tag na" data-tip="Rate based on fewer than ${DATA.rank_floor} calls - treat with caution.">few calls</span>` : ''),
     fmtNum(r.ans), fmtSecs(r.ringMed), fmtSecs(r.talkAvg),
+    r.outCalls ? `${fmtNum(r.outCalls)} <span class="soft">&middot; ${fmtPct(pct(r.out.ans, r.outCalls),0)} picked up</span>` : '<span class="soft">—</span>',
+    r.outCalls ? `${fmtF(r.outTalk,1)} h` : '<span class="soft">—</span>',
     r.resKnown ? `<span data-tip="Fully resolved ${r.resYes}, partly ${r.resPart}, of ${r.resKnown} calls where the outcome was clear"><span style="color:${grade(r.resolved)};font-weight:600">${fmtPct(r.resolved,0)}</span> <span class="soft">(${r.resYes}/${r.resKnown})</span>${r.fewCoded ? ' <span class="status-tag na">few calls</span>' : ''}</span>` : '<span class="soft">—</span>'],
     {enabled:()=>true, handler:r=>openAgentModal(r)});
 
@@ -705,6 +718,7 @@ function teamStats(calls){
   return { pickup: pct(ansTotal, rungTotal), ringMed: median(calls.filter(c=>c.a && c.ring!==null).map(c=>c.ring)) };
 }
 function openAgentModal(r){
+  if(r.outCalls === undefined){ const o = agentOutgoing()[r.name]; r = {...r, out:o, outCalls: o ? o.calls : 0, outTalk: o ? o.talk/3600 : 0}; }
   let html = `<div class="mini-tiles">
     ${miniTile('Team Rank', r.rank ? `${r.rank}${ord(r.rank)}` : '—', 'Rank by pickup rate among all agents for the selected period.')}
     ${miniTile('Calls Rung', fmtNum(r.rung), 'Calls on which her phone rang.')}
@@ -714,6 +728,8 @@ function openAgentModal(r){
     ${miniTile('Avg Talk Time', fmtSecs(r.talkAvg))}
     ${miniTile('Share of Answered', fmtPct(r.share,0))}
     ${miniTile('Active Days', fmtNum(r.days))}
+    ${miniTile('Outgoing Calls', r.outCalls ? `${fmtNum(r.outCalls)} (${fmtPct(pct(r.out.ans, r.outCalls),0)} picked up)` : '—', 'Calls she made from the portal in this period. Not part of the score.')}
+    ${miniTile('Outgoing Talk', r.outCalls ? `${fmtF(r.outTalk,1)} h` : '—')}
     ${miniTile('Resolved on the Call', r.resKnown ? `${fmtPct(r.resolved,0)} (${r.resYes}/${r.resKnown})` : '—', 'Of her answered calls where the outcome was clear, the share fully resolved during the call (partly resolved: '+(r.resPart||0)+'). Not scored - it depends on what callers ask.')}
   </div>`;
   html += agentInsight(r, teamStats(callsInPeriod()));
