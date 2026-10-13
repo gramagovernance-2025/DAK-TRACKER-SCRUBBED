@@ -23,6 +23,8 @@ body{
 .top-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
 .badge{ display:inline-flex; align-items:center; gap:6px; font-size:11px; letter-spacing:.08em; text-transform:uppercase; font-weight:700; color:var(--primary); background:var(--primary-soft); border:1px solid var(--line-strong); border-radius:999px; padding:5px 12px; }
 .badge::before{ content:"\25CF"; font-size:8px; }
+.header-logo{ height:52px; width:auto; }
+.landing-logo{ display:block; height:84px; width:auto; margin:0 auto 10px; }
 .icon-btn{ appearance:none; cursor:pointer; font-family:inherit; font-size:12.5px; font-weight:600; color:var(--ink-soft); background:var(--panel-alt); border:1px solid var(--line-strong); border-radius:999px; padding:7px 14px; display:inline-flex; align-items:center; gap:6px; }
 .icon-btn:hover{ color:var(--ink); border-color:var(--ink-soft); }
 header.masthead{ border-bottom:1px solid var(--line); padding-bottom:14px; margin-bottom:16px; }
@@ -189,12 +191,13 @@ th.sortable:hover{ color:var(--ink); }
 <body>
 <div class="page">
   <div class="top-row">
-    <span class="badge">DAK Tracker &middot; statewide</span>
+    <img src="grama_jeevika_logo.png" alt="GRAMA &middot; Jeevika" class="header-logo" id="header-logo" style="display:none;">
     <button class="icon-btn" id="btn-export-excel" style="display:none;">&#128190; Download Excel</button>
     <button class="icon-btn" id="btn-print" style="display:none;">&#128424;&#65039; Print / Save as PDF</button>
   </div>
 
   <div id="view-finder">
+    <img src="grama_jeevika_logo.png" alt="GRAMA &middot; Jeevika" class="landing-logo">
     <div class="finder-icon">&#128269;</div>
     <header class="masthead finder-title">
       <h1 class="serif">Find a DAK</h1>
@@ -2018,11 +2021,13 @@ function hideAllMainViews(){
 function hideScopedTopButtons(){
   document.getElementById('btn-print').style.display = 'none';
   document.getElementById('btn-export-excel').style.display = 'none';
+  document.getElementById('header-logo').style.display = 'none';
   CURRENT_SCOPE = null;
 }
 function showScopedTopButtons(scope){
   document.getElementById('btn-print').style.display = 'inline-flex';
   document.getElementById('btn-export-excel').style.display = 'inline-flex';
+  document.getElementById('header-logo').style.display = 'block';
   CURRENT_SCOPE = scope;
 }
 function showFinder(){
